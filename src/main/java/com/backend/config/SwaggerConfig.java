@@ -1,28 +1,22 @@
 package com.backend.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.util.List;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.Schema;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
-@OpenAPIDefinition(
-        info = @Info(title = "Kitching API 명세",
-                description = "Kitching API 명세서 입니다.",
-                version = "v1")
-        , servers = {
-        @Server(url = "/", description = "API 서버"),
-}
-)
 @Configuration
 public class SwaggerConfig {
+
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI openAPI() {
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER).name("Authorization");
@@ -31,5 +25,36 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
                 .security(List.of(securityRequirement));
+    }
+
+    @Bean
+    public OpenApiCustomizer snakeCaseCustomiser() {
+        return openApi -> openApi.getComponents().getSchemas().values().forEach(this::applySnakeCase);
+    }
+
+    private void applySnakeCase(Schema<?> schema) {
+        Map<String, Schema> properties = schema.getProperties();
+        if (properties != null) {
+            Map<String, Schema> newProperties = new LinkedHashMap<>();
+            for (Map.Entry<String, Schema> entry : properties.entrySet()) {
+                String camelCase = entry.getKey();
+                String snakeCase = camelToSnake(camelCase);
+                newProperties.put(snakeCase, entry.getValue());
+            }
+            schema.setProperties(newProperties);
+        }
+    }
+
+    private String camelToSnake(String str) {
+        StringBuilder builder = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                builder.append('_');
+                builder.append(Character.toLowerCase(c));
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
     }
 }
