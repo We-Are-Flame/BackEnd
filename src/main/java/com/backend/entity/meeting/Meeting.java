@@ -1,6 +1,6 @@
 package com.backend.entity.meeting;
 
-import com.backend.entity.common.BaseEntity;
+import com.backend.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,8 +28,6 @@ public class Meeting extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Long id;
-
-    @Column(columnDefinition = "TEXT")
     private String name;
 
     @Column(name = "max_participants")
