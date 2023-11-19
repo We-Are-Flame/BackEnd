@@ -3,7 +3,6 @@ package com.backend.controller.meeting;
 import com.backend.dto.meeting.request.MeetingCreateRequest;
 import com.backend.dto.meeting.response.MeetingCreateResponse;
 import com.backend.entity.user.User;
-import com.backend.repository.user.UserRepository;
 import com.backend.service.MeetingService;
 import com.backend.util.mock.UserMocking;
 import lombok.RequiredArgsConstructor;
