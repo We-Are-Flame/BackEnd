@@ -4,7 +4,6 @@ import com.backend.dto.meeting.dto.ImageDTO;
 import com.backend.dto.meeting.dto.LocationDTO;
 import com.backend.dto.meeting.dto.MeetingInfoDTO;
 import com.backend.dto.meeting.dto.TimeDTO;
-import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
@@ -15,12 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class MeetingMapper {
-    public static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO, Category category) {
+    public static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO) {
         return MeetingInfo.builder()
                 .name(meetingInfoDTO.getName())
                 .maxParticipants(meetingInfoDTO.getMaxParticipants())
                 .description(meetingInfoDTO.getDescription())
-                .category(category)
                 .build();
     }
 

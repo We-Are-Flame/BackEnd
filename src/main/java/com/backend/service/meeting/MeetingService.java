@@ -1,5 +1,8 @@
 package com.backend.service.meeting;
 
+import com.backend.dto.meeting.dto.LocationDTO;
+import com.backend.dto.meeting.dto.MeetingInfoDTO;
+import com.backend.dto.meeting.dto.TimeDTO;
 import com.backend.dto.meeting.request.MeetingCreateRequest;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
@@ -17,31 +20,54 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MeetingService {
     private final MeetingRepository meetingRepository;
-    private final MeetingImagesService meetingImagesService;
-    private final MeetingRegistrationService meetingRegistrationService;
+    private final ImagesService imagesService;
+    private final RegistrationService registrationService;
     private final CategoryService categoryService;
+    private final HashtagService hashtagService;
 
     @Transactional
     public Long createMeeting(MeetingCreateRequest request, User user) {
-        Category category = categoryService.findCategory(request.getMeetingInfoDTO().getCategory());
-        Meeting meeting = toMeeting(request, category);
+        // 카테고리 탐색 후 Meeting생성과 함께 맵핑, 저장
+        Category category = findCategory(request.getCategory());
+        Meeting meeting = buildMeeting(request, category);
         meetingRepository.save(meeting);
 
-        meetingImagesService.saveMeetingImages(meeting, request.getImageDTO());
-        meetingRegistrationService.createOwnerStatus(meeting, user);
+        //이미지 저장 및 해시태그 생성, 맵핑
+        processHashtagsAndImages(request, meeting);
+
+        //Meeting의 생성자를 Owner로 등록
+        createOwnerRegistration(meeting, user);
 
         return meeting.getId();
     }
 
-    private Meeting toMeeting(MeetingCreateRequest request, Category category) {
-        MeetingInfo meetingInfo = MeetingMapper.toMeetingInfo(request.getMeetingInfoDTO(), category);
-        MeetingAddress meetingAddress = MeetingMapper.toMeetingAddress(request.getLocationDTO());
-        MeetingTime meetingTime = MeetingMapper.toMeetingTime(request.getTimeDTO());
+    private Category findCategory(String categoryName) {
+        return categoryService.findCategory(categoryName);
+    }
+
+    private Meeting buildMeeting(MeetingCreateRequest request, Category category) {
+        MeetingInfoDTO meetingInfoDTO = request.getMeetingInfoDTO();
+        LocationDTO locationDTO = request.getLocationDTO();
+        TimeDTO timeDTO = request.getTimeDTO();
+
+        MeetingInfo meetingInfo = MeetingMapper.toMeetingInfo(meetingInfoDTO);
+        MeetingAddress meetingAddress = MeetingMapper.toMeetingAddress(locationDTO);
+        MeetingTime meetingTime = MeetingMapper.toMeetingTime(timeDTO);
 
         return Meeting.builder()
                 .meetingInfo(meetingInfo)
                 .meetingAddress(meetingAddress)
                 .meetingTime(meetingTime)
+                .category(category)
                 .build();
+    }
+
+    private void processHashtagsAndImages(MeetingCreateRequest request, Meeting meeting) {
+        hashtagService.processMeetingHashtags(request.getHashtagDTO(), meeting);
+        imagesService.saveMeetingImages(meeting, request.getImageDTO());
+    }
+
+    private void createOwnerRegistration(Meeting meeting, User user) {
+        registrationService.createOwnerStatus(meeting, user);
     }
 }

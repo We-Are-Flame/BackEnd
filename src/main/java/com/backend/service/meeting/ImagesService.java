@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MeetingImagesService {
+public class ImagesService {
     private final MeetingImageRepository meetingImageRepository;
 
     @Transactional

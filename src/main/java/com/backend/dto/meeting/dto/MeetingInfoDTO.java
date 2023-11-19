@@ -9,5 +9,4 @@ public class MeetingInfoDTO {
     private final String name;
     private final Integer maxParticipants;
     private final String description;
-    private final String category;
 }
