@@ -1,22 +1,28 @@
 package com.backend.dto.meeting.request;
 
-import com.backend.dto.meeting.common.ImageDTO;
-import com.backend.dto.meeting.common.LocationDTO;
-import com.backend.dto.meeting.common.TimeDTO;
-import java.util.List;
+import com.backend.dto.meeting.dto.ImageDTO;
+import com.backend.dto.meeting.dto.LocationDTO;
+import com.backend.dto.meeting.dto.MeetingInfoDTO;
+import com.backend.dto.meeting.dto.TimeDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class MeetingCreateRequest {
-    private final String name;
-    private final Integer maxParticipants;
-    private final String description;
-    private final String category;
-    private final List<String> hashtags;
+    @JsonProperty("info")
+    private final MeetingInfoDTO meetingInfoDTO;
 
-    private final LocationDTO location;
-    private final TimeDTO time;
-    private final ImageDTO image;
+//    @JsonProperty("hashtag")
+//    private final HashtagDTO hashtagDTO;
+
+    @JsonProperty("location")
+    private final LocationDTO locationDTO;
+
+    @JsonProperty("time")
+    private final TimeDTO timeDTO;
+
+    @JsonProperty("image")
+    private final ImageDTO imageDTO;
 }

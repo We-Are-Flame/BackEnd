@@ -1,17 +1,28 @@
 package com.backend.util.mapper;
 
-import com.backend.dto.meeting.common.ImageDTO;
-import com.backend.dto.meeting.common.LocationDTO;
-import com.backend.dto.meeting.common.TimeDTO;
+import com.backend.dto.meeting.dto.ImageDTO;
+import com.backend.dto.meeting.dto.LocationDTO;
+import com.backend.dto.meeting.dto.MeetingInfoDTO;
+import com.backend.dto.meeting.dto.TimeDTO;
+import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
+import com.backend.entity.meeting.embeddable.MeetingInfo;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MeetingMapper {
+    public static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO, Category category) {
+        return MeetingInfo.builder()
+                .name(meetingInfoDTO.getName())
+                .maxParticipants(meetingInfoDTO.getMaxParticipants())
+                .description(meetingInfoDTO.getDescription())
+                .category(category)
+                .build();
+    }
 
     public static MeetingTime toMeetingTime(TimeDTO timeDTO) {
         return MeetingTime.builder()
@@ -48,4 +59,3 @@ public class MeetingMapper {
                 .build();
     }
 }
-

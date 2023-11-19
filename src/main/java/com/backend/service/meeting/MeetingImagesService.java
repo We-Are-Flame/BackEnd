@@ -1,6 +1,6 @@
 package com.backend.service.meeting;
 
-import com.backend.dto.meeting.common.ImageDTO;
+import com.backend.dto.meeting.dto.ImageDTO;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.exception.BadRequestException;

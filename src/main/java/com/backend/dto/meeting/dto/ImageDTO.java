@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.common;
+package com.backend.dto.meeting.dto;
 
 import java.util.List;
 import lombok.Builder;

@@ -16,7 +16,7 @@ public class UserMocking {
 
     @Transactional
     public User findOrMockUser() {
-        return userRepository.findById(1L).orElseGet(this::mockUser);
+        return userRepository.findById(3L).orElseGet(this::mockUser);
     }
 
     private User mockUser() {
