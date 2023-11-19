@@ -1,7 +1,12 @@
 package com.backend.entity.meeting;
 
 import com.backend.entity.base.BaseEntity;
+import com.backend.entity.meeting.embeddable.MeetingAddress;
+import com.backend.entity.meeting.embeddable.MeetingInfo;
+import com.backend.entity.meeting.embeddable.MeetingTime;
+import com.backend.entity.user.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,8 +14,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.Transient;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,21 +38,51 @@ public class Meeting extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Long id;
-    private String name;
 
-    @Column(name = "max_participants")
-    private Integer maxParticipants;
+    @Embedded
+    private MeetingInfo meetingInfo;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Embedded
+    private MeetingAddress meetingAddress;
 
-    private String location;
-    private String detailLocation;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private Integer duration;
+    @Embedded
+    private MeetingTime meetingTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "meeting")
+    private Set<MeetingImage> meetingImages;
+
+    @OneToMany(mappedBy = "meeting")
+    private Set<MeetingHashtag> meetingHashtags;
+
+    @OneToMany(mappedBy = "meeting")
+    private List<MeetingRegistration> registrations;
+
+    @Transient
+    private User host;
+
+    public void assignHost(User host) {
+        this.host = host;
+    }
+
+    public Optional<MeetingImage> findThumbnailImage() {
+        return meetingImages.stream()
+                .filter(MeetingImage::getIsThumbnail)
+                .findFirst();
+    }
+
+    public List<String> findTopHashtags(int limit) {
+        return meetingHashtags.stream()
+                .limit(limit)
+                .map(MeetingHashtag::getHashtag)
+                .map(Hashtag::getName)
+                .collect(Collectors.toList());
+    }
+
+    public String getCategoryName() {
+            return category.getName();
+    }
 }

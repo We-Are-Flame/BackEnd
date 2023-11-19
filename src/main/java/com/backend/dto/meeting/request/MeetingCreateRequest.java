@@ -1,23 +1,35 @@
 package com.backend.dto.meeting.request;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.backend.dto.meeting.dto.HashtagDTO;
+import com.backend.dto.meeting.dto.ImageDTO;
+import com.backend.dto.meeting.dto.LocationDTO;
+import com.backend.dto.meeting.dto.MeetingInfoDTO;
+import com.backend.dto.meeting.dto.TimeDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
+//TODO [HJ] 프론트와 논의 후 Validation 추가
 @Getter
 @Builder
 public class MeetingCreateRequest {
-    private final String name;
-    private final Integer maxParticipants;
-    private final String description;
-    private final String location;
-    private final String detailLocation;
-    private final LocalDateTime startTime;
-    private final LocalDateTime endTime;
-    private final Integer duration;
+    @Schema(example = "술", description = "카테고리")
     private final String category;
-    private final List<String> hashtags;
-    private final String thumbnailUrl;
-    private final List<String> imageUrls;
+
+    @JsonProperty("info")
+    private final MeetingInfoDTO meetingInfoDTO;
+
+    @JsonUnwrapped
+    private final HashtagDTO hashtagDTO;
+
+    @JsonProperty("location")
+    private final LocationDTO locationDTO;
+
+    @JsonProperty("time")
+    private final TimeDTO timeDTO;
+
+    @JsonProperty("image")
+    private final ImageDTO imageDTO;
 }
