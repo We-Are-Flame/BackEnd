@@ -19,6 +19,3 @@ public class MeetingCreateResponse extends BaseResponse {
                 .build();
     }
 }
-
-
-
