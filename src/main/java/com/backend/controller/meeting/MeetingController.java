@@ -5,6 +5,7 @@ import com.backend.dto.meeting.response.MeetingCreateResponse;
 import com.backend.entity.user.User;
 import com.backend.repository.user.UserRepository;
 import com.backend.service.MeetingService;
+import com.backend.util.mock.UserMocking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,19 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class MeetingController {
     private final MeetingService meetingService;
-    private final UserRepository userRepository;
+    private final UserMocking userMocking;
 
     @PostMapping("/meetings")
     public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request) {
-        User user = mockingUser();
-
+        ///TODO [HJ] 로그인 구현되는대로 실제 로직으로 변경
+        User user = userMocking.findOrMockUser();
         Long id = meetingService.createMeeting(request);
         MeetingCreateResponse response = MeetingCreateResponse.success(id);
         return ResponseEntity.ok(response);
-    }
-
-    private User mockingUser() {
-        return userRepository.findById(1L).get();
     }
 }
 
