@@ -1,7 +1,11 @@
 package com.backend.entity.meeting;
 
 import com.backend.entity.base.BaseEntity;
+import com.backend.entity.meeting.embeddable.MeetingAddress;
+import com.backend.entity.meeting.embeddable.MeetingTime;
+import com.backend.entity.user.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,17 +33,21 @@ public class Meeting extends BaseEntity {
     private Long id;
     private String name;
 
-    @Column(name = "max_participants")
-    private Integer maxParticipants;
-
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String location;
-    private String detailLocation;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private Integer duration;
+    @Column(name = "max_participants")
+    private Integer maxParticipants;
+
+    @Embedded
+    private MeetingAddress meetingAddress;
+
+    @Embedded
+    private MeetingTime meetingTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
