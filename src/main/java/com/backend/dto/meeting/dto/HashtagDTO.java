@@ -12,8 +12,8 @@ import lombok.Getter;
 @Builder
 public class HashtagDTO {
     @ArraySchema(
-            arraySchema = @Schema(description = "해시태그 목록, 예: ['술', '남녀상관X']", type = "array"),
-            schema = @Schema(type = "string", example = "술")
+            arraySchema = @Schema(description = "해시태그 목록, 예: ['#술', '#남녀상관X']", type = "array"),
+            schema = @Schema(type = "string", example = "#술")
     )
     private final List<String> hashtags;
 

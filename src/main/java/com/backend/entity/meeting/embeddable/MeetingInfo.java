@@ -7,13 +7,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Embeddable
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MeetingInfo {
-    private String name;
+    private String title;
     private String description;
     private Integer maxParticipants;
+
+    @Builder.Default
+    private Integer currentParticipants = 0;
 }

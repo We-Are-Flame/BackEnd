@@ -11,10 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
+//TODO [HJ] 프론트와 논의 후 Validation 추가
 @Getter
 @Builder
 public class MeetingCreateRequest {
-    @Schema(example = "술",description = "카테고리")
+    @Schema(example = "술", description = "카테고리")
     private final String category;
 
     @JsonProperty("info")

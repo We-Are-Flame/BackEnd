@@ -4,6 +4,8 @@ import com.backend.dto.meeting.dto.ImageDTO;
 import com.backend.dto.meeting.dto.LocationDTO;
 import com.backend.dto.meeting.dto.MeetingInfoDTO;
 import com.backend.dto.meeting.dto.TimeDTO;
+import com.backend.dto.meeting.request.MeetingCreateRequest;
+import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
@@ -14,22 +16,39 @@ import java.util.List;
 import java.util.Optional;
 
 public class MeetingMapper {
-    public static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO) {
+    public static Meeting toMeeting(MeetingCreateRequest request, Category category) {
+        MeetingInfoDTO meetingInfoDTO = request.getMeetingInfoDTO();
+        LocationDTO locationDTO = request.getLocationDTO();
+        TimeDTO timeDTO = request.getTimeDTO();
+
+        MeetingInfo meetingInfo = MeetingMapper.toMeetingInfo(meetingInfoDTO);
+        MeetingAddress meetingAddress = MeetingMapper.toMeetingAddress(locationDTO);
+        MeetingTime meetingTime = MeetingMapper.toMeetingTime(timeDTO);
+
+        return Meeting.builder()
+                .meetingInfo(meetingInfo)
+                .meetingAddress(meetingAddress)
+                .meetingTime(meetingTime)
+                .category(category)
+                .build();
+    }
+
+    private static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO) {
         return MeetingInfo.builder()
-                .name(meetingInfoDTO.getName())
+                .title(meetingInfoDTO.getTitle())
                 .maxParticipants(meetingInfoDTO.getMaxParticipants())
                 .description(meetingInfoDTO.getDescription())
                 .build();
     }
 
-    public static MeetingTime toMeetingTime(TimeDTO timeDTO) {
+    private static MeetingTime toMeetingTime(TimeDTO timeDTO) {
         return MeetingTime.builder()
                 .startTime(timeDTO.getStartTime())
                 .endTime(timeDTO.getEndTime())
                 .build();
     }
 
-    public static MeetingAddress toMeetingAddress(LocationDTO locationDTO) {
+    private static MeetingAddress toMeetingAddress(LocationDTO locationDTO) {
         return MeetingAddress.builder()
                 .location(locationDTO.getLocation())
                 .detailLocation(locationDTO.getDetailLocation())
