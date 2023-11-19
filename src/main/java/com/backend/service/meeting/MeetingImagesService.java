@@ -1,4 +1,4 @@
-package com.backend.service;
+package com.backend.service.meeting;
 
 import com.backend.dto.meeting.common.ImageDTO;
 import com.backend.entity.meeting.Meeting;
@@ -10,14 +10,16 @@ import com.backend.util.mapper.MeetingMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class MeetingImagesService {
     private final MeetingImageRepository meetingImageRepository;
 
+    @Transactional
     public void saveMeetingImages(Meeting meeting, ImageDTO imageDTO) {
-        if (imageDTO.hasThumbnail()) {
+        if (imageDTO.NotExistThumbnail()) {
             throw new BadRequestException(ErrorMessages.THUMBNAIL_NOT_EXIST);
         }
 
