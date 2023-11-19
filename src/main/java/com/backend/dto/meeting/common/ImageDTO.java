@@ -9,4 +9,8 @@ import lombok.Getter;
 public class ImageDTO {
     private final String thumbnailUrl;
     private final List<String> imageUrls;
+
+    public boolean hasThumbnail() {
+        return thumbnailUrl != null;
+    }
 }

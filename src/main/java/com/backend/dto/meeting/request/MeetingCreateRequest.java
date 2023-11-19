@@ -19,8 +19,4 @@ public class MeetingCreateRequest {
     private final LocationDTO location;
     private final TimeDTO time;
     private final ImageDTO image;
-
-    public boolean hasThumbnail() {
-        return image != null && image.getThumbnailUrl() != null;
-    }
 }

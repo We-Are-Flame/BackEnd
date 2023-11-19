@@ -24,6 +24,7 @@ public class MeetingController {
     public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request) {
         ///TODO [HJ] 로그인 구현되는대로 실제 로직으로 변경
         User user = userMocking.findOrMockUser();
+
         Long id = meetingService.createMeeting(request);
         MeetingCreateResponse response = MeetingCreateResponse.success(id);
         return ResponseEntity.ok(response);
