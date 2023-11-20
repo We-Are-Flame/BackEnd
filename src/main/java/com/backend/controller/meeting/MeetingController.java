@@ -1,5 +1,6 @@
 package com.backend.controller.meeting;
 
+import com.backend.annotation.CurrentMember;
 import com.backend.dto.meeting.request.MeetingCreateRequest;
 import com.backend.dto.meeting.response.MeetingCreateResponse;
 import com.backend.dto.meeting.response.MeetingReadResponse;
@@ -29,9 +30,7 @@ public class MeetingController {
     private final UserMocking userMocking;
 
     @PostMapping
-    public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request) {
-        ///TODO [HJ] 로그인 구현되는대로 실제 로직으로 변경
-        User user = userMocking.findOrMockUser();
+    public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request, @CurrentMember User user) {
 
         Long id = meetingService.createMeeting(request, user);
         MeetingCreateResponse response = MeetingCreateResponse.success(id);

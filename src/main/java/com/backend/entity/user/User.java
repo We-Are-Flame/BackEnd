@@ -1,13 +1,6 @@
 package com.backend.entity.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +19,7 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
@@ -37,4 +30,9 @@ public class User {
     private Integer temperature;
 
     private String email;
+
+    public void updateUserInfo(String name, String profileImage) {
+        this.nickname = name;
+        this.profileImage = profileImage;
+    }
 }
