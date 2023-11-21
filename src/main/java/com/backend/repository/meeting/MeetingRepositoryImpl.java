@@ -37,25 +37,40 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     private List<Meeting> fetchMeetingsWithDetails(Pageable pageable) {
         QMeeting meeting = QMeeting.meeting;
+        QMeetingRegistration registration = QMeetingRegistration.meetingRegistration;
+        QUser user = QUser.user;
 
         JPAQuery<Meeting> query = queryFactory
                 .selectFrom(meeting)
                 .leftJoin(meeting.category, QCategory.category).fetchJoin()
                 .leftJoin(meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
                 .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin()
-                .leftJoin(meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
-                .leftJoin(QMeetingRegistration.meetingRegistration.user, QUser.user).fetchJoin()
+                .leftJoin(meeting.registrations, registration).fetchJoin()
+                .leftJoin(registration.user, user).fetchJoin()
                 .leftJoin(meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
-                .where(QMeetingRegistration.meetingRegistration.role.eq(RegistrationRole.OWNER));
+                .where(registration.role.eq(RegistrationRole.OWNER));
 
+        // 정렬 및 페이지네이션 적용
         for (Sort.Order order : pageable.getSort()) {
             OrderSpecifier<?> orderSpecifier = getOrderedSpecifier(meeting, order);
             query.orderBy(orderSpecifier);
         }
 
-        return query.offset(pageable.getOffset())
+        List<Meeting> meetings = query.offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        // 각 Meeting 엔티티에 대해 호스트를 할당
+        meetings.forEach(this::assignHostToMeeting);
+
+        return meetings;
+    }
+
+    private void assignHostToMeeting(Meeting meeting) {
+        meeting.getRegistrations().stream()
+                .filter(registration -> registration.getRole() == RegistrationRole.OWNER)
+                .findFirst()
+                .ifPresent(ownerRegistration -> meeting.assignHost(ownerRegistration.getUser()));
     }
 
     private long fetchMeetingCount() {

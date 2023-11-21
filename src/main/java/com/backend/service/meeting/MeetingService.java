@@ -1,9 +1,22 @@
 package com.backend.service.meeting;
 
-import com.backend.dto.meeting.request.MeetingCreateRequest;
-import com.backend.dto.meeting.response.MeetingReadResponse;
+import com.backend.dto.meeting.request.create.MeetingCreateRequest;
+import com.backend.dto.meeting.response.read.MeetingResponse;
+import com.backend.dto.meeting.response.read.MeetingResponseList;
+import com.backend.dto.meeting.response.read.output.HashtagOutput;
+import com.backend.dto.meeting.response.read.output.HostOutput;
+import com.backend.dto.meeting.response.read.output.InfoOutput;
+import com.backend.dto.meeting.response.read.output.LocationOutput;
+import com.backend.dto.meeting.response.read.output.TimeOutput;
 import com.backend.entity.meeting.Category;
+import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
+import com.backend.entity.meeting.MeetingHashtag;
+import com.backend.entity.meeting.MeetingImage;
+import com.backend.entity.meeting.MeetingRegistration;
+import com.backend.entity.meeting.embeddable.MeetingAddress;
+import com.backend.entity.meeting.embeddable.MeetingInfo;
+import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.util.mapper.MeetingMapper;
@@ -11,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,45 +65,71 @@ public class MeetingService {
     }
 
     private void processHashtagsAndImages(MeetingCreateRequest request, Meeting meeting) {
-        hashtagService.processMeetingHashtags(request.getHashtagDTO(), meeting);
-        imagesService.saveMeetingImages(meeting, request.getImageDTO());
+        hashtagService.processMeetingHashtags(request.getHashtagInput(), meeting);
+        imagesService.saveMeetingImages(meeting, request.getImageInput());
     }
 
     private void createOwnerRegistration(Meeting meeting, User user) {
         registrationService.createOwnerStatus(meeting, user);
     }
 
-    public Page<MeetingReadResponse> readMeetings(int page, int size, String sort) {
-        Pageable pageable = createPageable(page, size, sort);
+    public Page<MeetingResponseList> readMeetings(Pageable pageable) {
         Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
-
-        // 엔티티를 DTO로 변환
-        List<MeetingReadResponse> dtos = meetings.getContent().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(dtos, pageable, meetings.getTotalElements());
+        return meetings.map(this::convertToMeetingResponseList);
     }
 
-    private MeetingReadResponse convertToDto(Meeting meeting) {
-        // 엔티티에서 필요한 데이터만 추출하여 DTO 생성
-        return MeetingReadResponse.builder()
-                .id(meeting.getId())
-                .title(meeting.getMeetingInfo().getTitle())
+    private MeetingResponseList convertToMeetingResponseList(Meeting meeting) {
+        return MeetingResponseList.builder()
+                .responses(meeting.getRegistrations().stream()
+                        .map(this::convertToMeetingResponse)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
-    private Pageable createPageable(int page, int size, String sort) {
-        if (sort == null || sort.trim().isEmpty()) {
-            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        }
+    private MeetingResponse convertToMeetingResponse(MeetingRegistration registration) {
+        Meeting meeting = registration.getMeeting();
+        return MeetingResponse.builder()
+                .id(meeting.getId())
+                .thumbnailUrl(meeting.findThumbnailImage().map(MeetingImage::getImageUrl).orElse(""))
+                .topTags(meeting.findTopHashtags(3)) // 예시로 3개의 태그를 가져옵니다.
+                .infoOutput(convertToInfoOutput(meeting))
+                .locationOutput(convertToLocationOutput(meeting))
+                .timeOutput(convertToTimeOutput(meeting))
+                .hostOutput(convertToHostOutput(meeting))
+                .build();
+    }
 
-        Sort.Order sortOrder = switch (sort) {
-            case "createdAt" -> new Sort.Order(Sort.Direction.DESC, "createdAt");
-            case "title" -> new Sort.Order(Direction.ASC, "title");
-            default -> new Sort.Order(Sort.Direction.DESC, "id");
-        };
+    private InfoOutput convertToInfoOutput(Meeting meeting) {
+        MeetingInfo info = meeting.getMeetingInfo();
+        return InfoOutput.builder()
+                .title(info.getTitle())
+                .maxParticipants(info.getMaxParticipants())
+                .currentParticipants(info.getCurrentParticipants())
+                .build();
+    }
 
-        return PageRequest.of(page, size, Sort.by(sortOrder));
+    private LocationOutput convertToLocationOutput(Meeting meeting) {
+        MeetingAddress address = meeting.getMeetingAddress();
+        return LocationOutput.builder()
+                .location(address.getLocation())
+                .detailLocation(address.getDetailLocation())
+                .build();
+    }
+
+    private TimeOutput convertToTimeOutput(Meeting meeting) {
+        MeetingTime time = meeting.getMeetingTime();
+        return TimeOutput.builder()
+                .startTime(time.getStartTime())
+                .endTime(time.getEndTime())
+                .duration(time.getDuration())
+                .build();
+    }
+
+    private HostOutput convertToHostOutput(Meeting meeting) {
+        User host = meeting.getHost();
+        return HostOutput.builder()
+                .name(host.getNickname())
+                .profileImage(host.getProfileImage())
+                .build();
     }
 }

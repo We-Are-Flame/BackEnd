@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.dto;
+package com.backend.dto.meeting.request.create.input;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ImageDTO {
+public class ImageInput {
     @Schema(example = "썸네일.jpg", description = "썸네일 링크")
     private final String thumbnailUrl;
     @ArraySchema(

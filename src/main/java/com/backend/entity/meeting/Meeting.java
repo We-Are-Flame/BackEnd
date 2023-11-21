@@ -83,6 +83,6 @@ public class Meeting extends BaseEntity {
     }
 
     public String getCategoryName() {
-            return category.getName();
+        return category.getName();
     }
 }

@@ -1,6 +1,6 @@
 package com.backend.service.meeting;
 
-import com.backend.dto.meeting.dto.ImageDTO;
+import com.backend.dto.meeting.request.create.input.ImageInput;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.exception.BadRequestException;
@@ -18,12 +18,12 @@ public class ImagesService {
     private final MeetingImageRepository meetingImageRepository;
 
     @Transactional
-    public void saveMeetingImages(Meeting meeting, ImageDTO imageDTO) {
-        if (imageDTO.NotExistThumbnail()) {
+    public void saveMeetingImages(Meeting meeting, ImageInput imageInput) {
+        if (imageInput.NotExistThumbnail()) {
             throw new BadRequestException(ErrorMessages.THUMBNAIL_NOT_EXIST);
         }
 
-        List<MeetingImage> meetingImages = MeetingMapper.toMeetingImages(meeting, imageDTO);
+        List<MeetingImage> meetingImages = MeetingMapper.toMeetingImages(meeting, imageInput);
         meetingImageRepository.saveAll(meetingImages);
     }
 }

@@ -1,6 +1,6 @@
 package com.backend.service.meeting;
 
-import com.backend.dto.meeting.dto.HashtagDTO;
+import com.backend.dto.meeting.request.create.input.HashtagInput;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingHashtag;
@@ -15,8 +15,8 @@ public class HashtagService {
     private final HashtagRepository hashtagRepository;
     private final MeetingHashtagRepository meetingHashtagRepository;
 
-    public void processMeetingHashtags(HashtagDTO hashtagDTO, Meeting meeting) {
-        hashtagDTO.getHashtags().forEach(hashtagName ->
+    public void processMeetingHashtags(HashtagInput hashtagInput, Meeting meeting) {
+        hashtagInput.getHashtags().forEach(hashtagName ->
                 processHashtag(hashtagName, meeting));
     }
 

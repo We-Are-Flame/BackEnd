@@ -1,10 +1,10 @@
 package com.backend.util.mapper;
 
-import com.backend.dto.meeting.dto.ImageDTO;
-import com.backend.dto.meeting.dto.LocationDTO;
-import com.backend.dto.meeting.dto.MeetingInfoDTO;
-import com.backend.dto.meeting.dto.TimeDTO;
-import com.backend.dto.meeting.request.MeetingCreateRequest;
+import com.backend.dto.meeting.request.create.MeetingCreateRequest;
+import com.backend.dto.meeting.request.create.input.ImageInput;
+import com.backend.dto.meeting.request.create.input.InfoInput;
+import com.backend.dto.meeting.request.create.input.LocationInput;
+import com.backend.dto.meeting.request.create.input.TimeInput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
@@ -17,13 +17,13 @@ import java.util.Optional;
 
 public class MeetingMapper {
     public static Meeting toMeeting(MeetingCreateRequest request, Category category) {
-        MeetingInfoDTO meetingInfoDTO = request.getMeetingInfoDTO();
-        LocationDTO locationDTO = request.getLocationDTO();
-        TimeDTO timeDTO = request.getTimeDTO();
+        InfoInput infoInput = request.getInfoInput();
+        LocationInput locationInput = request.getLocationInput();
+        TimeInput timeInput = request.getTimeInput();
 
-        MeetingInfo meetingInfo = MeetingMapper.toMeetingInfo(meetingInfoDTO);
-        MeetingAddress meetingAddress = MeetingMapper.toMeetingAddress(locationDTO);
-        MeetingTime meetingTime = MeetingMapper.toMeetingTime(timeDTO);
+        MeetingInfo meetingInfo = MeetingMapper.toMeetingInfo(infoInput);
+        MeetingAddress meetingAddress = MeetingMapper.toMeetingAddress(locationInput);
+        MeetingTime meetingTime = MeetingMapper.toMeetingTime(timeInput);
 
         return Meeting.builder()
                 .meetingInfo(meetingInfo)
@@ -33,35 +33,35 @@ public class MeetingMapper {
                 .build();
     }
 
-    private static MeetingInfo toMeetingInfo(MeetingInfoDTO meetingInfoDTO) {
+    private static MeetingInfo toMeetingInfo(InfoInput infoInput) {
         return MeetingInfo.builder()
-                .title(meetingInfoDTO.getTitle())
-                .maxParticipants(meetingInfoDTO.getMaxParticipants())
-                .description(meetingInfoDTO.getDescription())
+                .title(infoInput.getTitle())
+                .maxParticipants(infoInput.getMaxParticipants())
+                .description(infoInput.getDescription())
                 .build();
     }
 
-    private static MeetingTime toMeetingTime(TimeDTO timeDTO) {
+    private static MeetingTime toMeetingTime(TimeInput timeInput) {
         return MeetingTime.builder()
-                .startTime(timeDTO.getStartTime())
-                .endTime(timeDTO.getEndTime())
+                .startTime(timeInput.getStartTime())
+                .endTime(timeInput.getEndTime())
                 .build();
     }
 
-    private static MeetingAddress toMeetingAddress(LocationDTO locationDTO) {
+    private static MeetingAddress toMeetingAddress(LocationInput locationInput) {
         return MeetingAddress.builder()
-                .location(locationDTO.getLocation())
-                .detailLocation(locationDTO.getDetailLocation())
+                .location(locationInput.getLocation())
+                .detailLocation(locationInput.getDetailLocation())
                 .build();
     }
 
-    public static List<MeetingImage> toMeetingImages(Meeting meeting, ImageDTO imageDTO) {
+    public static List<MeetingImage> toMeetingImages(Meeting meeting, ImageInput imageInput) {
         List<MeetingImage> meetingImages = new ArrayList<>();
 
-        Optional.ofNullable(imageDTO.getThumbnailUrl())
+        Optional.ofNullable(imageInput.getThumbnailUrl())
                 .ifPresent(url -> meetingImages.add(createMeetingImage(meeting, url, true)));
 
-        Optional.ofNullable(imageDTO.getImageUrls())
+        Optional.ofNullable(imageInput.getImageUrls())
                 .ifPresent(urls -> urls.forEach(url ->
                         meetingImages.add(createMeetingImage(meeting, url, false))));
 

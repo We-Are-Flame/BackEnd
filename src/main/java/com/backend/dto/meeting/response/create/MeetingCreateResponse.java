@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.response;
+package com.backend.dto.meeting.response.create;
 
 import com.backend.dto.bases.BaseResponse;
 import com.backend.dto.bases.ResponseMessage;
