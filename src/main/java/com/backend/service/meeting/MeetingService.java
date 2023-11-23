@@ -1,13 +1,24 @@
 package com.backend.service.meeting;
 
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
+import com.backend.dto.meeting.response.read.MeetingDetailResponse;
 import com.backend.dto.meeting.response.read.MeetingResponse;
+import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
+import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
+import com.backend.dto.meeting.response.read.output.HostOutput;
+import com.backend.dto.meeting.response.read.output.ImageOutput;
+import com.backend.dto.meeting.response.read.output.LocationOutput;
 import com.backend.entity.meeting.Category;
+import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
+import com.backend.entity.meeting.MeetingImage;
 import com.backend.entity.user.User;
+import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,5 +73,59 @@ public class MeetingService {
         Pageable pageable = PageRequest.of(page, end, CustomSort.getSort(sort));
         Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
         return meetings.map(MeetingResponseMapper::toMeetingResponse);
+    }
+
+    public MeetingDetailResponse readOneMeeting(Long meetingId) {
+        Meeting meeting = meetingRepository.findMeetingWithDetailsById(meetingId)
+                .orElseThrow(() -> new NotFoundException("PK에 맞는 모임이 없습니다."));
+        return convertToMeetingDetailResponse(meeting);
+    }
+
+    private MeetingDetailResponse convertToMeetingDetailResponse(Meeting meeting) {
+        List<String> hashtags = meeting.getHashtags().stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toList());
+
+        DetailInfoOutput infoOutput = DetailInfoOutput.builder()
+                .title(meeting.getTitle())
+                .description(meeting.getDescription())
+                .maxParticipants(meeting.getMaxParticipants())
+                .currentParticipants(meeting.getCurrentParticipants())
+                .build();
+
+        ImageOutput imageOutput = ImageOutput.builder()
+                .thumbnailUrl(meeting.getThumbnailUrl())
+                .imageUrls(meeting.getMeetingImages().stream()
+                        .map(MeetingImage::getImageUrl)
+                        .collect(Collectors.toList()))
+                .build();
+
+        LocationOutput locationOutput = LocationOutput.builder()
+                .location(meeting.getMeetingAddress().getLocation())
+                .detailLocation(meeting.getMeetingAddress().getDetailLocation())
+                .build();
+
+        DetailTimeOutput timeOutput = DetailTimeOutput.builder()
+                .startTime(meeting.getMeetingTime().getStartTime())
+                .endTime(meeting.getMeetingTime().getEndTime())
+                .createdAt(meeting.getCreatedAt())
+                .duration(meeting.getMeetingTime().getDuration())
+                .build();
+
+        HostOutput hostOutput = HostOutput.builder()
+                .name(meeting.getHost().getNickname())
+                .profileImage(meeting.getHost().getProfileImage())
+                .build();
+
+        return MeetingDetailResponse.builder()
+                .id(meeting.getId())
+                .hashtags(hashtags)
+                .detailInfoOutput(infoOutput)
+                .imageOutput(imageOutput)
+                .locationOutput(locationOutput)
+                .timeOutput(timeOutput)
+                .hostOutput(hostOutput)
+                ///TODO [HJ] 모임에 대한 상태 로직 판별부터 구현
+                .build();
     }
 }

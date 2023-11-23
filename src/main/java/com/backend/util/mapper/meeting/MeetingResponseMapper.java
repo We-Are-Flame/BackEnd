@@ -39,20 +39,28 @@ public class MeetingResponseMapper {
     }
 
     private static InfoOutput buildInfo(Meeting meeting) {
-        return InfoOutput.create(
-                meeting.getTitle(),
-                meeting.getMaxParticipants(),
-                meeting.getCurrentParticipants());
+        return InfoOutput.builder()
+                .title(meeting.getTitle())
+                .maxParticipants(meeting.getMaxParticipants())
+                .currentParticipants(meeting.getCurrentParticipants())
+                .build();
     }
 
     private static LocationOutput buildLocation(Meeting meeting) {
         MeetingAddress address = meeting.getMeetingAddress();
-        return LocationOutput.create(address.getLocation(), address.getDetailLocation());
+        return LocationOutput.builder()
+                .location(address.getLocation())
+                .detailLocation(address.getDetailLocation())
+                .build();
     }
 
     private static TimeOutput buildTime(Meeting meeting) {
         MeetingTime time = meeting.getMeetingTime();
-        return TimeOutput.create(time.getStartTime(), time.getEndTime(), time.getDuration());
+        return TimeOutput.builder()
+                .startTime(time.getStartTime())
+                .endTime(time.getEndTime())
+                .duration(time.getDuration())
+                .build();
     }
 
     private static HostOutput buildHost(Meeting meeting) {
