@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -31,8 +32,11 @@ public class MeetingController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<MeetingResponse>> getAllMeetings(Pageable pageable) {
-        Page<MeetingResponse> meetings = meetingService.readMeetings(pageable);
+    public ResponseEntity<Page<MeetingResponse>> getAllMeetings(
+            @RequestParam int start,
+            @RequestParam int end,
+            @RequestParam String sort) {
+        Page<MeetingResponse> meetings = meetingService.readMeetings(start, end, sort);
         return ResponseEntity.ok(meetings);
     }
 }

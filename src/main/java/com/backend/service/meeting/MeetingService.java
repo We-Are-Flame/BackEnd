@@ -10,6 +10,7 @@ import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,9 +57,10 @@ public class MeetingService {
         registrationService.createOwnerStatus(meeting, user);
     }
 
-    public Page<MeetingResponse> readMeetings(Pageable pageable) {
+    public Page<MeetingResponse> readMeetings(int start, int end, String sort) {
+        int page = start / end;
+        Pageable pageable = PageRequest.of(page, end, CustomSort.getSort(sort));
         Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
-        System.out.println(meetings);
         return meetings.map(MeetingResponseMapper::toMeetingResponse);
     }
 }
