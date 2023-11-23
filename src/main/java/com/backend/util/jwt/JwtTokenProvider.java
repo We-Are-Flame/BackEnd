@@ -1,14 +1,19 @@
 package com.backend.util.jwt;
 
 
-
-import java.util.*;
-
+import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.JwtAuthenticationException;
 import com.backend.service.custom.CustomUserDetailsService;
-import io.jsonwebtoken.*;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import java.util.Date;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,19 +21,33 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.backend.entity.user.User;
-
 @Component
 public class JwtTokenProvider {
 
-    private String secretKey;
     private final Long ACCESS_TOKEN_EXPIRE_TIME;
-
+    private final String secretKey;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     public JwtTokenProvider(Environment env) {
         secretKey = env.getProperty("jwt.secret");
         ACCESS_TOKEN_EXPIRE_TIME = Long.parseLong(env.getProperty("jwt.access-token-expire-time"));
+    }
+
+    private static String generateErrorMessage(io.jsonwebtoken.JwtException e) {
+        if (e instanceof SignatureException) {
+            return "시그니처가 일치하지 않습니다!";
+        }
+        if (e instanceof ExpiredJwtException) {
+            return "토큰이 만료되었습니다!";
+        }
+        if (e instanceof MalformedJwtException) {
+            return "잘못된 형식의 토큰입니다!";
+        }
+        if (e instanceof UnsupportedJwtException) {
+            return "지원하지 않는 토큰입니다!";
+        }
+        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
     }
 
     public String sign(User user, Date now) {
@@ -72,13 +91,5 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
-
-    private static String generateErrorMessage(io.jsonwebtoken.JwtException e) {
-        if (e instanceof SignatureException) return "시그니처가 일치하지 않습니다!";
-        if (e instanceof ExpiredJwtException) return "토큰이 만료되었습니다!";
-        if (e instanceof MalformedJwtException) return "잘못된 형식의 토큰입니다!";
-        if (e instanceof UnsupportedJwtException) return "지원하지 않는 토큰입니다!";
-        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
     }
 }
