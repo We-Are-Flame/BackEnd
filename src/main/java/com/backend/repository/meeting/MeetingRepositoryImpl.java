@@ -1,13 +1,11 @@
 package com.backend.repository.meeting;
 
+import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
-import com.backend.entity.meeting.QCategory;
+import com.backend.entity.meeting.MeetingHashtag;
 import com.backend.entity.meeting.QHashtag;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
-import com.backend.entity.meeting.QMeetingImage;
-import com.backend.entity.meeting.QMeetingRegistration;
-import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.user.QUser;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -15,6 +13,11 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,48 +32,65 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     @Override
     public Page<Meeting> findAllWithDetails(Pageable pageable) {
-        List<Meeting> meetings = fetchMeetingsWithDetails(pageable);
-        long total = fetchMeetingCount();
+        CompletableFuture<List<Meeting>> meetingsFuture = CompletableFuture.supplyAsync(
+                () -> fetchMeetingsWithDetails(pageable));
+        CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(this::fetchMeetingCount);
 
-        return new PageImpl<>(meetings, pageable, total);
+        CompletableFuture.allOf(meetingsFuture, countFuture).join();
+
+        try {
+            List<Meeting> meetings = meetingsFuture.get();
+            long total = countFuture.get();
+            return new PageImpl<>(meetings, pageable, total);
+        } catch (CompletionException e) {
+            throw new RuntimeException("Meeting을 가져오는 중에 Error가 발생하였습니다.", e.getCause());
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Meeting> fetchMeetingsWithDetails(Pageable pageable) {
         QMeeting meeting = QMeeting.meeting;
-        QMeetingRegistration registration = QMeetingRegistration.meetingRegistration;
-        QUser user = QUser.user;
+        QMeetingHashtag meetingHashtag = QMeetingHashtag.meetingHashtag;
+        QHashtag hashtag = QHashtag.hashtag;
 
         JPAQuery<Meeting> query = queryFactory
-                .selectFrom(meeting)
-                .leftJoin(meeting.category, QCategory.category).fetchJoin()
-                .leftJoin(meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
-                .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin()
-                .leftJoin(meeting.registrations, registration).fetchJoin()
-                .leftJoin(registration.user, user).fetchJoin()
-                .leftJoin(meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
-                .where(registration.role.eq(RegistrationRole.OWNER));
+                .select(meeting)
+                .from(meeting)
+                .leftJoin(meeting.host, QUser.user).fetchJoin()
+                .leftJoin(meeting.meetingHashtags, meetingHashtag).fetchJoin()
+                .leftJoin(meetingHashtag.hashtag, hashtag).fetchJoin();
 
-        // 정렬 및 페이지네이션 적용
+        // 정렬 조건 추가
         for (Sort.Order order : pageable.getSort()) {
-            OrderSpecifier<?> orderSpecifier = getOrderedSpecifier(meeting, order);
-            query.orderBy(orderSpecifier);
+            query.orderBy(getOrderSpecifier(meeting, order));
         }
 
-        List<Meeting> meetings = query.offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        // 페이징 처리
+        query.offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
 
-        // 각 Meeting 엔티티에 대해 호스트를 할당
-        meetings.forEach(this::assignHostToMeeting);
+        List<Meeting> meetings = query.fetch();
 
+        // 각 Meeting에 대해 Hashtag 목록을 할당
+        meetings.forEach(m -> {
+            Set<Hashtag> hashtags = m.getMeetingHashtags().stream()
+                    .map(MeetingHashtag::getHashtag)
+                    .collect(Collectors.toSet());
+            m.assignHashtags(hashtags);
+        });
+        System.out.println(meetings);
         return meetings;
     }
 
-    private void assignHostToMeeting(Meeting meeting) {
-        meeting.getRegistrations().stream()
-                .filter(registration -> registration.getRole() == RegistrationRole.OWNER)
-                .findFirst()
-                .ifPresent(ownerRegistration -> meeting.assignHost(ownerRegistration.getUser()));
+
+    private OrderSpecifier<?> getOrderSpecifier(QMeeting meeting, Sort.Order order) {
+        Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+        return switch (order.getProperty()) {
+            case "createdAt" -> new OrderSpecifier<>(direction, meeting.createdAt);
+            case "title" -> new OrderSpecifier<>(direction, meeting.title);
+            default -> new OrderSpecifier<>(direction, meeting.id);
+        };
     }
 
     private long fetchMeetingCount() {
@@ -78,14 +98,5 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                         .from(QMeeting.meeting)
                         .fetchOne())
                 .orElse(0L);
-    }
-
-    private OrderSpecifier<?> getOrderedSpecifier(QMeeting meeting, Sort.Order order) {
-        Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-        return switch (order.getProperty()) {
-            case "createdAt" -> new OrderSpecifier<>(direction, meeting.createdAt);
-            case "title" -> new OrderSpecifier<>(direction, meeting.meetingInfo.title);
-            default -> new OrderSpecifier<>(direction, meeting.id);
-        };
     }
 }

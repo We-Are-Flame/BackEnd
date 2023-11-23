@@ -2,7 +2,6 @@ package com.backend.entity.meeting;
 
 import com.backend.entity.base.BaseEntity;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
-import com.backend.entity.meeting.embeddable.MeetingInfo;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
 import jakarta.persistence.Column;
@@ -18,9 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,9 +35,13 @@ public class Meeting extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Long id;
+    private String title;
+    private String description;
+    private String thumbnailUrl;
 
-    @Embedded
-    private MeetingInfo meetingInfo;
+    @Builder.Default
+    private Integer currentParticipants = 0;
+    private Integer maxParticipants;
 
     @Embedded
     private MeetingAddress meetingAddress;
@@ -52,6 +53,10 @@ public class Meeting extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User host;
+
     @OneToMany(mappedBy = "meeting")
     private Set<MeetingImage> meetingImages;
 
@@ -62,27 +67,9 @@ public class Meeting extends BaseEntity {
     private List<MeetingRegistration> registrations;
 
     @Transient
-    private User host;
+    private Set<Hashtag> hashtags;
 
-    public void assignHost(User host) {
-        this.host = host;
-    }
-
-    public Optional<MeetingImage> findThumbnailImage() {
-        return meetingImages.stream()
-                .filter(MeetingImage::getIsThumbnail)
-                .findFirst();
-    }
-
-    public List<String> findTopHashtags(int limit) {
-        return meetingHashtags.stream()
-                .limit(limit)
-                .map(MeetingHashtag::getHashtag)
-                .map(Hashtag::getName)
-                .collect(Collectors.toList());
-    }
-
-    public String getCategoryName() {
-        return category.getName();
+    public void assignHashtags(Set<Hashtag> hashtags) {
+        this.hashtags = hashtags;
     }
 }

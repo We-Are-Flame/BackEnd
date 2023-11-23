@@ -16,8 +16,4 @@ public class ImageInput {
             schema = @Schema(type = "string", example = "image.jpg")
     )
     private final List<String> imageUrls;
-
-    public boolean NotExistThumbnail() {
-        return thumbnailUrl == null;
-    }
 }

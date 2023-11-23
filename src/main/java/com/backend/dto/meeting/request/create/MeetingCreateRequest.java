@@ -31,4 +31,8 @@ public class MeetingCreateRequest {
 
     @JsonProperty("image")
     private final ImageInput imageInput;
+
+    public String getThumbnailUrl() {
+        return imageInput.getThumbnailUrl();
+    }
 }
