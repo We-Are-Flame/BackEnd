@@ -42,8 +42,8 @@ public class MeetingController {
     }
 
     @GetMapping("/{meetingId}")
-    public ResponseEntity<MeetingDetailResponse> getMeeting(@PathVariable Long meetingId) {
-        MeetingDetailResponse meeting = meetingService.readOneMeeting(meetingId);
+    public ResponseEntity<MeetingDetailResponse> getMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
+        MeetingDetailResponse meeting = meetingService.readOneMeeting(meetingId, user);
         return ResponseEntity.ok(meeting);
     }
 }

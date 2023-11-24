@@ -72,4 +72,27 @@ public class Meeting extends BaseEntity {
     public void assignHashtags(Set<Hashtag> hashtags) {
         this.hashtags = hashtags;
     }
+
+    public boolean isUserOwner(User user) {
+        return user != null && this.host.isSameId(user);
+    }
+
+    public RegistrationStatus determineParticipationStatus(User user) {
+        if (user == null) {
+            return RegistrationStatus.NONE;
+        }
+        return this.getParticipationStatusForUser(user);
+    }
+
+    private RegistrationStatus getParticipationStatusForUser(User user) {
+        return registrations.stream()
+                .filter(registration -> registration.isUserContained(user))
+                .findFirst()
+                .map(MeetingRegistration::getStatus)
+                .orElse(RegistrationStatus.NONE);
+    }
+
+    public boolean isExpired() {
+        return this.meetingTime.isBeforeNow();
+    }
 }

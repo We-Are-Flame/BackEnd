@@ -1,38 +1,54 @@
 package com.backend.util.mapper.meeting;
 
+import com.backend.dto.meeting.response.read.MeetingDetailResponse;
 import com.backend.dto.meeting.response.read.MeetingResponse;
+import com.backend.dto.meeting.response.read.MeetingStatus;
+import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
+import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
 import com.backend.dto.meeting.response.read.output.HostOutput;
+import com.backend.dto.meeting.response.read.output.ImageOutput;
 import com.backend.dto.meeting.response.read.output.InfoOutput;
 import com.backend.dto.meeting.response.read.output.LocationOutput;
 import com.backend.dto.meeting.response.read.output.TimeOutput;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
+import com.backend.entity.meeting.MeetingImage;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MeetingResponseMapper {
-    public static MeetingResponse toMeetingResponse(Meeting meeting) {
-        List<String> topTags = extractTopTags(meeting);
-        InfoOutput infoOutput = buildInfo(meeting);
-        LocationOutput locationOutput = buildLocation(meeting);
-        TimeOutput timeOutput = buildTime(meeting);
-        HostOutput hostOutput = buildHost(meeting);
 
+    public static MeetingResponse toMeetingResponse(Meeting meeting) {
         return MeetingResponse.builder()
                 .id(meeting.getId())
                 .thumbnailUrl(meeting.getThumbnailUrl())
-                .topTags(topTags)
-                .infoOutput(infoOutput)
-                .locationOutput(locationOutput)
-                .timeOutput(timeOutput)
-                .hostOutput(hostOutput)
+                .topTags(extractHashTags(meeting))
+                .infoOutput(buildInfo(meeting))
+                .locationOutput(buildLocation(meeting.getMeetingAddress()))
+                .timeOutput(buildTime(meeting.getMeetingTime()))
+                .hostOutput(buildHost(meeting.getHost()))
                 .build();
     }
 
-    private static List<String> extractTopTags(Meeting meeting) {
+    public static MeetingDetailResponse toMeetingDetailResponse(Meeting meeting, MeetingStatus status) {
+        return MeetingDetailResponse.builder()
+                .id(meeting.getId())
+                .hashtags(extractHashTags(meeting))
+                .detailInfoOutput(buildDetailInfo(meeting))
+                .imageOutput(buildImage(meeting.getMeetingImages()))
+                .locationOutput(buildLocation(meeting.getMeetingAddress()))
+                .timeOutput(buildDetailTime(meeting.getMeetingTime(), meeting.getCreatedAt()))
+                .hostOutput(buildHost(meeting.getHost()))
+                .status(status)
+                .build();
+    }
+
+    private static List<String> extractHashTags(Meeting meeting) {
         return meeting.getHashtags().stream()
                 .map(Hashtag::getName)
                 .collect(Collectors.toList());
@@ -46,16 +62,39 @@ public class MeetingResponseMapper {
                 .build();
     }
 
-    private static LocationOutput buildLocation(Meeting meeting) {
-        MeetingAddress address = meeting.getMeetingAddress();
+    private static DetailInfoOutput buildDetailInfo(Meeting meeting) {
+        return DetailInfoOutput.builder()
+                .title(meeting.getTitle())
+                .description(meeting.getDescription())
+                .maxParticipants(meeting.getMaxParticipants())
+                .currentParticipants(meeting.getCurrentParticipants())
+                .build();
+    }
+
+    private static ImageOutput buildImage(Set<MeetingImage> images) {
+        List<String> imageUrls = images.stream()
+                .map(MeetingImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        String thumbnailUrl = null;
+        if (!imageUrls.isEmpty()) {
+            thumbnailUrl = imageUrls.get(0);
+        }
+
+        return ImageOutput.builder()
+                .thumbnailUrl(thumbnailUrl)
+                .imageUrls(imageUrls)
+                .build();
+    }
+
+    private static LocationOutput buildLocation(MeetingAddress address) {
         return LocationOutput.builder()
                 .location(address.getLocation())
                 .detailLocation(address.getDetailLocation())
                 .build();
     }
 
-    private static TimeOutput buildTime(Meeting meeting) {
-        MeetingTime time = meeting.getMeetingTime();
+    private static TimeOutput buildTime(MeetingTime time) {
         return TimeOutput.builder()
                 .startTime(time.getStartTime())
                 .endTime(time.getEndTime())
@@ -63,8 +102,16 @@ public class MeetingResponseMapper {
                 .build();
     }
 
-    private static HostOutput buildHost(Meeting meeting) {
-        User host = meeting.getHost();
+    private static DetailTimeOutput buildDetailTime(MeetingTime time, LocalDateTime createdAt) {
+        return DetailTimeOutput.builder()
+                .startTime(time.getStartTime())
+                .endTime(time.getEndTime())
+                .createdAt(createdAt)
+                .duration(time.getDuration())
+                .build();
+    }
+
+    private static HostOutput buildHost(User host) {
         return HostOutput.builder()
                 .name(host.getNickname())
                 .profileImage(host.getProfileImage())

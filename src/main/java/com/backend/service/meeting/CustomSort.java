@@ -48,7 +48,8 @@ public enum CustomSort {
         };
     }
 
-    private List<OrderSpecifier<?>> createOrderSpecifiers(QMeeting meeting, ComparableExpressionBase<?> path, Order order) {
+    private List<OrderSpecifier<?>> createOrderSpecifiers(QMeeting meeting, ComparableExpressionBase<?> path,
+                                                          Order order) {
         DateTimePath<LocalDateTime> endTimePath = meeting.meetingTime.endTime;
         LocalDateTime now = LocalDateTime.now();
 

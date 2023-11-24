@@ -7,6 +7,7 @@ import com.backend.entity.meeting.QHashtag;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
 import com.backend.entity.meeting.QMeetingImage;
+import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.user.QUser;
 import com.backend.service.meeting.CustomSort;
 import com.querydsl.core.types.OrderSpecifier;
@@ -44,8 +45,9 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     public Optional<Meeting> findMeetingWithDetailsById(Long meetingId) {
         JPAQuery<Meeting> query = createBaseMeetingQuery()
-                .where(QMeeting.meeting.id.eq(meetingId))
-                .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin();
+                .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
+                .leftJoin(QMeeting.meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
+                .where(QMeeting.meeting.id.eq(meetingId));
 
         return Optional.ofNullable(performQueryAndEnrichWithHashtags(query));
     }
