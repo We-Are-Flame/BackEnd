@@ -1,5 +1,6 @@
 package com.backend.controller.meeting;
 
+import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.create.MeetingCreateResponse;
@@ -25,6 +26,7 @@ public class MeetingController {
     private final MeetingService meetingService;
 
     @PostMapping
+    @CheckUserNotNull
     public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request,
                                                                @CurrentMember User user) {
         Long id = meetingService.createMeeting(request, user);
