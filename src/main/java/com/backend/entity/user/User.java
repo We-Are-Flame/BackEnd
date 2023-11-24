@@ -50,4 +50,8 @@ public class User {
         this.nickname = name;
         this.profileImage = profileImage;
     }
+
+    public boolean isSameId(User otherUser) {
+        return this.id.equals(otherUser.getId());
+    }
 }

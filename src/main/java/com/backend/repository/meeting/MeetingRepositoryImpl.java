@@ -6,6 +6,8 @@ import com.backend.entity.meeting.MeetingHashtag;
 import com.backend.entity.meeting.QHashtag;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
+import com.backend.entity.meeting.QMeetingImage;
+import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.user.QUser;
 import com.backend.service.meeting.CustomSort;
 import com.querydsl.core.types.OrderSpecifier;
@@ -28,27 +30,34 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     @Override
     public Page<Meeting> findAllWithDetails(Pageable pageable) {
-        List<Meeting> meetings = fetchMeetingsWithDetails(pageable);
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .orderBy(getOrderSpecifiers(pageable));
+
+        applyPagination(query, pageable);
+
+        List<Meeting> meetings = query.fetch().stream()
+                .map(this::enrichMeetingWithHashtags)
+                .collect(Collectors.toList());
         long total = fetchMeetingCount();
+
         return new PageImpl<>(meetings, pageable, total);
     }
 
-    private List<Meeting> fetchMeetingsWithDetails(Pageable pageable) {
-        JPAQuery<Meeting> query = createMeetingQuery(pageable);
-        applyPagination(query, pageable);
-        List<Meeting> meetings = query.fetch();
-        return enrichMeetingsWithHashtags(meetings);
+    public Optional<Meeting> findMeetingWithDetailsById(Long meetingId) {
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
+                .leftJoin(QMeeting.meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
+                .where(QMeeting.meeting.id.eq(meetingId));
+
+        return Optional.ofNullable(performQueryAndEnrichWithHashtags(query));
     }
 
-    private JPAQuery<Meeting> createMeetingQuery(Pageable pageable) {
-        QMeeting meeting = QMeeting.meeting;
+    private JPAQuery<Meeting> createBaseMeetingQuery() {
         return queryFactory
-                .select(meeting)
-                .from(meeting)
-                .leftJoin(meeting.host, QUser.user).fetchJoin()
-                .leftJoin(meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
-                .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin()
-                .orderBy(getOrderSpecifiers(pageable, meeting));
+                .selectFrom(QMeeting.meeting)
+                .leftJoin(QMeeting.meeting.host, QUser.user).fetchJoin()
+                .leftJoin(QMeeting.meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
+                .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin();
     }
 
     private void applyPagination(JPAQuery<?> query, Pageable pageable) {
@@ -56,19 +65,24 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .limit(pageable.getPageSize());
     }
 
-    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable, QMeeting meeting) {
+    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
         return pageable.getSort().stream()
-                .flatMap(order -> CustomSort.fromString(order.getProperty()).toOrderSpecifiers(meeting).stream())
+                .flatMap(order -> CustomSort.fromString(order.getProperty()).toOrderSpecifiers(QMeeting.meeting)
+                        .stream())
                 .toArray(OrderSpecifier[]::new);
     }
 
+    private Meeting performQueryAndEnrichWithHashtags(JPAQuery<Meeting> query) {
+        Meeting meeting = query.fetchOne();
+        return enrichMeetingWithHashtags(meeting);
+    }
 
-    private List<Meeting> enrichMeetingsWithHashtags(List<Meeting> meetings) {
-        meetings.forEach(meeting -> {
+    private Meeting enrichMeetingWithHashtags(Meeting meeting) {
+        if (meeting != null) {
             Set<Hashtag> hashtags = extractHashtags(meeting);
             meeting.assignHashtags(hashtags);
-        });
-        return meetings;
+        }
+        return meeting;
     }
 
     private Set<Hashtag> extractHashtags(Meeting meeting) {

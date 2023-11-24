@@ -7,7 +7,4 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class LocationOutput extends LocationDTO {
-    public static LocationOutput create(String location, String detailLocation) {
-        return LocationOutput.builder().location(location).detailLocation(detailLocation).build();
-    }
 }

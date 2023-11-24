@@ -1,19 +1,19 @@
 package com.backend.dto.meeting.request.create.input;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.backend.dto.meeting.dto.ImageDTO;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class ImageInput {
-    @Schema(example = "썸네일.jpg", description = "썸네일 링크")
-    private final String thumbnailUrl;
-    @ArraySchema(
-            arraySchema = @Schema(description = "이미지 목록, 예: ['image1.jpg', 'image2.jpg']", type = "array"),
-            schema = @Schema(type = "string", example = "image.jpg")
-    )
-    private final List<String> imageUrls;
+@SuperBuilder
+public class ImageInput extends ImageDTO {
+    @JsonCreator
+    public static ImageInput create(String thumbnailUrl, List<String> imageUrls) {
+        return ImageInput.builder()
+                .thumbnailUrl(thumbnailUrl)
+                .imageUrls(imageUrls)
+                .build();
+    }
 }

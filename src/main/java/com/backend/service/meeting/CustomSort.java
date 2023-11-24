@@ -4,6 +4,7 @@ import com.backend.entity.meeting.QMeeting;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.core.types.dsl.DateTimePath;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,11 +41,29 @@ public enum CustomSort {
 
     public List<OrderSpecifier<?>> toOrderSpecifiers(QMeeting meeting) {
         return switch (this) {
-            case NEW -> List.of(new OrderSpecifier<>(Order.DESC, meeting.createdAt));
-            case TITLE -> List.of(new OrderSpecifier<>(Order.ASC, meeting.title));
+            case NEW -> createOrderSpecifiers(meeting, meeting.createdAt, Order.DESC);
+            case TITLE -> createOrderSpecifiers(meeting, meeting.title, Order.ASC);
             case SOON -> createSoonOrderSpecifiers(meeting);
             default -> List.of(new OrderSpecifier<>(Order.ASC, meeting.id));
         };
+    }
+
+    private List<OrderSpecifier<?>> createOrderSpecifiers(QMeeting meeting, ComparableExpressionBase<?> path,
+                                                          Order order) {
+        DateTimePath<LocalDateTime> endTimePath = meeting.meetingTime.endTime;
+        LocalDateTime now = LocalDateTime.now();
+
+        // 현재 시간을 지난 endTime에 대한 정렬 우선순위 설정
+        OrderSpecifier<?> prioritySpecifier = new CaseBuilder()
+                .when(endTimePath.before(now))
+                .then(2)
+                .otherwise(1)
+                .asc();
+
+        // 원래의 정렬 순서를 유지하면서 endTime 정렬 순위 적용
+        OrderSpecifier<?> originalOrderSpecifier = new OrderSpecifier<>(order, path);
+
+        return List.of(prioritySpecifier, originalOrderSpecifier);
     }
 
     private List<OrderSpecifier<?>> createSoonOrderSpecifiers(QMeeting meeting) {

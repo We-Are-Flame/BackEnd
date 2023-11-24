@@ -5,6 +5,7 @@ import com.backend.dto.meeting.request.create.input.ImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +33,7 @@ public class MeetingCreateRequest {
     @JsonProperty("image")
     private final ImageInput imageInput;
 
+    @JsonIgnore
     public String getThumbnailUrl() {
         return imageInput.getThumbnailUrl();
     }
