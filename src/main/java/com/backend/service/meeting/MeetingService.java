@@ -3,7 +3,9 @@ package com.backend.service.meeting;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.read.MeetingDetailResponse;
 import com.backend.dto.meeting.response.read.MeetingResponse;
-import com.backend.dto.meeting.response.read.MeetingStatus;
+import com.backend.dto.meeting.response.read.MyMeetingResponse;
+import com.backend.dto.meeting.response.read.MyMeetingResponseList;
+import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
@@ -12,6 +14,7 @@ import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -66,7 +69,7 @@ public class MeetingService {
 
     public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
         Meeting meeting = fetchMeeting(meetingId);
-        MeetingStatus status = buildMeetingStatus(meeting, user);
+        StatusOutput status = buildMeetingStatus(meeting, user);
         return MeetingResponseMapper.toMeetingDetailResponse(meeting, status);
     }
 
@@ -75,12 +78,20 @@ public class MeetingService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    private MeetingStatus buildMeetingStatus(Meeting meeting, User user) {
-        return MeetingStatus.builder()
+    private StatusOutput buildMeetingStatus(Meeting meeting, User user) {
+        return StatusOutput.builder()
                 .isOwner(meeting.isUserOwner(user))
                 .participateStatus(meeting.determineParticipationStatus(user))
                 .isExpire(meeting.isExpired())
                 .build();
+    }
+
+    public MyMeetingResponseList readMyMeetings(User user) {
+        List<Meeting> myMeetings = meetingRepository.findAllByHost(user);
+        List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()
+                .map(MeetingResponseMapper::toMyMeetingResponse)
+                .toList();
+        return new MyMeetingResponseList(myMeetingResponses.size(), myMeetingResponses);
     }
 }
 

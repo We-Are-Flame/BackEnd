@@ -1,12 +1,14 @@
 package com.backend.dto.comment.response;
 
-import java.util.List;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class CommentResponse {
-    private int count;
-    private List<CommentData> content;
+    private String profileImage;
+    private String nickname;
+    private String description;
+    private LocalDateTime createdAt;
 }
