@@ -1,8 +1,8 @@
 package com.backend.service.meeting;
 
 import com.backend.dto.comment.request.CommentCreateRequest;
-import com.backend.dto.comment.response.CommentData;
 import com.backend.dto.comment.response.CommentResponse;
+import com.backend.dto.comment.response.CommentResponseList;
 import com.backend.entity.meeting.Comment;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
@@ -46,16 +46,16 @@ public class CommentService {
                 .build();
     }
 
-    public CommentResponse getComments(Long meetingId) {
+    public CommentResponseList getComments(Long meetingId) {
         List<Comment> comments = commentRepository.findByMeetingId(meetingId);
-        List<CommentData> commentDataList = convertToCommentData(comments);
-        int count = commentDataList.size();
-        return new CommentResponse(count, commentDataList);
+        List<CommentResponse> commentResponseList = convertToCommentData(comments);
+        int count = commentResponseList.size();
+        return new CommentResponseList(count, commentResponseList);
     }
 
-    private List<CommentData> convertToCommentData(List<Comment> comments) {
+    private List<CommentResponse> convertToCommentData(List<Comment> comments) {
         return comments.stream()
-                .map(comment -> CommentData.builder()
+                .map(comment -> CommentResponse.builder()
                         .profileImage(comment.getUser().getProfileImage())
                         .nickname(comment.getUser().getNickname())
                         .description(comment.getDescription())

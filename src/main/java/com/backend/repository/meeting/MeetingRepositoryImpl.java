@@ -9,6 +9,7 @@ import com.backend.entity.meeting.QMeetingHashtag;
 import com.backend.entity.meeting.QMeetingImage;
 import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.user.QUser;
+import com.backend.entity.user.User;
 import com.backend.service.meeting.CustomSort;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -43,6 +44,7 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         return new PageImpl<>(meetings, pageable, total);
     }
 
+    @Override
     public Optional<Meeting> findMeetingWithDetailsById(Long meetingId) {
         JPAQuery<Meeting> query = createBaseMeetingQuery()
                 .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
@@ -50,6 +52,16 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .where(QMeeting.meeting.id.eq(meetingId));
 
         return Optional.ofNullable(performQueryAndEnrichWithHashtags(query));
+    }
+
+    @Override
+    public List<Meeting> findAllByHost(User host) {
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .where(QMeeting.meeting.host.eq(host));
+
+        return query.fetch().stream()
+                .map(this::enrichMeetingWithHashtags)
+                .collect(Collectors.toList());
     }
 
     private JPAQuery<Meeting> createBaseMeetingQuery() {

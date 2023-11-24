@@ -4,7 +4,7 @@ import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.comment.request.CommentCreateRequest;
 import com.backend.dto.comment.response.CommentCreateResponse;
-import com.backend.dto.comment.response.CommentResponse;
+import com.backend.dto.comment.response.CommentResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class CommentController {
     }
 
     @GetMapping("/{meetingId}/comments")
-    public ResponseEntity<CommentResponse> getComments(@PathVariable Long meetingId) {
+    public ResponseEntity<CommentResponseList> getComments(@PathVariable Long meetingId) {
         return ResponseEntity.ok(commentService.getComments(meetingId));
     }
 }

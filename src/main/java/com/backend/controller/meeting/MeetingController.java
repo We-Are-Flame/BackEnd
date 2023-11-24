@@ -6,6 +6,7 @@ import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.create.MeetingCreateResponse;
 import com.backend.dto.meeting.response.read.MeetingDetailResponse;
 import com.backend.dto.meeting.response.read.MeetingResponse;
+import com.backend.dto.meeting.response.read.MyMeetingResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.MeetingService;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,13 @@ public class MeetingController {
     public ResponseEntity<MeetingDetailResponse> getMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
         MeetingDetailResponse meeting = meetingService.readOneMeeting(meetingId, user);
         return ResponseEntity.ok(meeting);
+    }
+
+    @CheckUserNotNull
+    @GetMapping("/my")
+    public ResponseEntity<MyMeetingResponseList> getMyMeetings(@CurrentMember User user) {
+        MyMeetingResponseList meetings = meetingService.readMyMeetings(user);
+        return ResponseEntity.ok(meetings);
     }
 }
 
