@@ -1,3 +1,4 @@
 [submodule "config"]
 	path = config
 	url = https://github.com/We-Are-Flame/config
+	branch = main
