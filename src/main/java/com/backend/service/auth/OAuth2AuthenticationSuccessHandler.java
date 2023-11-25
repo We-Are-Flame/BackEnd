@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.core.env.Environment;
 
 
 @Component
@@ -28,6 +29,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Environment environment;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -49,8 +51,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(resBody));
 
+        String callbackUrl = environment.getProperty("callback.url");
         getRedirectStrategy().sendRedirect(request, response,
-                String.format("http://localhost:3000/callback?token=%s", accessToken));
+                String.format("%s?token=%s", callbackUrl, accessToken));
     }
 
     private User getUser(Authentication authentication) {
