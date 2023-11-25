@@ -28,7 +28,6 @@ public class MeetingImage {
     private Long id;
 
     private String imageUrl;
-    private Boolean isThumbnail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id", nullable = false)

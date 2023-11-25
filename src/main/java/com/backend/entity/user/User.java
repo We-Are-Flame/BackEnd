@@ -1,6 +1,18 @@
 package com.backend.entity.user;
 
-import jakarta.persistence.*;
+import com.backend.entity.meeting.Meeting;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +31,12 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "setting_id")
     private Setting setting;
+
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Meeting> meetings;
 
     private String nickname;
 
@@ -34,5 +49,9 @@ public class User {
     public void updateUserInfo(String name, String profileImage) {
         this.nickname = name;
         this.profileImage = profileImage;
+    }
+
+    public boolean isSameId(User otherUser) {
+        return this.id.equals(otherUser.getId());
     }
 }

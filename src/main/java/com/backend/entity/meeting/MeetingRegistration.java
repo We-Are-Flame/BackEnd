@@ -43,4 +43,8 @@ public class MeetingRegistration {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id", nullable = false)
     private Meeting meeting;
+
+    public boolean isUserContained(User user) {
+        return this.user.isSameId(user);
+    }
 }

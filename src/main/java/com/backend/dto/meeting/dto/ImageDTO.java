@@ -3,11 +3,11 @@ package com.backend.dto.meeting.dto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
+@SuperBuilder
 public class ImageDTO {
     @Schema(example = "썸네일.jpg", description = "썸네일 링크")
     private final String thumbnailUrl;
@@ -16,8 +16,4 @@ public class ImageDTO {
             schema = @Schema(type = "string", example = "image.jpg")
     )
     private final List<String> imageUrls;
-
-    public boolean NotExistThumbnail() {
-        return thumbnailUrl == null;
-    }
 }

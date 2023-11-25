@@ -1,5 +1,7 @@
 package com.backend.entity.meeting.embeddable;
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.Embeddable;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,5 +23,10 @@ public class MeetingTime {
         this.startTime = startTime;
         this.endTime = endTime;
         this.duration = Duration.between(startTime, endTime).toHours();
+    }
+
+    @Access(AccessType.FIELD)
+    public boolean isBeforeNow() {
+        return this.endTime.isBefore(LocalDateTime.now());
     }
 }

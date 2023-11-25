@@ -57,6 +57,13 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    //AOP설정
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    //NCP Object Storage 세팅(S3)
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('bootBuildImage') {
@@ -86,10 +93,14 @@ tasks.withType(JavaCompile) {
 
 // java source set 에 querydsl QClass 위치 추가
 sourceSets {
-    main.java.srcDirs += [ generated ]
+    main.java.srcDirs += [generated]
 }
 
 // gradle clean 시에 QClass 디렉토리 삭제
 clean {
     delete file(generated)
+}
+
+bootJar {
+    archiveFileName = "kitching.jar"
 }

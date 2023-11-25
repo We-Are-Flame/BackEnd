@@ -1,4 +1,4 @@
-package com.backend.controller.handler;
+package com.backend.controller.global;
 
 import com.backend.dto.bases.ErrorResponse;
 import com.backend.exception.BadRequestException;

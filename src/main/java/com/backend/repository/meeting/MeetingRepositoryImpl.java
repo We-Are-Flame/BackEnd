@@ -1,25 +1,27 @@
 package com.backend.repository.meeting;
 
+import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
-import com.backend.entity.meeting.QCategory;
+import com.backend.entity.meeting.MeetingHashtag;
 import com.backend.entity.meeting.QHashtag;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
 import com.backend.entity.meeting.QMeetingImage;
 import com.backend.entity.meeting.QMeetingRegistration;
-import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.user.QUser;
-import com.querydsl.core.types.Order;
+import com.backend.entity.user.User;
+import com.backend.service.meeting.CustomSort;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,33 +31,76 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     @Override
     public Page<Meeting> findAllWithDetails(Pageable pageable) {
-        List<Meeting> meetings = fetchMeetingsWithDetails(pageable);
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .orderBy(getOrderSpecifiers(pageable));
+
+        applyPagination(query, pageable);
+
+        List<Meeting> meetings = query.fetch().stream()
+                .map(this::enrichMeetingWithHashtags)
+                .collect(Collectors.toList());
         long total = fetchMeetingCount();
 
         return new PageImpl<>(meetings, pageable, total);
     }
 
-    private List<Meeting> fetchMeetingsWithDetails(Pageable pageable) {
-        QMeeting meeting = QMeeting.meeting;
+    @Override
+    public Optional<Meeting> findMeetingWithDetailsById(Long meetingId) {
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
+                .leftJoin(QMeeting.meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
+                .where(QMeeting.meeting.id.eq(meetingId));
 
-        JPAQuery<Meeting> query = queryFactory
-                .selectFrom(meeting)
-                .leftJoin(meeting.category, QCategory.category).fetchJoin()
-                .leftJoin(meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
-                .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin()
-                .leftJoin(meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
-                .leftJoin(QMeetingRegistration.meetingRegistration.user, QUser.user).fetchJoin()
-                .leftJoin(meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
-                .where(QMeetingRegistration.meetingRegistration.role.eq(RegistrationRole.OWNER));
+        return Optional.ofNullable(performQueryAndEnrichWithHashtags(query));
+    }
 
-        for (Sort.Order order : pageable.getSort()) {
-            OrderSpecifier<?> orderSpecifier = getOrderedSpecifier(meeting, order);
-            query.orderBy(orderSpecifier);
+    @Override
+    public List<Meeting> findAllByHost(User host) {
+        JPAQuery<Meeting> query = createBaseMeetingQuery()
+                .where(QMeeting.meeting.host.eq(host));
+
+        return query.fetch().stream()
+                .map(this::enrichMeetingWithHashtags)
+                .collect(Collectors.toList());
+    }
+
+    private JPAQuery<Meeting> createBaseMeetingQuery() {
+        return queryFactory
+                .selectFrom(QMeeting.meeting)
+                .leftJoin(QMeeting.meeting.host, QUser.user).fetchJoin()
+                .leftJoin(QMeeting.meeting.meetingHashtags, QMeetingHashtag.meetingHashtag).fetchJoin()
+                .leftJoin(QMeetingHashtag.meetingHashtag.hashtag, QHashtag.hashtag).fetchJoin();
+    }
+
+    private void applyPagination(JPAQuery<?> query, Pageable pageable) {
+        query.offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
+        return pageable.getSort().stream()
+                .flatMap(order -> CustomSort.fromString(order.getProperty()).toOrderSpecifiers(QMeeting.meeting)
+                        .stream())
+                .toArray(OrderSpecifier[]::new);
+    }
+
+    private Meeting performQueryAndEnrichWithHashtags(JPAQuery<Meeting> query) {
+        Meeting meeting = query.fetchOne();
+        return enrichMeetingWithHashtags(meeting);
+    }
+
+    private Meeting enrichMeetingWithHashtags(Meeting meeting) {
+        if (meeting != null) {
+            Set<Hashtag> hashtags = extractHashtags(meeting);
+            meeting.assignHashtags(hashtags);
         }
+        return meeting;
+    }
 
-        return query.offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+    private Set<Hashtag> extractHashtags(Meeting meeting) {
+        return meeting.getMeetingHashtags().stream()
+                .map(MeetingHashtag::getHashtag)
+                .collect(Collectors.toSet());
     }
 
     private long fetchMeetingCount() {
@@ -63,14 +108,5 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                         .from(QMeeting.meeting)
                         .fetchOne())
                 .orElse(0L);
-    }
-
-    private OrderSpecifier<?> getOrderedSpecifier(QMeeting meeting, Sort.Order order) {
-        Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-        return switch (order.getProperty()) {
-            case "createdAt" -> new OrderSpecifier<>(direction, meeting.createdAt);
-            case "title" -> new OrderSpecifier<>(direction, meeting.meetingInfo.title);
-            default -> new OrderSpecifier<>(direction, meeting.id);
-        };
     }
 }
