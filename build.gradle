@@ -60,6 +60,10 @@ dependencies {
 
     //AOP설정
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    //NCP Object Storage 세팅(S3)
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('bootBuildImage') {
