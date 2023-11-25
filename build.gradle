@@ -96,3 +96,7 @@ sourceSets {
 clean {
     delete file(generated)
 }
+
+bootJar {
+    archiveFileName = "kitching.jar"
+}
