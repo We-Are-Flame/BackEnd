@@ -29,7 +29,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors-> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .authorizeHttpRequests((authorizeHttpRequest) -> authorizeHttpRequest
-                        .requestMatchers("/api/login/**").permitAll()
+                        .requestMatchers("/api/login/**")
+                        .permitAll()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login
                         .authorizationEndpoint(config -> config.baseUri("/oauth2/authorization"))
