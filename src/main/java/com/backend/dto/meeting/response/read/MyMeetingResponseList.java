@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MyMeetingResponseList {
-    private int count;
     @JsonProperty("content")
     private final List<MyMeetingResponse> myMeetingResponse;
+    private int count;
 }

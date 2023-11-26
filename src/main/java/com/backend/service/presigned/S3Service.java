@@ -5,7 +5,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-
 import com.backend.dto.presigned.ImageRequestList;
 import com.backend.dto.presigned.ImageResponseList;
 import com.backend.util.S3Util;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +51,8 @@ public class S3Service {
                         .withMethod(HttpMethod.PUT)
                         .withExpiration(expiration);
 
-        generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString());
+        generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL,
+                CannedAccessControlList.PublicRead.toString());
         generatePresignedUrlRequest.setContentType(fileType);
 
         return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
