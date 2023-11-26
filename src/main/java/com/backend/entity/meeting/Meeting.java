@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -63,8 +64,9 @@ public class Meeting extends BaseEntity {
     @OneToMany(mappedBy = "meeting")
     private Set<MeetingHashtag> meetingHashtags;
 
+    @Builder.Default
     @OneToMany(mappedBy = "meeting")
-    private List<MeetingRegistration> registrations;
+    private List<MeetingRegistration> registrations = new ArrayList<>();
 
     @Transient
     private Set<Hashtag> hashtags;
