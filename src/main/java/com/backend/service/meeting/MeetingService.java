@@ -91,7 +91,7 @@ public class MeetingService {
         List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()
                 .map(MeetingResponseMapper::toMyMeetingResponse)
                 .toList();
-        return new MyMeetingResponseList(myMeetingResponses.size(), myMeetingResponses);
+        return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
     }
 }
 
