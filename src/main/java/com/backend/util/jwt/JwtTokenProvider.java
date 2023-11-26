@@ -13,8 +13,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,12 +26,13 @@ public class JwtTokenProvider {
 
     private final Long ACCESS_TOKEN_EXPIRE_TIME;
     private final String secretKey;
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public JwtTokenProvider(Environment env) {
+    public JwtTokenProvider(Environment env, CustomUserDetailsService customUserDetailsService) {
         secretKey = env.getProperty("jwt.secret");
-        ACCESS_TOKEN_EXPIRE_TIME = Long.parseLong(env.getProperty("jwt.access-token-expire-time"));
+        ACCESS_TOKEN_EXPIRE_TIME = Long.parseLong(
+                Objects.requireNonNull(env.getProperty("jwt.access-token-expire-time")));
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     private static String generateErrorMessage(io.jsonwebtoken.JwtException e) {

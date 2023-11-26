@@ -64,6 +64,14 @@ dependencies {
     //NCP Object Storage 세팅(S3)
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    //DatatypeConverter
+    implementation 'com.sun.xml.bind:jaxb-impl:4.0.2'
+    implementation 'com.sun.xml.bind:jaxb-core:4.0.2'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
+    //LocalDateTime  직렬화
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('bootBuildImage') {

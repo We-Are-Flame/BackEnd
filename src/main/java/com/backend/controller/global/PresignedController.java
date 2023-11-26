@@ -1,7 +1,6 @@
 package com.backend.controller.global;
 
 import com.backend.dto.presigned.ImageRequestList;
-
 import com.backend.dto.presigned.ImageResponseList;
 import com.backend.service.presigned.S3Service;
 import io.swagger.v3.oas.annotations.tags.Tag;
