@@ -42,20 +42,13 @@ public class User {
 
     private String profileImage;
 
-    private Integer temperature;
+    @Builder.Default
+    private Integer temperature = 360;
 
     private String email;
 
     public void updateUserInfo(String name, String profileImage) {
-        updateNickname(name);
-        updateProfileImage(profileImage);
-    }
-
-    public void updateNickname(String nickname){
-        this.nickname = nickname;
-    }
-
-    public void updateProfileImage(String profileImage){
+        this.nickname = name;
         this.profileImage = profileImage;
     }
 

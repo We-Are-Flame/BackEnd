@@ -21,4 +21,16 @@ public class UserUpdateResponse{
         }
     }
 
+    @SuperBuilder
+    public static class ProfileImage extends BaseResponse {
+        private final Long id;
+        public static ProfileImage success(Long id) {
+            return ProfileImage.builder()
+                    .id(id)
+                    .status(ResponseStatus.SUCCESS)
+                    .message(ResponseMessage.PROFILE_IMAGE_UPDATE_SUCCESS.getMessage())
+                    .build();
+        }
+    }
+
 }

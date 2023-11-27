@@ -19,12 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PutMapping
+    @PutMapping("nickname")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.Nickname> updateNickName(@RequestBody UserUpdateRequest.Nickname request,
                                                                @CurrentMember User user){
         Long id = userService.updateNickname(request, user.getId());
         UserUpdateResponse.Nickname response = UserUpdateResponse.Nickname.success(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("profile-image")
+    @CheckUserNotNull
+    ResponseEntity<UserUpdateResponse.ProfileImage> updateProfileImage(@RequestBody UserUpdateRequest.ProfileImage request,
+                                                                       @CurrentMember User user){
+        Long id = userService.updateProfileImage(request, user.getId());
+        UserUpdateResponse.ProfileImage response = UserUpdateResponse.ProfileImage.success(id);
         return ResponseEntity.ok(response);
     }
 

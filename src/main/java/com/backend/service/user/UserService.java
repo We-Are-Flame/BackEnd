@@ -22,4 +22,12 @@ public class UserService {
         user.updateNickname(request.getNickname());
         return user.getId();
     }
+
+    @Transactional
+    public Long updateProfileImage(UserUpdateRequest.ProfileImage request, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
+        user.updateProfileImage(request.getImageInput().getProfileImageUrl());
+        return user.getId();
+    }
 }
