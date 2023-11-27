@@ -35,7 +35,7 @@ public class User {
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Meeting> meetings;
 
     private String nickname;

@@ -15,8 +15,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+
     private final UserService userService;
 
+    @GetMapping
+    @CheckUserNotNull
+    ResponseEntity<UserResponse.MyPage> getMyPage(@CurrentMember User user){
+        UserResponse.MyPage response = userService.getMyPage(user);
+        return ResponseEntity.ok(response);
+    }
     @PutMapping("nickname")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.Nickname> updateNickName(@RequestBody UserUpdateRequest.Nickname request,
@@ -47,6 +54,4 @@ public class UserController {
         UserUpdateResponse.Notification response = UserUpdateResponse.Notification.success(id);
         return ResponseEntity.ok(response);
     }
-
-
 }

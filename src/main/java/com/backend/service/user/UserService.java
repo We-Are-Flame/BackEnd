@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
 
+    public UserResponse.MyPage getMyPage(User user) {
+        return UserResponse.MyPage.from(user);
+    }
+
     @Transactional
     public Long updateNickname(UserUpdateRequest.Nickname request, Long userId) {
         User user = userRepository.findById(userId)
