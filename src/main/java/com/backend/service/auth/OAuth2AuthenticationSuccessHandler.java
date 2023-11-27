@@ -1,7 +1,7 @@
 package com.backend.service.auth;
 
 
-import com.backend.dto.auth.LoginResponse;
+import com.backend.dto.auth.response.LoginResponse;
 import com.backend.dto.auth.oauth2.OAuth2UserInfo;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
