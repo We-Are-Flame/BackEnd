@@ -12,6 +12,7 @@ import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.user.UserRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
@@ -32,6 +33,7 @@ public class MeetingService {
     private final RegistrationService registrationService;
     private final CategoryService categoryService;
     private final HashtagService hashtagService;
+
 
     @Transactional
     public Long createMeeting(MeetingCreateRequest request, User user) {
@@ -67,6 +69,7 @@ public class MeetingService {
         return PageRequest.of(page, end, CustomSort.getSort(sort));
     }
 
+    @Transactional
     public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
         Meeting meeting = fetchMeeting(meetingId);
         StatusOutput status = buildMeetingStatus(meeting, user);

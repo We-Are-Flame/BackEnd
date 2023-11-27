@@ -7,6 +7,7 @@ import com.backend.exception.JwtAuthenticationException;
 import com.backend.service.custom.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,22 +34,6 @@ public class JwtTokenProvider {
         ACCESS_TOKEN_EXPIRE_TIME = Long.parseLong(
                 Objects.requireNonNull(env.getProperty("jwt.access-token-expire-time")));
         this.customUserDetailsService = customUserDetailsService;
-    }
-
-    private static String generateErrorMessage(io.jsonwebtoken.JwtException e) {
-        if (e instanceof SignatureException) {
-            return "시그니처가 일치하지 않습니다!";
-        }
-        if (e instanceof ExpiredJwtException) {
-            return "토큰이 만료되었습니다!";
-        }
-        if (e instanceof MalformedJwtException) {
-            return "잘못된 형식의 토큰입니다!";
-        }
-        if (e instanceof UnsupportedJwtException) {
-            return "지원하지 않는 토큰입니다!";
-        }
-        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
     }
 
     public String sign(User user, Date now) {
@@ -78,19 +63,35 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
-    public String validateTokenAndGetSubject(String token) {
+    private String validateTokenAndGetSubject(String token) {
         try {
             return validateToken(token);
-        } catch (io.jsonwebtoken.JwtException e) {
+        } catch (JwtException e) {
             throw new JwtAuthenticationException(generateErrorMessage(e));
         }
     }
 
-    public String validateToken(String token) {
+    private String validateToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    private static String generateErrorMessage(JwtException e) {
+        if (e instanceof SignatureException) {
+            return "시그니처가 일치하지 않습니다!";
+        }
+        if (e instanceof ExpiredJwtException) {
+            return "토큰이 만료되었습니다!";
+        }
+        if (e instanceof MalformedJwtException) {
+            return "잘못된 형식의 토큰입니다!";
+        }
+        if (e instanceof UnsupportedJwtException) {
+            return "지원하지 않는 토큰입니다!";
+        }
+        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
     }
 }
