@@ -47,7 +47,15 @@ public class User {
     private String email;
 
     public void updateUserInfo(String name, String profileImage) {
-        this.nickname = name;
+        updateNickname(name);
+        updateProfileImage(profileImage);
+    }
+
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImage(String profileImage){
         this.profileImage = profileImage;
     }
 
