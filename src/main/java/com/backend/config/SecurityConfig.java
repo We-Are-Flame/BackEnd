@@ -40,6 +40,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .clearAuthentication(true)
+                        .logoutSuccessUrl("/")
+
+                )
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .build();
     }
