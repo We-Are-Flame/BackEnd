@@ -33,4 +33,16 @@ public class UserUpdateResponse{
         }
     }
 
+    @SuperBuilder
+    public static class Notification extends BaseResponse {
+        private final Long id;
+        public static Notification success(Long id) {
+            return Notification.builder()
+                    .id(id)
+                    .status(ResponseStatus.SUCCESS)
+                    .message(ResponseMessage.NOTIFICATION_UPDATE_SUCCESS.getMessage())
+                    .build();
+        }
+    }
+
 }

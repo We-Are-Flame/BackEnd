@@ -3,15 +3,13 @@ package com.backend.controller.user;
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.user.request.update.UserUpdateRequest;
+import com.backend.dto.user.response.read.UserResponse;
 import com.backend.dto.user.response.update.UserUpdateResponse;
 import com.backend.entity.user.User;
 import com.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,7 +25,6 @@ public class UserController {
         UserUpdateResponse.Nickname response = UserUpdateResponse.Nickname.success(id);
         return ResponseEntity.ok(response);
     }
-
     @PutMapping("profile-image")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.ProfileImage> updateProfileImage(@RequestBody UserUpdateRequest.ProfileImage request,
@@ -36,5 +33,20 @@ public class UserController {
         UserUpdateResponse.ProfileImage response = UserUpdateResponse.ProfileImage.success(id);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("notification")
+    @CheckUserNotNull
+    ResponseEntity<UserResponse.Notification> getUserNotification(@CurrentMember User user){
+        UserResponse.Notification response = userService.getUserNotification(user);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("notification")
+    @CheckUserNotNull
+    ResponseEntity<UserUpdateResponse.Notification> updateUserNotification(@RequestBody UserUpdateRequest.Notification request,
+                                                                           @CurrentMember User user){
+        Long id = userService.updateUserNotification(request, user.getId());
+        UserUpdateResponse.Notification response = UserUpdateResponse.Notification.success(id);
+        return ResponseEntity.ok(response);
+    }
+
 
 }
