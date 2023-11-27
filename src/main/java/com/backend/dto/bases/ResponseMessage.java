@@ -6,7 +6,8 @@ public enum ResponseMessage {
     REGISTRATION_CREATION_SUCCESS("모임에 성공적으로 신청하셨습니다."),
     NICKNAME_UPDATE_SUCCESS("닉네임을 성공적으로 변경하셨습니다."),
     PROFILE_IMAGE_UPDATE_SUCCESS("프로필 이미지를 성공적으로 변경하셨습니다."),
-    NOTIFICATION_UPDATE_SUCCESS("유저 알림 설정을 성공적으로 변경하셨습니다.");
+    NOTIFICATION_UPDATE_SUCCESS("유저 알림 설정을 성공적으로 변경하셨습니다."),
+    TOKEN_VALIDATE_SUCCESS("토큰이 유효합니다.");
 
     private final String message;
 
