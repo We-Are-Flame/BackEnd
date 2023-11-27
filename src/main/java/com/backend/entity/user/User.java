@@ -31,27 +31,34 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Meeting> meetings;
 
     private String nickname;
 
     private String profileImage;
 
-    private Integer temperature;
+    @Builder.Default
+    private Integer temperature = 360;
 
     private String email;
 
-    public void updateUserInfo(String name, String profileImage) {
-        this.nickname = name;
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+    public void updateProfileImage(String profileImage){
         this.profileImage = profileImage;
     }
 
     public boolean isSameId(User otherUser) {
         return this.id.equals(otherUser.getId());
+    }
+
+    public void updateNotification(Boolean isNotification) {
+        this.setting.updateNotification(isNotification);
     }
 }

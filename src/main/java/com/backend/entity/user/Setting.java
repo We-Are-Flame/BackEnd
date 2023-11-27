@@ -25,4 +25,8 @@ public class Setting {
     private Long id;
 
     private Boolean isUserNotification;
+
+    public void updateNotification(Boolean isUserNotification) {
+        this.isUserNotification = isUserNotification;
+    }
 }
