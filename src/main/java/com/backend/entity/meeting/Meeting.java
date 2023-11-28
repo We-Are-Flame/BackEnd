@@ -4,6 +4,7 @@ import com.backend.entity.base.BaseEntity;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -58,14 +59,14 @@ public class Meeting extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User host;
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MeetingImage> meetingImages;
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MeetingHashtag> meetingHashtags;
 
     @Builder.Default
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingRegistration> registrations = new ArrayList<>();
 
     @Transient

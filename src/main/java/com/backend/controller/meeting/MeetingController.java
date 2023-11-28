@@ -12,6 +12,8 @@ import com.backend.service.meeting.MeetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +50,13 @@ public class MeetingController {
     public ResponseEntity<MeetingDetailResponse> getMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
         MeetingDetailResponse meeting = meetingService.readOneMeeting(meetingId, user);
         return ResponseEntity.ok(meeting);
+    }
+
+    @CheckUserNotNull
+    @DeleteMapping("/{meetingId}")
+    public ResponseEntity<Void> deleteMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
+        meetingService.deleteMeeting(meetingId, user);
+        return ResponseEntity.noContent().build();
     }
 
     @CheckUserNotNull
