@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class ImageDTO {
+public class MeetingImageDTO {
     @Schema(example = "썸네일.jpg", description = "썸네일 링크")
     private final String thumbnailUrl;
     @ArraySchema(

@@ -6,7 +6,7 @@ import com.backend.dto.meeting.response.read.MyMeetingResponse;
 import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
 import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
 import com.backend.dto.meeting.response.read.output.HostOutput;
-import com.backend.dto.meeting.response.read.output.ImageOutput;
+import com.backend.dto.meeting.response.read.output.MeetingImageOutput;
 import com.backend.dto.meeting.response.read.output.InfoOutput;
 import com.backend.dto.meeting.response.read.output.LocationOutput;
 import com.backend.dto.meeting.response.read.output.StatusOutput;
@@ -83,7 +83,7 @@ public class MeetingResponseMapper {
                 .build();
     }
 
-    private static ImageOutput buildImage(Set<MeetingImage> images) {
+    private static MeetingImageOutput buildImage(Set<MeetingImage> images) {
         List<String> imageUrls = images.stream()
                 .map(MeetingImage::getImageUrl)
                 .collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class MeetingResponseMapper {
             thumbnailUrl = imageUrls.get(0);
         }
 
-        return ImageOutput.builder()
+        return MeetingImageOutput.builder()
                 .thumbnailUrl(thumbnailUrl)
                 .imageUrls(imageUrls)
                 .build();

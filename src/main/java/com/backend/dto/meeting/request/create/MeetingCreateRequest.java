@@ -1,7 +1,7 @@
 package com.backend.dto.meeting.request.create;
 
 import com.backend.dto.meeting.request.create.input.HashtagInput;
-import com.backend.dto.meeting.request.create.input.ImageInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
@@ -29,9 +29,8 @@ public class MeetingCreateRequest {
 
     @JsonProperty("time")
     private final TimeInput timeInput;
-
     @JsonProperty("image")
-    private final ImageInput imageInput;
+    private final MeetingImageInput imageInput;
 
     @JsonIgnore
     public String getThumbnailUrl() {
