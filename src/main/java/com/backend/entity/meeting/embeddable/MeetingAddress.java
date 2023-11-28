@@ -15,4 +15,6 @@ import lombok.NoArgsConstructor;
 public class MeetingAddress {
     private String location;
     private String detailLocation;
+    private String latitude;
+    private String longitude;
 }

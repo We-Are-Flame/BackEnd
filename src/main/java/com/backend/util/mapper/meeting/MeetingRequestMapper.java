@@ -48,6 +48,8 @@ public class MeetingRequestMapper {
         return MeetingAddress.builder()
                 .location(locationInput.getLocation())
                 .detailLocation(locationInput.getDetailLocation())
+                .latitude(locationInput.getLatitude())
+                .longitude(locationInput.getLongitude())
                 .build();
     }
 

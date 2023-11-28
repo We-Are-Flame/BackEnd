@@ -103,6 +103,8 @@ public class MeetingResponseMapper {
         return LocationOutput.builder()
                 .location(address.getLocation())
                 .detailLocation(address.getDetailLocation())
+                .latitude(address.getLatitude())
+                .longitude(address.getLongitude())
                 .build();
     }
 

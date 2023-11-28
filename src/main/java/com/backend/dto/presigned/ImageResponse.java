@@ -1,4 +1,4 @@
-package com.backend.service.presigned;
+package com.backend.dto.presigned;
 
 import java.net.URL;
 
