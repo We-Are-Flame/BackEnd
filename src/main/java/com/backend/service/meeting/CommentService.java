@@ -46,6 +46,7 @@ public class CommentService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public CommentResponseList getComments(Long meetingId) {
         List<Comment> comments = commentRepository.findByMeetingId(meetingId);
         List<CommentResponse> commentResponseList = convertToCommentData(comments);

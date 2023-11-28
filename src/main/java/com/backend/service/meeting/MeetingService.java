@@ -12,7 +12,6 @@ import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
-import com.backend.repository.user.UserRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
@@ -58,6 +57,7 @@ public class MeetingService {
         registrationService.createOwnerStatus(meeting, user);
     }
 
+    @Transactional(readOnly = true)
     public Page<MeetingResponse> readMeetings(int start, int end, String sort) {
         Pageable pageable = createPageable(start, end, sort);
         Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
@@ -69,7 +69,7 @@ public class MeetingService {
         return PageRequest.of(page, end, CustomSort.getSort(sort));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
         Meeting meeting = fetchMeeting(meetingId);
         StatusOutput status = buildMeetingStatus(meeting, user);
@@ -89,6 +89,7 @@ public class MeetingService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public MyMeetingResponseList readMyMeetings(User user) {
         List<Meeting> myMeetings = meetingRepository.findAllByHost(user);
         List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()

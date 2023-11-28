@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.backend.dto.presigned.ImageRequestList;
+import com.backend.dto.presigned.ImageResponse;
 import com.backend.dto.presigned.ImageResponseList;
 import com.backend.util.S3Util;
 import java.net.URL;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class S3Service {
     private final AmazonS3Client amazonS3Client;
     private final S3Util s3Util;
 
+    @Transactional(readOnly = true)
     public ImageResponseList createPresignedUrls(ImageRequestList request) {
         List<ImageResponse> urlResponses = request.imageList()
                 .stream()
