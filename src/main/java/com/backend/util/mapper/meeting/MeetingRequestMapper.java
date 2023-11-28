@@ -1,7 +1,7 @@
 package com.backend.util.mapper.meeting;
 
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
-import com.backend.dto.meeting.request.create.input.ImageInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
@@ -53,7 +53,7 @@ public class MeetingRequestMapper {
                 .build();
     }
 
-    public static List<MeetingImage> toMeetingImages(Meeting meeting, ImageInput imageInput) {
+    public static List<MeetingImage> toMeetingImages(Meeting meeting, MeetingImageInput imageInput) {
         return Optional.ofNullable(imageInput.getImageUrls())
                 .orElse(Collections.emptyList())
                 .stream()
