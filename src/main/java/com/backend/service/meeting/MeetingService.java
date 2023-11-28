@@ -9,12 +9,14 @@ import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
+import com.backend.exception.AccessDeniedException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -97,5 +99,20 @@ public class MeetingService {
                 .toList();
         return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
     }
-}
 
+    @Transactional
+    public void deleteMeeting(Long meetingId, User user) {
+        validateMeetingOwner(meetingId, user);
+        meetingRepository.deleteMeetingWithAllDetails(meetingId);
+    }
+
+    private void validateMeetingOwner(Long meetingId, User user) {
+        Optional<Long> ownerIdOpt = meetingRepository.findOwnerIdByMeetingId(meetingId);
+        Long ownerId = ownerIdOpt
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
+
+        if (!ownerId.equals(user.getId())) {
+            throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
+        }
+    }
+}

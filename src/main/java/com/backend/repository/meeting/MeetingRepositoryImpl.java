@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +63,25 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         return query.fetch().stream()
                 .map(this::enrichMeetingWithHashtags)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteMeetingWithAllDetails(Long meetingId) {
+        queryFactory.delete(QMeetingImage.meetingImage)
+                .where(QMeetingImage.meetingImage.meeting.id.eq(meetingId))
+                .execute();
+        queryFactory.delete(QMeetingHashtag.meetingHashtag)
+                .where(QMeetingHashtag.meetingHashtag.meeting.id.eq(meetingId))
+                .execute();
+        queryFactory.delete(QMeetingRegistration.meetingRegistration)
+                .where(QMeetingRegistration.meetingRegistration.meeting.id.eq(meetingId))
+                .execute();
+
+        // 마지막으로 Meeting 엔티티 삭제
+        queryFactory.delete(QMeeting.meeting)
+                .where(QMeeting.meeting.id.eq(meetingId))
+                .execute();
     }
 
     private JPAQuery<Meeting> createBaseMeetingQuery() {

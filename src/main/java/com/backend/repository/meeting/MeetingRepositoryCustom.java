@@ -13,5 +13,7 @@ public interface MeetingRepositoryCustom {
     Optional<Meeting> findMeetingWithDetailsById(Long id);
 
     List<Meeting> findAllByHost(User host);
+
+    void deleteMeetingWithAllDetails(Long meetingId);
 }
 
