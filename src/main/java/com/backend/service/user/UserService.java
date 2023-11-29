@@ -49,4 +49,9 @@ public class UserService {
                 .isUserNotification(user.getSetting().getIsUserNotification())
                 .build();
     }
+
+    public User validateUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
+    }
 }

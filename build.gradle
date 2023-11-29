@@ -72,6 +72,9 @@ dependencies {
 
     //LocalDateTime  직렬화
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    //Chat 웹소켓 설정
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('bootBuildImage') {

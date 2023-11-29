@@ -1,4 +1,4 @@
-package com.backend.entity.chatting;
+package com.backend.entity.chat;
 
 import com.backend.entity.user.User;
 import jakarta.persistence.Column;
@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,12 +21,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "chat_messages")
-public class ChatMessage {
+@Table(name = "chat_room_users")
+public class ChatRoomUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_message_id")
+    @Column(name = "chat_room_user_Id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,8 +37,6 @@ public class ChatMessage {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
-    private String message;
-
-    private LocalDateTime createdAt;
+    private Boolean isOwner;
+    private Boolean isRoomNotification;
 }
