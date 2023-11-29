@@ -5,6 +5,7 @@ import com.backend.dto.chat.response.read.ChatUserResponse;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
 import com.backend.dto.chat.response.read.RoomResponse;
 import com.backend.dto.chat.response.read.RoomResponseList;
+import com.backend.dto.chat.response.read.output.RoomStatusOutput;
 import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
@@ -46,7 +47,7 @@ public class RoomService {
                     ChatRoom chatRoom = roomUser.getChatRoom();
                     List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoom(chatRoom);
                     ChatMessage lastMessage = chatMessages.get(chatMessages.size() - 1);
-                    StatusOutput status = buildMeetingStatus(chatRoom.getMeeting(), user);
+                    RoomStatusOutput status = buildChatRoomStatus(chatRoom.getMeeting(), roomUser);
                     return RoomResponse.of(roomUser, chatRoom, lastMessage, status);
                 })
                 .toList();
@@ -151,10 +152,9 @@ public class RoomService {
     }
 
     // TODO : 이것도 수정 하고 싶음
-    private StatusOutput buildMeetingStatus(Meeting meeting, User user) {
-        return StatusOutput.builder()
-                .isOwner(meeting.isUserOwner(user))
-                .participateStatus(meeting.determineParticipationStatus(user))
+    private RoomStatusOutput buildChatRoomStatus(Meeting meeting, ChatRoomUser user) {
+        return RoomStatusOutput.builder()
+                .isOwner(user.getIsOwner())
                 .isExpire(meeting.isExpired())
                 .build();
     }

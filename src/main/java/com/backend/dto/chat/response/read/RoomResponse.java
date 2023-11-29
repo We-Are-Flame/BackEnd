@@ -1,5 +1,6 @@
 package com.backend.dto.chat.response.read;
 
+import com.backend.dto.chat.response.read.output.RoomStatusOutput;
 import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
@@ -20,9 +21,9 @@ public class RoomResponse {
     private String lastMessage ; // 마지막 메세지
     private LocalDateTime lastDateTime; // 마지막 메세지 시간
     private Boolean isNotification; // 채팅방 알림 설정
-    private StatusOutput status; // 채팅방 상태
+    private RoomStatusOutput status; // 채팅방 상태
 
-    public static RoomResponse of(ChatRoomUser chatRoomUser, ChatRoom chatRoom, ChatMessage chatMessage, StatusOutput status){
+    public static RoomResponse of(ChatRoomUser chatRoomUser, ChatRoom chatRoom, ChatMessage chatMessage, RoomStatusOutput status){
         return RoomResponse.builder()
                 .roomId(chatRoom.getUuid())
                 .roomName(chatRoom.getChatRoomName())
