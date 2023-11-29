@@ -39,7 +39,7 @@ public class User {
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Meeting> meetings;
 
     private String nickname;
@@ -52,7 +52,7 @@ public class User {
     private String email;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
     public void updateNickname(String nickname){

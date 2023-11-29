@@ -37,13 +37,4 @@ public class ChatMessage extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private MessageType messageType;
 
-    public static ChatMessage of(ChatCreateRequest chatDto, ChatRoom chatRoom, User sender){
-        return ChatMessage.builder()
-                .messageType(chatDto.getMessageType())
-                .chatRoom(chatRoom)
-                .sender(sender)
-                .message(chatDto.getMessage())
-                .build();
-    }
-
 }

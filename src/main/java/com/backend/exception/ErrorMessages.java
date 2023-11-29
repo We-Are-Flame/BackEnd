@@ -12,5 +12,8 @@ public class ErrorMessages {
     public static final String ROOM_NOT_FOUND = "해당 채팅방을 찾을 수 없습니다!";
     public static final String USER_NOT_FOUND_IN_CHAT_ROOM = "채팅방에서 해당 유저를 찾을 수 없습니다.";
     public static final String USER_DOES_NOT_OWN_CHAT_ROOM = "해당 채팅방의 방장이 아닙니다.";
+    public static final String ALREADY_EXIST_CHAT_ROOM = "이미 해당 모임의 채팅방이 만들어져 있습니다.";
+    public static final String ALREADY_EXIST_CHAT_USER = "이미 채팅방에 입장해 있습니다.";
+
 }
 

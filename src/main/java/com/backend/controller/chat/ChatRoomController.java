@@ -44,7 +44,7 @@ public class ChatRoomController {
     @CheckUserNotNull
     public ResponseEntity<RoomDeleteResponse> deleteChatRoom(@CurrentMember User user,
                                                              @PathVariable String roomId) {
-        Long id = roomService.deleteChatRoom(user, roomId);
+        Long id = roomService.deleteChatRoom(user.getId(), roomId);
         RoomDeleteResponse response = RoomDeleteResponse.success(id);
         return ResponseEntity.ok(response);
     }

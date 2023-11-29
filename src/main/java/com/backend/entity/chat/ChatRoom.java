@@ -2,10 +2,8 @@ package com.backend.entity.chat;
 
 import com.backend.entity.base.BaseEntity;
 import com.backend.entity.meeting.Meeting;
-import com.backend.entity.meeting.MeetingRegistration;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +33,11 @@ public class ChatRoom extends BaseEntity {
     private Integer userCount = 0;
 
     @Builder.Default
-    @OneToMany(mappedBy = "chatRoom", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatMessage> messages = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "chatRoom", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatRoomUser> roomUsers = new ArrayList<>();
     public void addMessage(ChatMessage message) {
         this.messages.add(message);

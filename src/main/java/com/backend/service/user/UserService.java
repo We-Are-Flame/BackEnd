@@ -50,7 +50,7 @@ public class UserService {
                 .build();
     }
 
-    public User validateUser(Long userId) {
+    public User fetchUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
     }

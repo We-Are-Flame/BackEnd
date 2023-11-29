@@ -27,7 +27,7 @@ public class ChatController {
     @MessageMapping("/chat/enterUser")
     public void enterUser(@Payload ChatCreateRequest chatRequest, SimpMessageHeaderAccessor headerAccessor) {
 
-        roomService.addUser(chatRequest.getRoomId(), chatRequest.getSenderId());
+        roomService.addUserInChatRoom(chatRequest.getRoomId(), chatRequest.getSenderId());
 
         headerAccessor.getSessionAttributes().put("userId", chatRequest.getSenderId());
         headerAccessor.getSessionAttributes().put("roomId", chatRequest.getRoomId());
@@ -50,7 +50,7 @@ public class ChatController {
         String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
 
         ChatCreateRequest chat = chatService.createLeaveMessage(userId, roomId);
-        roomService.delUser(roomId, userId);
+        roomService.removeUserFromChatRoom(roomId, userId);
 
         sendMessage(chat);
     }
