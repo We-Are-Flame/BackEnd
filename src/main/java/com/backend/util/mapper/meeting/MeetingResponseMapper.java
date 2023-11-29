@@ -41,7 +41,7 @@ public class MeetingResponseMapper {
                 .id(meeting.getId())
                 .hashtags(extractHashTags(meeting))
                 .detailInfoOutput(buildDetailInfo(meeting))
-                .imageOutput(buildImage(meeting.getMeetingImages()))
+                .imageOutput(buildImage(meeting.getMeetingImages(), meeting.getThumbnailUrl()))
                 .locationOutput(buildLocation(meeting.getMeetingAddress()))
                 .timeOutput(buildDetailTime(meeting.getMeetingTime(), meeting.getCreatedAt()))
                 .hostOutput(buildHost(meeting.getHost()))
@@ -83,15 +83,11 @@ public class MeetingResponseMapper {
                 .build();
     }
 
-    private static MeetingImageOutput buildImage(Set<MeetingImage> images) {
+    private static MeetingImageOutput buildImage(Set<MeetingImage> images, String thumbnailUrl) {
         List<String> imageUrls = images.stream()
                 .map(MeetingImage::getImageUrl)
                 .collect(Collectors.toList());
 
-        String thumbnailUrl = null;
-        if (!imageUrls.isEmpty()) {
-            thumbnailUrl = imageUrls.get(0);
-        }
 
         return MeetingImageOutput.builder()
                 .thumbnailUrl(thumbnailUrl)
