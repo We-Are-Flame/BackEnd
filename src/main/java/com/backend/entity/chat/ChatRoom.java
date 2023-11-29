@@ -23,7 +23,7 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "chat_room_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "meeting_id")
     private Meeting meeting;
 
