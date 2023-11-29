@@ -20,20 +20,14 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class ChatController {
 
     private final SimpMessageSendingOperations template;
-
     private final ChatService chatService;
-    private final RoomService roomService;
 
     @MessageMapping("/chat/enterUser")
     public void enterUser(@Payload ChatCreateRequest chatRequest, SimpMessageHeaderAccessor headerAccessor) {
 
-        roomService.addUserInChatRoom(chatRequest.getRoomId(), chatRequest.getSenderId());
-
         headerAccessor.getSessionAttributes().put("userId", chatRequest.getSenderId());
         headerAccessor.getSessionAttributes().put("roomId", chatRequest.getRoomId());
 
-        chatRequest.updateMessage(chatRequest.getSender() + " 님이 입장 했습니다.");
-        sendMessage(chatRequest);
     }
 
     @MessageMapping("/chat/sendMessage")
@@ -49,9 +43,5 @@ public class ChatController {
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
 
-        ChatCreateRequest chat = chatService.createLeaveMessage(userId, roomId);
-        roomService.removeUserFromChatRoom(roomId, userId);
-
-        sendMessage(chat);
     }
 }

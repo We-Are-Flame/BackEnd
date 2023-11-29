@@ -54,15 +54,13 @@ public class RoomService {
 
         ChatRoom chatRoom = buildChatRoom(request, meeting);
         chatRoomRepository.save(chatRoom);
-        addUserInChatRoom(chatRoom.getUuid(), user.getId());
+        addUserInChatRoom(user.getId(), chatRoom.getUuid());
 
         ChatMessage roomCreateMessage = buildRoomCreateMessage(chatRoom, user);
         chatMessageRepository.save(roomCreateMessage);
 
         return chatRoom.getUuid();
     }
-
-
 
     @Transactional
     public Long deleteChatRoom(Long userId, String roomId) {
@@ -80,7 +78,7 @@ public class RoomService {
     }
 
     @Transactional
-    public void addUserInChatRoom(String roomId, Long userId){
+    public Long addUserInChatRoom(Long userId, String roomId){
         User user = userService.fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
@@ -91,10 +89,11 @@ public class RoomService {
 
         user.addChatUser(chatRoomUser);
         room.addRoomUser(chatRoomUser);
+        return user.getId();
     }
 
     @Transactional
-    public void removeUserFromChatRoom(String roomId, Long userId){
+    public Long exitUserFromChatRoom(Long userId, String roomId){
         User user = userService.fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
@@ -105,6 +104,7 @@ public class RoomService {
         chatRoomUserRepository.deleteById(chatRoomUser.getId());
 
         checkAndDeleteEmptyRoom(room);
+        return user.getId();
     }
 
     public ChatUserResponseList getRoomUserList(String roomId) {

@@ -3,6 +3,8 @@ package com.backend.controller.chat;
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.chat.request.create.RoomCreateRequest;
+import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
+import com.backend.dto.chat.response.delete.ChatRoomUserExitResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
@@ -40,6 +42,15 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("{roomId}")
+    @CheckUserNotNull
+    public ResponseEntity<ChatRoomUserEnterResponse> enterUserInChatRoom(@CurrentMember User user,
+                                                                          @PathVariable String roomId) {
+        Long id = roomService.addUserInChatRoom(user.getId(), roomId);
+        ChatRoomUserEnterResponse response = ChatRoomUserEnterResponse.success(id);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("{roomId}")
     @CheckUserNotNull
     public ResponseEntity<RoomDeleteResponse> deleteChatRoom(@CurrentMember User user,
@@ -49,11 +60,13 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{roomId}/messages")
-    @ResponseBody
-    public ResponseEntity<ChatResponseList> getMessages(@PathVariable String roomId){
-        ChatResponseList roomMessages = chatService.findRoomMessages(roomId);
-        return ResponseEntity.ok(roomMessages);
+    @DeleteMapping("{roomId}/user")
+    @CheckUserNotNull
+    public ResponseEntity<ChatRoomUserExitResponse> exitUserFromChatRoom(@CurrentMember User user,
+                                                                         @PathVariable String roomId) {
+        Long id = roomService.exitUserFromChatRoom(user.getId(), roomId);
+        ChatRoomUserExitResponse response = ChatRoomUserExitResponse.success(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{roomId}/users")
@@ -62,4 +75,13 @@ public class ChatRoomController {
         ChatUserResponseList roomUsers = roomService.getRoomUserList(roomId);
         return ResponseEntity.ok(roomUsers);
     }
+
+    @GetMapping("/{roomId}/messages")
+    @ResponseBody
+    public ResponseEntity<ChatResponseList> getMessages(@PathVariable String roomId){
+        ChatResponseList roomMessages = chatService.findRoomMessages(roomId);
+        return ResponseEntity.ok(roomMessages);
+    }
+
+
 }
