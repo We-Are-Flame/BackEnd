@@ -8,13 +8,13 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class RoomCreateResponse extends BaseResponse {
-    private final String id;
-    public static RoomCreateResponse success(String id) {
-        return RoomCreateResponse.builder()
+public class ChatRoomUserEnterResponse extends BaseResponse {
+    private final Long id;
+    public static ChatRoomUserEnterResponse success(Long id) {
+        return ChatRoomUserEnterResponse.builder()
                 .id(id)
                 .status(ResponseStatus.SUCCESS)
-                .message(ResponseMessage.CHAT_ROOM_CREATION_SUCCESS.getMessage())
+                .message(ResponseMessage.CHAT_ROOM_USER_ENTER_SUCCESS.getMessage())
                 .build();
     }
 }
