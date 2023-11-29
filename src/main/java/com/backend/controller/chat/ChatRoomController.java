@@ -41,7 +41,7 @@ public class ChatRoomController {
     @PostMapping("/room")
     @CheckUserNotNull
     public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest request, @CurrentMember User user) {
-        Long id = roomService.createChatRoom(request, user.getId());
+        String id = roomService.createChatRoom(request, user.getId());
         log.info("CREATE Chat Room [{}]", id);
         RoomCreateResponse response = RoomCreateResponse.success(id);
         return ResponseEntity.ok(response);

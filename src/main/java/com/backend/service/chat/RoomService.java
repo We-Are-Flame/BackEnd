@@ -56,7 +56,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Long createChatRoom(RoomCreateRequest request, Long userId) {
+    public String createChatRoom(RoomCreateRequest request, Long userId) {
         Meeting meeting = meetingRepository.findById(request.getMeetingId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
 
@@ -79,7 +79,7 @@ public class RoomService {
                 .build();
 
         chatMessageRepository.save(roomCreateMessage);
-        return room.getId();
+        return room.getUuid();
     }
 
     @Transactional
