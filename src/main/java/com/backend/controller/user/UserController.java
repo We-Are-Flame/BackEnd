@@ -21,7 +21,7 @@ public class UserController {
     @GetMapping
     @CheckUserNotNull
     ResponseEntity<UserResponse.MyPage> getMyPage(@CurrentMember User user){
-        UserResponse.MyPage response = userService.getMyPage(user);
+        UserResponse.MyPage response = userService.getMyPage(user.getId());
         return ResponseEntity.ok(response);
     }
     @PutMapping("nickname")

@@ -47,7 +47,7 @@ public class User {
     private String profileImage;
 
     @Builder.Default
-    private Integer temperature = 360;
+    private Integer temperature = 365;
 
     private String email;
 
