@@ -3,6 +3,7 @@ package com.backend.repository.meeting;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingHashtag;
+import com.backend.entity.meeting.QComment;
 import com.backend.entity.meeting.QHashtag;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
@@ -76,6 +77,9 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .execute();
         queryFactory.delete(QMeetingRegistration.meetingRegistration)
                 .where(QMeetingRegistration.meetingRegistration.meeting.id.eq(meetingId))
+                .execute();
+        queryFactory.delete(QComment.comment)
+                .where(QComment.comment.meeting.id.eq(meetingId))
                 .execute();
 
         // 마지막으로 Meeting 엔티티 삭제
