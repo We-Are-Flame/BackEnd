@@ -6,6 +6,7 @@ import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import com.backend.exception.AlreadyExistsException;
+import com.backend.exception.BadRequestException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
@@ -60,5 +61,29 @@ public class RegistrationService {
 
         // 등록을 저장하고 ID를 반환
         return meetingRegistrationRepository.save(registration);
+    }
+
+    @Transactional
+    public Long cancelMeeting(Long meetingId, User user) {
+        Meeting meeting = getMeeting(meetingId);
+        checkIfUserIsHost(meeting, user);
+        MeetingRegistration registration = findRegistration(meeting, user);
+        deleteRegistration(registration);
+        return registration.getId();
+    }
+
+    private void checkIfUserIsHost(Meeting meeting, User user) {
+        if (meeting.isUserOwner(user)) {
+            throw new BadRequestException(ErrorMessages.CANNOT_CANCEL_OWNER_REGISTRATION);
+        }
+    }
+
+    private MeetingRegistration findRegistration(Meeting meeting, User user) {
+        return meetingRegistrationRepository.findByMeetingAndUser(meeting, user)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+    }
+
+    private void deleteRegistration(MeetingRegistration registration) {
+        meetingRegistrationRepository.delete(registration);
     }
 }

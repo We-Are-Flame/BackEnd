@@ -11,11 +11,11 @@ import lombok.experimental.SuperBuilder;
 public class RegistrationResponse extends BaseResponse {
     private final Long id;
 
-    public static RegistrationResponse success(Long id) {
+    public static RegistrationResponse success(Long id, ResponseMessage message) {
         return RegistrationResponse.builder()
                 .id(id)
                 .status(ResponseStatus.SUCCESS)
-                .message(ResponseMessage.REGISTRATION_CREATION_SUCCESS.getMessage())
+                .message(message.getMessage())
                 .build();
     }
 }
