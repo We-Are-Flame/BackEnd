@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.backend.util.mapper.user.UserResponseMapper.buildUserNotification;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -43,7 +45,7 @@ public class UserService {
     }
 
     public UserResponse.Notification getUserNotification(User user) {
-        return getUserNotification(user);
+        return buildUserNotification(user);
     }
 
     public User fetchUser(Long userId) {
