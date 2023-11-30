@@ -16,38 +16,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserResponse.MyPage getMyPage(User user) {
+    public UserResponse.MyPage getMyPage(Long userId) {
+        User user = fetchUser(userId);
         return UserResponse.MyPage.from(user);
     }
 
     @Transactional
     public Long updateNickname(UserUpdateRequest.Nickname request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
+        User user = fetchUser(userId);
         user.updateNickname(request.getNickname());
         return user.getId();
     }
 
     @Transactional
     public Long updateProfileImage(UserUpdateRequest.ProfileImage request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
+        User user = fetchUser(userId);
         user.updateProfileImage(request.getImageInput().getProfileImageUrl());
         return user.getId();
     }
 
     @Transactional
     public Long updateUserNotification(UserUpdateRequest.Notification request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
+        User user = fetchUser(userId);
         user.updateNotification(request.getIsNotification());
         return user.getId();
     }
 
     public UserResponse.Notification getUserNotification(User user) {
-        return UserResponse.Notification.builder()
-                .isUserNotification(user.getSetting().getIsUserNotification())
-                .build();
+        return getUserNotification(user);
     }
 
     public User fetchUser(Long userId) {
