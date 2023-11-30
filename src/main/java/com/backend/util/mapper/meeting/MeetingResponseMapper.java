@@ -6,9 +6,9 @@ import com.backend.dto.meeting.response.read.MyMeetingResponse;
 import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
 import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
 import com.backend.dto.meeting.response.read.output.HostOutput;
-import com.backend.dto.meeting.response.read.output.MeetingImageOutput;
 import com.backend.dto.meeting.response.read.output.InfoOutput;
 import com.backend.dto.meeting.response.read.output.LocationOutput;
+import com.backend.dto.meeting.response.read.output.MeetingImageOutput;
 import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.dto.meeting.response.read.output.TimeOutput;
 import com.backend.entity.meeting.Hashtag;
@@ -45,7 +45,7 @@ public class MeetingResponseMapper {
                 .locationOutput(buildLocation(meeting.getMeetingAddress()))
                 .timeOutput(buildDetailTime(meeting.getMeetingTime(), meeting.getCreatedAt()))
                 .hostOutput(buildHost(meeting.getHost()))
-                .status(status)
+                .statusOutput(status)
                 .build();
     }
 
@@ -87,7 +87,6 @@ public class MeetingResponseMapper {
         List<String> imageUrls = images.stream()
                 .map(MeetingImage::getImageUrl)
                 .collect(Collectors.toList());
-
 
         return MeetingImageOutput.builder()
                 .thumbnailUrl(thumbnailUrl)

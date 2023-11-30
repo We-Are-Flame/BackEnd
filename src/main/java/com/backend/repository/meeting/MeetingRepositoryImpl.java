@@ -88,6 +88,15 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .execute();
     }
 
+    @Override
+    public boolean isUserOwner(Long meetingId, Long userId) {
+        return queryFactory.selectOne()
+                .from(QMeeting.meeting)
+                .where(QMeeting.meeting.id.eq(meetingId)
+                        .and(QMeeting.meeting.host.id.eq(userId)))
+                .fetchFirst() != null;
+    }
+
     private JPAQuery<Meeting> createBaseMeetingQuery() {
         return queryFactory
                 .selectFrom(QMeeting.meeting)

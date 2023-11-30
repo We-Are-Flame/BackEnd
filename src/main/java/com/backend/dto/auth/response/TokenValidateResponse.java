@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class TokenValidateResponse extends BaseResponse {
     private Long id;
+
     public static TokenValidateResponse success(Long id) {
         return TokenValidateResponse.builder()
                 .id(id)

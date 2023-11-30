@@ -1,5 +1,9 @@
 package com.backend.service.chat;
 
+import static com.backend.util.mapper.chat.RoomRequestMapper.buildLeaveRoomMessage;
+import static com.backend.util.mapper.chat.RoomRequestMapper.toChatMessage;
+import static com.backend.util.mapper.chat.RoomRequestMapper.toChatResponses;
+
 import com.backend.dto.chat.request.create.ChatCreateRequest;
 import com.backend.dto.chat.response.read.ChatResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
@@ -11,14 +15,11 @@ import com.backend.exception.NotFoundException;
 import com.backend.repository.chat.ChatMessageRepository;
 import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.service.user.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.backend.util.mapper.chat.RoomRequestMapper.*;
 
 @Slf4j
 @RequiredArgsConstructor

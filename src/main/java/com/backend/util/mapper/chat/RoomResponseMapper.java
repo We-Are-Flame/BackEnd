@@ -12,7 +12,6 @@ import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +28,7 @@ public class RoomResponseMapper {
                 })
                 .toList();
     }
+
     public static ChatRoomUser toChatRoomUser(User user, ChatRoom chatRoom) {
         return chatRoom.getRoomUsers().stream()
                 .filter(cu -> cu.getUser().getId().equals(user.getId()))
@@ -69,6 +69,7 @@ public class RoomResponseMapper {
                 .isRoomNotification(Boolean.TRUE)
                 .build();
     }
+
     public static RoomStatusOutput buildChatRoomStatus(Meeting meeting, ChatRoomUser user) {
         return RoomStatusOutput.builder()
                 .isOwner(user.getIsOwner())

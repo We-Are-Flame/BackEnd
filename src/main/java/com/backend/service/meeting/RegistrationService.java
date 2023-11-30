@@ -1,5 +1,8 @@
 package com.backend.service.meeting;
 
+import com.backend.annotation.CheckIsOwner;
+import com.backend.dto.registration.response.RegistrationResponse;
+import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
@@ -11,33 +14,46 @@ import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
 import com.backend.repository.meeting.MeetingRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RegistrationService {
     private final MeetingRegistrationRepository meetingRegistrationRepository;
     private final MeetingRepository meetingRepository;
 
-    @Transactional
     public void createOwnerStatus(Meeting meeting, User user) {
-        MeetingRegistration registration = MeetingRegistration.builder()
-                .meeting(meeting)
-                .user(user)
-                .role(RegistrationRole.OWNER)
-                .status(RegistrationStatus.ACCEPTED)
-                .build();
-
+        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.OWNER,
+                RegistrationStatus.ACCEPTED);
         meetingRegistrationRepository.save(registration);
     }
 
-    @Transactional
     public Long applyMeeting(Long meetingId, User user) {
         Meeting meeting = getMeeting(meetingId);
-        checkForDuplicateRegistration(meeting, user);
-        return createRegistration(meeting, user).getId();
+        checkRegistrationDuplication(meeting, user);
+        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.MEMBER,
+                RegistrationStatus.PENDING);
+        return saveRegistration(registration).getId();
+    }
+
+    public Long cancelMeeting(Long meetingId, User user) {
+        Meeting meeting = getMeeting(meetingId);
+        checkIsNotOwner(meeting, user);
+        MeetingRegistration registration = findRegistration(meeting, user);
+        deleteRegistration(registration);
+        return registration.getId();
+    }
+
+    @CheckIsOwner
+    @Transactional(readOnly = true)
+    public RegistrationResponseList getRegistration(Long meetingId, User user) {
+        Meeting meeting = getMeeting(meetingId);
+        List<RegistrationResponse> responseList = fetchRegistrationResponses(meeting);
+        return new RegistrationResponseList(responseList.size(), responseList);
     }
 
     private Meeting getMeeting(Long meetingId) {
@@ -45,34 +61,13 @@ public class RegistrationService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    private void checkForDuplicateRegistration(Meeting meeting, User user) {
+    private void checkRegistrationDuplication(Meeting meeting, User user) {
         if (meetingRegistrationRepository.existsByMeetingAndUser(meeting, user)) {
             throw new AlreadyExistsException(ErrorMessages.ALREADY_REGISTRATER);
         }
     }
 
-    private MeetingRegistration createRegistration(Meeting meeting, User user) {
-        MeetingRegistration registration = MeetingRegistration.builder()
-                .meeting(meeting)
-                .user(user)
-                .role(RegistrationRole.MEMBER)
-                .status(RegistrationStatus.PENDING)
-                .build();
-
-        // 등록을 저장하고 ID를 반환
-        return meetingRegistrationRepository.save(registration);
-    }
-
-    @Transactional
-    public Long cancelMeeting(Long meetingId, User user) {
-        Meeting meeting = getMeeting(meetingId);
-        checkIfUserIsHost(meeting, user);
-        MeetingRegistration registration = findRegistration(meeting, user);
-        deleteRegistration(registration);
-        return registration.getId();
-    }
-
-    private void checkIfUserIsHost(Meeting meeting, User user) {
+    private void checkIsNotOwner(Meeting meeting, User user) {
         if (meeting.isUserOwner(user)) {
             throw new BadRequestException(ErrorMessages.CANNOT_CANCEL_OWNER_REGISTRATION);
         }
@@ -85,5 +80,37 @@ public class RegistrationService {
 
     private void deleteRegistration(MeetingRegistration registration) {
         meetingRegistrationRepository.delete(registration);
+    }
+
+    private MeetingRegistration buildRegistration(Meeting meeting, User user, RegistrationRole role,
+                                                  RegistrationStatus status) {
+        return MeetingRegistration.builder()
+                .meeting(meeting)
+                .user(user)
+                .role(role)
+                .status(status)
+                .build();
+    }
+
+    private MeetingRegistration saveRegistration(MeetingRegistration registration) {
+        return meetingRegistrationRepository.save(registration);
+    }
+
+    private List<RegistrationResponse> fetchRegistrationResponses(Meeting meeting) {
+        return meetingRegistrationRepository.findByMeeting(meeting).stream()
+                .filter(MeetingRegistration::isNotOwner)
+                .map(this::convertToRegistrationResponse)
+                .toList();
+    }
+
+    private RegistrationResponse convertToRegistrationResponse(MeetingRegistration registration) {
+        User registeredUser = registration.getUser();
+        return RegistrationResponse.builder()
+                .id(registration.getId())
+                .nickname(registeredUser.getNickname())
+                .profileImage(registeredUser.getProfileImage())
+                .temperature(registeredUser.getTemperature())
+                .participateStatus(registration.getStatus())
+                .build();
     }
 }

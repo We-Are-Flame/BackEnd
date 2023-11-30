@@ -7,11 +7,12 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-public class UserUpdateResponse{
+public class UserUpdateResponse {
 
     @SuperBuilder
     public static class Nickname extends BaseResponse {
         private final Long id;
+
         public static Nickname success(Long id) {
             return Nickname.builder()
                     .id(id)
@@ -24,6 +25,7 @@ public class UserUpdateResponse{
     @SuperBuilder
     public static class ProfileImage extends BaseResponse {
         private final Long id;
+
         public static ProfileImage success(Long id) {
             return ProfileImage.builder()
                     .id(id)
@@ -36,6 +38,7 @@ public class UserUpdateResponse{
     @SuperBuilder
     public static class Notification extends BaseResponse {
         private final Long id;
+
         public static Notification success(Long id) {
             return Notification.builder()
                     .id(id)

@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RoomCreateRequest{
+public class RoomCreateRequest {
 
     @JsonProperty("meeting_id")
     private Long meetingId;

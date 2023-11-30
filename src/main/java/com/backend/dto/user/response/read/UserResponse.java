@@ -9,14 +9,14 @@ import lombok.Getter;
 public class UserResponse {
     @Builder
     @Getter
-    public static class Notification{
+    public static class Notification {
         @JsonProperty("is_user_notification")
         private final Boolean isUserNotification;
     }
 
     @Builder
     @Getter
-    public static class MyPage{
+    public static class MyPage {
         private final String nickname;
         @JsonProperty("profile_image")
         private final String profileImage;
@@ -24,7 +24,7 @@ public class UserResponse {
         @JsonProperty("my_meetings")
         private final Integer myMeetings;
 
-        public static MyPage from(User user){
+        public static MyPage from(User user) {
             return MyPage.builder()
                     .nickname(user.getNickname())
                     .profileImage(user.getProfileImage())

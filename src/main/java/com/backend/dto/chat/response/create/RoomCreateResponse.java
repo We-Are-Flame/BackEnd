@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class RoomCreateResponse extends BaseResponse {
     private final String id;
+
     public static RoomCreateResponse success(String id) {
         return RoomCreateResponse.builder()
                 .id(id)

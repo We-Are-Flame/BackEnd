@@ -1,5 +1,6 @@
 package com.backend.service.meeting;
 
+import com.backend.annotation.CheckIsOwner;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.read.MeetingDetailResponse;
 import com.backend.dto.meeting.response.read.MeetingResponse;
@@ -9,14 +10,12 @@ import com.backend.dto.meeting.response.read.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
-import com.backend.exception.AccessDeniedException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,6 @@ public class MeetingService {
     private final CategoryService categoryService;
     private final HashtagService hashtagService;
 
-
     @Transactional
     public Long createMeeting(MeetingCreateRequest request, User user) {
         Meeting meeting = prepareMeeting(request, user);
@@ -45,6 +43,36 @@ public class MeetingService {
         return meeting.getId();
     }
 
+    @Transactional(readOnly = true)
+    public Page<MeetingResponse> readMeetings(int start, int end, String sort) {
+        Pageable pageable = createPageable(start, end, sort);
+        Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
+        return meetings.map(MeetingResponseMapper::toMeetingResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
+        Meeting meeting = fetchMeeting(meetingId);
+        StatusOutput status = buildMeetingStatus(meeting, user);
+        return MeetingResponseMapper.toMeetingDetailResponse(meeting, status);
+    }
+
+    @Transactional(readOnly = true)
+    public MyMeetingResponseList readMyMeetings(User user) {
+        List<Meeting> myMeetings = meetingRepository.findAllByHost(user);
+        List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()
+                .map(MeetingResponseMapper::toMyMeetingResponse)
+                .toList();
+        return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
+    }
+
+    @CheckIsOwner
+    @Transactional
+    public void deleteMeeting(Long meetingId, User user) {
+        meetingRepository.deleteMeetingWithAllDetails(meetingId);
+    }
+
+    // Private helper methods
     private Meeting prepareMeeting(MeetingCreateRequest request, User user) {
         Category category = categoryService.findCategory(request.getCategory());
         return MeetingRequestMapper.toMeeting(request, category, user);
@@ -59,23 +87,9 @@ public class MeetingService {
         registrationService.createOwnerStatus(meeting, user);
     }
 
-    @Transactional(readOnly = true)
-    public Page<MeetingResponse> readMeetings(int start, int end, String sort) {
-        Pageable pageable = createPageable(start, end, sort);
-        Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
-        return meetings.map(MeetingResponseMapper::toMeetingResponse);
-    }
-
     private Pageable createPageable(int start, int end, String sort) {
         int page = start / end;
         return PageRequest.of(page, end, CustomSort.getSort(sort));
-    }
-
-    @Transactional(readOnly = true)
-    public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
-        Meeting meeting = fetchMeeting(meetingId);
-        StatusOutput status = buildMeetingStatus(meeting, user);
-        return MeetingResponseMapper.toMeetingDetailResponse(meeting, status);
     }
 
     private Meeting fetchMeeting(Long meetingId) {
@@ -89,30 +103,5 @@ public class MeetingService {
                 .participateStatus(meeting.determineParticipationStatus(user))
                 .isExpire(meeting.isExpired())
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    public MyMeetingResponseList readMyMeetings(User user) {
-        List<Meeting> myMeetings = meetingRepository.findAllByHost(user);
-        List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()
-                .map(MeetingResponseMapper::toMyMeetingResponse)
-                .toList();
-        return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
-    }
-
-    @Transactional
-    public void deleteMeeting(Long meetingId, User user) {
-        validateMeetingOwner(meetingId, user);
-        meetingRepository.deleteMeetingWithAllDetails(meetingId);
-    }
-
-    private void validateMeetingOwner(Long meetingId, User user) {
-        Optional<Long> ownerIdOpt = meetingRepository.findOwnerIdByMeetingId(meetingId);
-        Long ownerId = ownerIdOpt
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
-
-        if (!ownerId.equals(user.getId())) {
-            throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
-        }
     }
 }

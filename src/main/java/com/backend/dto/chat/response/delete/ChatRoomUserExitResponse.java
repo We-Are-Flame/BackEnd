@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ChatRoomUserExitResponse extends BaseResponse {
     private final Long id;
+
     public static ChatRoomUserExitResponse success(Long id) {
         return ChatRoomUserExitResponse.builder()
                 .id(id)

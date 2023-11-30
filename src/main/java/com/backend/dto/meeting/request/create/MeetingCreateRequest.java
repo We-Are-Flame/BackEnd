@@ -1,9 +1,9 @@
 package com.backend.dto.meeting.request.create;
 
 import com.backend.dto.meeting.request.create.input.HashtagInput;
-import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

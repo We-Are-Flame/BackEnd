@@ -37,6 +37,10 @@ public class RegistrationServiceTest {
     @InjectMocks
     private RegistrationService registrationService;
 
+    private static Long[] userIdsProvider() {
+        return new Long[]{1L, 2L, 3L}; // 다양한 사용자 ID를 제공합니다.
+    }
+
     private User createUser(Long id) {
         return User.builder()
                 .id(id)
@@ -130,9 +134,5 @@ public class RegistrationServiceTest {
         // 중복이 있는 경우 테스트
         when(meetingRegistrationRepository.existsByMeetingAndUser(meeting, applicant)).thenReturn(true);
         assertThrows(AlreadyExistsException.class, () -> registrationService.applyMeeting(meeting.getId(), applicant));
-    }
-
-    private static Long[] userIdsProvider() {
-        return new Long[]{1L, 2L, 3L}; // 다양한 사용자 ID를 제공합니다.
     }
 }

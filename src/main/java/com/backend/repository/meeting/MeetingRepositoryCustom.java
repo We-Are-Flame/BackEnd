@@ -15,5 +15,7 @@ public interface MeetingRepositoryCustom {
     List<Meeting> findAllByHost(User host);
 
     void deleteMeetingWithAllDetails(Long meetingId);
+
+    boolean isUserOwner(Long meetingId, Long userId);
 }
 

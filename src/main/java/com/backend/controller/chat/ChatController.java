@@ -1,7 +1,6 @@
 package com.backend.controller.chat;
 
 import com.backend.dto.chat.request.create.ChatCreateRequest;
-import com.backend.service.chat.RoomService;
 import com.backend.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class RoomDeleteResponse extends BaseResponse {
     private final Long id;
+
     public static RoomDeleteResponse success(Long id) {
         return RoomDeleteResponse.builder()
                 .id(id)

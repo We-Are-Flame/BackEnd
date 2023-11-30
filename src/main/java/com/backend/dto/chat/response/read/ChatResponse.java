@@ -20,7 +20,7 @@ public class ChatResponse {
     private String message;
     private String time;
 
-    public static ChatResponse from(ChatMessage chatMessage){
+    public static ChatResponse from(ChatMessage chatMessage) {
         return ChatResponse.builder()
                 .messageType(chatMessage.getMessageType())
                 .roomId(chatMessage.getChatRoom().getUuid())

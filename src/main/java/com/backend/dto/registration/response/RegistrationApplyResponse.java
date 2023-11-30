@@ -1,4 +1,4 @@
-package com.backend.dto.chat.response.create;
+package com.backend.dto.registration.response;
 
 import com.backend.dto.bases.BaseResponse;
 import com.backend.dto.bases.ResponseMessage;
@@ -8,14 +8,14 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class ChatRoomUserEnterResponse extends BaseResponse {
+public class RegistrationApplyResponse extends BaseResponse {
     private final Long id;
 
-    public static ChatRoomUserEnterResponse success(Long id) {
-        return ChatRoomUserEnterResponse.builder()
+    public static RegistrationApplyResponse success(Long id, ResponseMessage message) {
+        return RegistrationApplyResponse.builder()
                 .id(id)
                 .status(ResponseStatus.SUCCESS)
-                .message(ResponseMessage.CHAT_ROOM_USER_ENTER_SUCCESS.getMessage())
+                .message(message.getMessage())
                 .build();
     }
 }
