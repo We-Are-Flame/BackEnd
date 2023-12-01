@@ -9,7 +9,6 @@ import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import com.backend.exception.AlreadyExistsException;
-import com.backend.exception.BadRequestException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
@@ -40,9 +39,9 @@ public class RegistrationService {
         return saveRegistration(registration).getId();
     }
 
+    @CheckIsOwner
     public Long cancelMeeting(Long meetingId, User user) {
         Meeting meeting = getMeeting(meetingId);
-        checkIsNotOwner(meeting, user);
         MeetingRegistration registration = findRegistration(meeting, user);
         deleteRegistration(registration);
         return registration.getId();
@@ -56,27 +55,39 @@ public class RegistrationService {
         return new RegistrationResponseList(responseList.size(), responseList);
     }
 
-    //TODO [HJ] 로직 점검 , 예외처리 및 Test 필요
     @CheckIsOwner
-    public Long acceptApply(Long registrationId, Long meetingId, User user) {
+    public Long acceptApply(Long meetingId, Long registrationId, User user) {
+        return updateRegistrationStatus(registrationId, RegistrationStatus.ACCEPTED);
+    }
+
+    @CheckIsOwner
+    public Long rejectApply(Long meetingId, Long registrationId, User user) {
+        return updateRegistrationStatus(registrationId, RegistrationStatus.REJECTED);
+    }
+
+    @CheckIsOwner
+    public Long acceptBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+        return processBulkUpdate(registrationIds, RegistrationStatus.ACCEPTED);
+    }
+
+    @CheckIsOwner
+    public Long rejectBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+        return processBulkUpdate(registrationIds, RegistrationStatus.REJECTED);
+    }
+
+    private Long updateRegistrationStatus(Long registrationId, RegistrationStatus status) {
         MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
 
-        registration.updateStatus(RegistrationStatus.ACCEPTED);
+        registration.updateStatus(status);
         meetingRegistrationRepository.save(registration);
 
         return registration.getId();
     }
 
-    @CheckIsOwner
-    public Long rejectApply(Long registrationId, Long meetingId, User user) {
-        MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
-
-        registration.updateStatus(RegistrationStatus.REJECTED);
-        meetingRegistrationRepository.save(registration);
-
-        return registration.getId();
+    private Long processBulkUpdate(List<Long> registrationIds, RegistrationStatus status) {
+        registrationIds.forEach(registrationId -> updateRegistrationStatus(registrationId, status));
+        return registrationIds.isEmpty() ? null : registrationIds.get(registrationIds.size() - 1);
     }
 
     private Meeting getMeeting(Long meetingId) {
@@ -87,12 +98,6 @@ public class RegistrationService {
     private void checkRegistrationDuplication(Meeting meeting, User user) {
         if (meetingRegistrationRepository.existsByMeetingAndUser(meeting, user)) {
             throw new AlreadyExistsException(ErrorMessages.ALREADY_REGISTRATER);
-        }
-    }
-
-    private void checkIsNotOwner(Meeting meeting, User user) {
-        if (meeting.isUserOwner(user)) {
-            throw new BadRequestException(ErrorMessages.CANNOT_CANCEL_OWNER_REGISTRATION);
         }
     }
 
@@ -137,3 +142,4 @@ public class RegistrationService {
                 .build();
     }
 }
+

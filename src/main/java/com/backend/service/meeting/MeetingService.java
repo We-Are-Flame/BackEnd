@@ -6,6 +6,8 @@ import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponseList;
+import com.backend.dto.meeting.response.NotEndResponse;
+import com.backend.dto.meeting.response.NotEndResponseList;
 import com.backend.dto.meeting.response.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
@@ -71,6 +73,12 @@ public class MeetingService {
     public Long deleteMeeting(Long meetingId, User user) {
         meetingRepository.deleteMeetingWithAllDetails(meetingId);
         return meetingId;
+    }
+
+    @Transactional(readOnly = true)
+    public NotEndResponseList getNotEndMeetings(User user) {
+        List<NotEndResponse> notEndResponses = meetingRepository.getNotEndMeetings(user);
+        return new NotEndResponseList(notEndResponses, notEndResponses.size());
     }
 
     private Meeting prepareMeeting(MeetingCreateRequest request, User user) {

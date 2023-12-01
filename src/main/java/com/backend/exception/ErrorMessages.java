@@ -9,6 +9,7 @@ public class ErrorMessages {
     public static final String NO_MATCH_TOKEN_AND_USER = "해당 토큰과 맞는 사용자가 존재하지 않습니다!";
     public static final String NOT_EXIST_USER = "로그인 후 진행해주셔야 합니다!";
     public static final String ACCESS_DENIED = "권한이 없습니다!";
+    public static final String DUPLICATE_REQUEST = "중복 요청을 보내실 수 없습니다!";
     public static final String ROOM_NOT_FOUND = "해당 채팅방을 찾을 수 없습니다!";
     public static final String USER_NOT_FOUND_IN_CHAT_ROOM = "채팅방에서 해당 유저를 찾을 수 없습니다.";
     public static final String USER_DOES_NOT_OWN_CHAT_ROOM = "해당 채팅방의 방장이 아닙니다.";

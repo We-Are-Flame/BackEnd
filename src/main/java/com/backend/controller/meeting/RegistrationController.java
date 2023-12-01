@@ -4,6 +4,7 @@ import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.common.ResponseMessage;
 import com.backend.dto.common.SuccessResponse;
+import com.backend.dto.registration.request.BulkApplyRequest;
 import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.RegistrationService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,18 +48,38 @@ public class RegistrationController {
 
     @CheckUserNotNull
     @PostMapping("/{meetingId}/registrations/{registrationId}/accept")
-    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long registrationId, @PathVariable Long meetingId,
+    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
                                                        @CurrentMember User user) {
-        Long id = registrationService.acceptApply(registrationId, meetingId, user);
+        Long id = registrationService.acceptApply(meetingId, registrationId, user);
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
     @PostMapping("/{meetingId}/registrations/{registrationId}/reject")
-    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long registrationId, @PathVariable Long meetingId,
+    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
                                                        @CurrentMember User user) {
-        Long id = registrationService.rejectApply(registrationId, meetingId, user);
+        Long id = registrationService.rejectApply(meetingId, registrationId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/bulk-accept")
+    public ResponseEntity<SuccessResponse> acceptApplyBulk(@PathVariable Long meetingId,
+                                                           @RequestBody BulkApplyRequest request,
+                                                           @CurrentMember User user) {
+        Long id = registrationService.acceptBulkApply(meetingId, request.getRegistrationIds(), user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/bulk-reject")
+    public ResponseEntity<SuccessResponse> rejectApplyBulk(@PathVariable Long meetingId,
+                                                           @RequestBody BulkApplyRequest request,
+                                                           @CurrentMember User user) {
+        Long id = registrationService.rejectBulkApply(meetingId, request.getRegistrationIds(), user);
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
         return ResponseEntity.ok(response);
     }

@@ -8,6 +8,7 @@ import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponseList;
+import com.backend.dto.meeting.response.NotEndResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.MeetingService;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,12 @@ public class MeetingController {
         return ResponseEntity.ok(meetings);
     }
 
-    //TODO [HJ] 사용자가 생성한 종료되지 않은 모임의 id, title을 반환하는 api 제작 필요
+    @CheckUserNotNull
+    @GetMapping("/my/not-end")
+    public ResponseEntity<NotEndResponseList> getMyNotEndMeetings(@CurrentMember User user) {
+        NotEndResponseList meetings = meetingService.getNotEndMeetings(user);
+        return ResponseEntity.ok(meetings);
+    }
 }
 
 

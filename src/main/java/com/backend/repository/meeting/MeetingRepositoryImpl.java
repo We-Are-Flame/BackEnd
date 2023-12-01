@@ -1,5 +1,7 @@
 package com.backend.repository.meeting;
 
+import com.backend.dto.meeting.response.NotEndResponse;
+import com.backend.dto.meeting.response.QNotEndResponse;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingHashtag;
@@ -15,6 +17,7 @@ import com.backend.service.meeting.CustomSort;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -95,6 +98,18 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .where(QMeeting.meeting.id.eq(meetingId)
                         .and(QMeeting.meeting.host.id.eq(userId)))
                 .fetchFirst() != null;
+    }
+
+    @Override
+    public List<NotEndResponse> getNotEndMeetings(User user) {
+        QMeeting qMeeting = QMeeting.meeting;
+
+        return queryFactory
+                .select(new QNotEndResponse(qMeeting.id, qMeeting.title))
+                .from(qMeeting)
+                .where(qMeeting.meetingTime.startTime.after(LocalDateTime.now())
+                        .and(qMeeting.host.eq(user)))
+                .fetch();
     }
 
     private JPAQuery<Meeting> createBaseMeetingQuery() {

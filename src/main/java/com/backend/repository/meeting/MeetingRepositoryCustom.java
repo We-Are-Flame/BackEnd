@@ -1,5 +1,6 @@
 package com.backend.repository.meeting;
 
+import com.backend.dto.meeting.response.NotEndResponse;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
 import java.util.List;
@@ -17,5 +18,7 @@ public interface MeetingRepositoryCustom {
     void deleteMeetingWithAllDetails(Long meetingId);
 
     boolean isUserOwner(Long meetingId, Long userId);
+
+    List<NotEndResponse> getNotEndMeetings(User user);
 }
 

@@ -52,7 +52,7 @@ public class MeetingRegistration {
         return this.role != RegistrationRole.OWNER;
     }
 
-    public void updateStatus(RegistrationStatus status) {
-        this.status = status;
+    public void updateStatus(RegistrationStatus newStatus) {
+        this.status = newStatus;
     }
 }
