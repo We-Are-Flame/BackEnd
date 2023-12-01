@@ -56,6 +56,29 @@ public class RegistrationService {
         return new RegistrationResponseList(responseList.size(), responseList);
     }
 
+    //TODO [HJ] 로직 점검 , 예외처리 및 Test 필요
+    @CheckIsOwner
+    public Long acceptApply(Long registrationId, Long meetingId, User user) {
+        MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+
+        registration.updateStatus(RegistrationStatus.ACCEPTED);
+        meetingRegistrationRepository.save(registration);
+
+        return registration.getId();
+    }
+
+    @CheckIsOwner
+    public Long rejectApply(Long registrationId, Long meetingId, User user) {
+        MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+
+        registration.updateStatus(RegistrationStatus.REJECTED);
+        meetingRegistrationRepository.save(registration);
+
+        return registration.getId();
+    }
+
     private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));

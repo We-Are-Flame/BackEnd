@@ -1,8 +1,8 @@
-package com.backend.dto.meeting.response.read;
+package com.backend.dto.meeting.response;
 
-import com.backend.dto.meeting.response.read.output.InfoOutput;
-import com.backend.dto.meeting.response.read.output.LocationOutput;
-import com.backend.dto.meeting.response.read.output.TimeOutput;
+import com.backend.dto.meeting.response.output.InfoOutput;
+import com.backend.dto.meeting.response.output.LocationOutput;
+import com.backend.dto.meeting.response.output.TimeOutput;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Builder;

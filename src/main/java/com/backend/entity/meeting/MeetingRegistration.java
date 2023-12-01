@@ -51,4 +51,8 @@ public class MeetingRegistration {
     public boolean isNotOwner() {
         return this.role != RegistrationRole.OWNER;
     }
+
+    public void updateStatus(RegistrationStatus status) {
+        this.status = status;
+    }
 }

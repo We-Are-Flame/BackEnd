@@ -1,4 +1,4 @@
-package com.backend.dto.bases;
+package com.backend.dto.common;
 
 public enum ResponseStatus {
     SUCCESS("성공"),

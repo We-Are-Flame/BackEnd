@@ -2,11 +2,11 @@ package com.backend.service.meeting;
 
 import com.backend.annotation.CheckIsOwner;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
-import com.backend.dto.meeting.response.read.MeetingDetailResponse;
-import com.backend.dto.meeting.response.read.MeetingResponse;
-import com.backend.dto.meeting.response.read.MyMeetingResponse;
-import com.backend.dto.meeting.response.read.MyMeetingResponseList;
-import com.backend.dto.meeting.response.read.output.StatusOutput;
+import com.backend.dto.meeting.response.MeetingDetailResponse;
+import com.backend.dto.meeting.response.MeetingResponse;
+import com.backend.dto.meeting.response.MyMeetingResponse;
+import com.backend.dto.meeting.response.MyMeetingResponseList;
+import com.backend.dto.meeting.response.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
@@ -68,11 +68,11 @@ public class MeetingService {
 
     @CheckIsOwner
     @Transactional
-    public void deleteMeeting(Long meetingId, User user) {
+    public Long deleteMeeting(Long meetingId, User user) {
         meetingRepository.deleteMeetingWithAllDetails(meetingId);
+        return meetingId;
     }
 
-    // Private helper methods
     private Meeting prepareMeeting(MeetingCreateRequest request, User user) {
         Category category = categoryService.findCategory(request.getCategory());
         return MeetingRequestMapper.toMeeting(request, category, user);

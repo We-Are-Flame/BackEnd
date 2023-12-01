@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.response.read.output;
+package com.backend.dto.meeting.response.output;
 
 import lombok.Builder;
 import lombok.Getter;

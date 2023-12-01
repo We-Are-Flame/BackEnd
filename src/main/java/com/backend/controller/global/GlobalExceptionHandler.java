@@ -1,6 +1,6 @@
 package com.backend.controller.global;
 
-import com.backend.dto.bases.ErrorResponse;
+import com.backend.dto.common.ErrorResponse;
 import com.backend.exception.AccessDeniedException;
 import com.backend.exception.AlreadyExistsException;
 import com.backend.exception.BadRequestException;

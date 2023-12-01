@@ -2,8 +2,8 @@ package com.backend.controller.meeting;
 
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
-import com.backend.dto.bases.ResponseMessage;
-import com.backend.dto.registration.response.RegistrationApplyResponse;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
 import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.RegistrationService;
@@ -17,35 +17,48 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/meetings")
 public class RegistrationController {
     private final RegistrationService registrationService;
 
     @CheckUserNotNull
-    @PostMapping("/meetings/{meetingId}/apply")
-    public ResponseEntity<RegistrationApplyResponse> applyMeetingRegistration(@PathVariable Long meetingId,
-                                                                              @CurrentMember User user) {
+    @PostMapping("/{meetingId}/apply")
+    public ResponseEntity<SuccessResponse> applyMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
         Long id = registrationService.applyMeeting(meetingId, user);
-        RegistrationApplyResponse response = RegistrationApplyResponse.success(id,
-                ResponseMessage.REGISTRATION_CREATION_SUCCESS);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_MEETING);
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
-    @PostMapping("/meetings/{meetingId}/cancel")
-    public ResponseEntity<RegistrationApplyResponse> cancelMeetingRegistration(@PathVariable Long meetingId,
-                                                                               @CurrentMember User user) {
+    @PostMapping("/{meetingId}/cancel")
+    public ResponseEntity<SuccessResponse> cancelApply(@PathVariable Long meetingId, @CurrentMember User user) {
         Long id = registrationService.cancelMeeting(meetingId, user);
-        RegistrationApplyResponse response = RegistrationApplyResponse.success(id,
-                ResponseMessage.REGISTRATION_CANCEL_SUCCESS);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CANCEL_MEETING);
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
-    @GetMapping("/meetings/{meetingId}/registrations")
-    public ResponseEntity<RegistrationResponseList> getMeetingRegistration(@PathVariable Long meetingId,
-                                                                           @CurrentMember User user) {
+    @GetMapping("/{meetingId}/registrations")
+    public ResponseEntity<RegistrationResponseList> getApply(@PathVariable Long meetingId, @CurrentMember User user) {
         RegistrationResponseList response = registrationService.getRegistration(meetingId, user);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/{registrationId}/accept")
+    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long registrationId, @PathVariable Long meetingId,
+                                                       @CurrentMember User user) {
+        Long id = registrationService.acceptApply(registrationId, meetingId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/{registrationId}/reject")
+    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long registrationId, @PathVariable Long meetingId,
+                                                       @CurrentMember User user) {
+        Long id = registrationService.rejectApply(registrationId, meetingId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
         return ResponseEntity.ok(response);
     }
 }
