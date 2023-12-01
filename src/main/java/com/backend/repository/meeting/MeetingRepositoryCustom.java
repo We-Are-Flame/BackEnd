@@ -17,8 +17,8 @@ public interface MeetingRepositoryCustom {
 
     void deleteMeetingWithAllDetails(Long meetingId);
 
-    boolean isUserOwner(Long meetingId, Long userId);
-
     List<NotEndResponse> getNotEndMeetings(User user);
+
+    boolean isOwner(Long meetingId, Long userId);
 }
 

@@ -4,7 +4,7 @@ package com.backend.util.jwt;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.JwtAuthenticationException;
-import com.backend.service.custom.CustomUserDetailsService;
+import com.backend.service.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

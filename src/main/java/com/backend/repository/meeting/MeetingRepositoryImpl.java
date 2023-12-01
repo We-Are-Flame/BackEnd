@@ -23,12 +23,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
@@ -92,15 +94,6 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     }
 
     @Override
-    public boolean isUserOwner(Long meetingId, Long userId) {
-        return queryFactory.selectOne()
-                .from(QMeeting.meeting)
-                .where(QMeeting.meeting.id.eq(meetingId)
-                        .and(QMeeting.meeting.host.id.eq(userId)))
-                .fetchFirst() != null;
-    }
-
-    @Override
     public List<NotEndResponse> getNotEndMeetings(User user) {
         QMeeting qMeeting = QMeeting.meeting;
 
@@ -110,6 +103,19 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .where(qMeeting.meetingTime.startTime.after(LocalDateTime.now())
                         .and(qMeeting.host.eq(user)))
                 .fetch();
+    }
+
+    @Override
+    public boolean isOwner(Long meetingId, Long userId) {
+        log.info("isOwner called with meetingId: {}, userId: {}", meetingId, userId);
+        QMeeting meeting = QMeeting.meeting;
+
+        return queryFactory
+                .select(meeting.id)
+                .from(meeting)
+                .where(meeting.id.eq(meetingId)
+                        .and(meeting.host.id.eq(userId)))
+                .fetchOne() != null;
     }
 
     private JPAQuery<Meeting> createBaseMeetingQuery() {

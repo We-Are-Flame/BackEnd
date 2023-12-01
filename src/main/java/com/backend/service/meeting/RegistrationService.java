@@ -1,6 +1,5 @@
 package com.backend.service.meeting;
 
-import com.backend.annotation.CheckIsOwner;
 import com.backend.dto.registration.response.RegistrationResponse;
 import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.meeting.Meeting;
@@ -39,7 +38,6 @@ public class RegistrationService {
         return saveRegistration(registration).getId();
     }
 
-    @CheckIsOwner
     public Long cancelMeeting(Long meetingId, User user) {
         Meeting meeting = getMeeting(meetingId);
         MeetingRegistration registration = findRegistration(meeting, user);
@@ -47,31 +45,26 @@ public class RegistrationService {
         return registration.getId();
     }
 
-    @CheckIsOwner
     @Transactional(readOnly = true)
-    public RegistrationResponseList getRegistration(Long meetingId, User user) {
+    public RegistrationResponseList getRegistration(Long meetingId) {
         Meeting meeting = getMeeting(meetingId);
         List<RegistrationResponse> responseList = fetchRegistrationResponses(meeting);
         return new RegistrationResponseList(responseList.size(), responseList);
     }
 
-    @CheckIsOwner
-    public Long acceptApply(Long meetingId, Long registrationId, User user) {
+    public Long acceptApply(Long registrationId) {
         return updateRegistrationStatus(registrationId, RegistrationStatus.ACCEPTED);
     }
 
-    @CheckIsOwner
-    public Long rejectApply(Long meetingId, Long registrationId, User user) {
+    public Long rejectApply(Long registrationId) {
         return updateRegistrationStatus(registrationId, RegistrationStatus.REJECTED);
     }
 
-    @CheckIsOwner
-    public Long acceptBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+    public Long acceptBulkApply(List<Long> registrationIds) {
         return processBulkUpdate(registrationIds, RegistrationStatus.ACCEPTED);
     }
 
-    @CheckIsOwner
-    public Long rejectBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+    public Long rejectBulkApply(List<Long> registrationIds) {
         return processBulkUpdate(registrationIds, RegistrationStatus.REJECTED);
     }
 
