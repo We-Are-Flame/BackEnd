@@ -2,26 +2,22 @@ package com.backend.util.wrapper;
 
 import com.backend.entity.user.User;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
+@Builder
 public class UserWrapper implements UserDetails {
-
     private final User user;
-    private final List<GrantedAuthority> authorities;
-
-    public UserWrapper(User user) {
-        this.user = user;
-        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
+    private final GrantedAuthority authority;
+    private final Long meetingId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.singleton(authority);
     }
 
     @Override

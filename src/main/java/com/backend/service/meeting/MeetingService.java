@@ -1,6 +1,5 @@
 package com.backend.service.meeting;
 
-import com.backend.annotation.CheckIsOwner;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
@@ -68,7 +67,6 @@ public class MeetingService {
         return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
     }
 
-    @CheckIsOwner
     @Transactional
     public Long deleteMeeting(Long meetingId, User user) {
         meetingRepository.deleteMeetingWithAllDetails(meetingId);
