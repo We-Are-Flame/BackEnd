@@ -4,19 +4,26 @@ import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.chat.request.create.RoomCreateRequest;
 import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
+import com.backend.dto.chat.response.create.RoomCreateResponse;
 import com.backend.dto.chat.response.delete.ChatRoomUserExitResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
-import com.backend.dto.chat.response.create.RoomCreateResponse;
 import com.backend.dto.chat.response.read.RoomResponseList;
+import com.backend.entity.user.User;
 import com.backend.service.chat.ChatService;
 import com.backend.service.chat.RoomService;
-import com.backend.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,14 +36,15 @@ public class ChatRoomController {
 
     @GetMapping("rooms")
     @CheckUserNotNull
-    public ResponseEntity<RoomResponseList> getMyChatRooms(@CurrentMember User user){
+    public ResponseEntity<RoomResponseList> getMyChatRooms(@CurrentMember User user) {
         RoomResponseList myChatRooms = roomService.getMyChatRooms(user.getId());
         return ResponseEntity.ok(myChatRooms);
     }
 
     @PostMapping("/room")
     @CheckUserNotNull
-    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest request, @CurrentMember User user) {
+    public ResponseEntity<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest request,
+                                                         @CurrentMember User user) {
         String id = roomService.createChatRoom(request, user.getId());
         RoomCreateResponse response = RoomCreateResponse.success(id);
         return ResponseEntity.ok(response);
@@ -45,7 +53,7 @@ public class ChatRoomController {
     @PostMapping("{roomId}")
     @CheckUserNotNull
     public ResponseEntity<ChatRoomUserEnterResponse> enterUserInChatRoom(@CurrentMember User user,
-                                                                          @PathVariable String roomId) {
+                                                                         @PathVariable String roomId) {
         Long id = roomService.addUserInChatRoom(user.getId(), roomId);
         ChatRoomUserEnterResponse response = ChatRoomUserEnterResponse.success(id);
         return ResponseEntity.ok(response);
@@ -78,7 +86,7 @@ public class ChatRoomController {
 
     @GetMapping("/{roomId}/messages")
     @ResponseBody
-    public ResponseEntity<ChatResponseList> getMessages(@PathVariable String roomId){
+    public ResponseEntity<ChatResponseList> getMessages(@PathVariable String roomId) {
         ChatResponseList roomMessages = chatService.findRoomMessages(roomId);
         return ResponseEntity.ok(roomMessages);
     }

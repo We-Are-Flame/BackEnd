@@ -2,13 +2,18 @@ package com.backend.controller.meeting;
 
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
-import com.backend.dto.registration.response.RegistrationResponse;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
+import com.backend.dto.registration.request.BulkApplyRequest;
+import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,9 +25,62 @@ public class RegistrationController {
 
     @CheckUserNotNull
     @PostMapping("/{meetingId}/apply")
-    public ResponseEntity<RegistrationResponse> createMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
+    public ResponseEntity<SuccessResponse> applyMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
         Long id = registrationService.applyMeeting(meetingId, user);
-        RegistrationResponse response = RegistrationResponse.success(id);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_MEETING);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/cancel")
+    public ResponseEntity<SuccessResponse> cancelApply(@PathVariable Long meetingId, @CurrentMember User user) {
+        Long id = registrationService.cancelMeeting(meetingId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CANCEL_MEETING);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @GetMapping("/{meetingId}/registrations")
+    public ResponseEntity<RegistrationResponseList> getApply(@PathVariable Long meetingId, @CurrentMember User user) {
+        RegistrationResponseList response = registrationService.getRegistration(meetingId, user);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/{registrationId}/accept")
+    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
+                                                       @CurrentMember User user) {
+        Long id = registrationService.acceptApply(meetingId, registrationId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/{registrationId}/reject")
+    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
+                                                       @CurrentMember User user) {
+        Long id = registrationService.rejectApply(meetingId, registrationId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/bulk-accept")
+    public ResponseEntity<SuccessResponse> acceptApplyBulk(@PathVariable Long meetingId,
+                                                           @RequestBody BulkApplyRequest request,
+                                                           @CurrentMember User user) {
+        Long id = registrationService.acceptBulkApply(meetingId, request.getRegistrationIds(), user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
+        return ResponseEntity.ok(response);
+    }
+
+    @CheckUserNotNull
+    @PostMapping("/{meetingId}/registrations/bulk-reject")
+    public ResponseEntity<SuccessResponse> rejectApplyBulk(@PathVariable Long meetingId,
+                                                           @RequestBody BulkApplyRequest request,
+                                                           @CurrentMember User user) {
+        Long id = registrationService.rejectBulkApply(meetingId, request.getRegistrationIds(), user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
         return ResponseEntity.ok(response);
     }
 }

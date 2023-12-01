@@ -1,5 +1,12 @@
 package com.backend.service.chat;
 
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoom;
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoomUser;
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildRoomCreateMessage;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toChatRoomUser;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toChatUserResponses;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toRoomResponses;
+
 import com.backend.dto.chat.request.create.RoomCreateRequest;
 import com.backend.dto.chat.response.read.ChatUserResponse;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
@@ -10,19 +17,21 @@ import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.chat.ChatRoomUser;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
-import com.backend.exception.*;
+import com.backend.exception.AccessDeniedException;
+import com.backend.exception.AlreadyExistsException;
+import com.backend.exception.BadRequestException;
+import com.backend.exception.ErrorMessages;
+import com.backend.exception.NotFoundException;
 import com.backend.repository.chat.ChatMessageRepository;
 import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.chat.ChatRoomUserRepository;
 import com.backend.repository.meeting.MeetingRepository;
 import com.backend.service.user.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-
-import static com.backend.util.mapper.chat.RoomResponseMapper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +87,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Long addUserInChatRoom(Long userId, String roomId){
+    public Long addUserInChatRoom(Long userId, String roomId) {
         User user = userService.fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
@@ -93,7 +102,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Long exitUserFromChatRoom(Long userId, String roomId){
+    public Long exitUserFromChatRoom(Long userId, String roomId) {
         User user = userService.fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
@@ -129,13 +138,13 @@ public class RoomService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    private void checkDuplicateChatRoom(Meeting meeting){
+    private void checkDuplicateChatRoom(Meeting meeting) {
         if (chatRoomRepository.findByMeeting(meeting).isPresent()) {
             throw new AlreadyExistsException(ErrorMessages.ALREADY_EXIST_CHAT_ROOM);
         }
     }
 
-    private void checkIsChatRoomOwner(ChatRoomUser chatRoomUser){
+    private void checkIsChatRoomOwner(ChatRoomUser chatRoomUser) {
         if (chatRoomUser.getIsOwner().equals(false)) {
             throw new BadRequestException(ErrorMessages.USER_DOES_NOT_OWN_CHAT_ROOM);
         }
@@ -148,13 +157,13 @@ public class RoomService {
     }
 
     private void checkIsMeetingOwner(Meeting meeting, User user) {
-        if (!meeting.getHost().equals(user)){
+        if (!meeting.getHost().equals(user)) {
             throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
         }
     }
 
     private void checkAndDeleteEmptyRoom(ChatRoom room) {
-        if(room.getRoomUsers().isEmpty()){
+        if (room.getRoomUsers().isEmpty()) {
             chatRoomRepository.deleteById(room.getId());
         }
     }

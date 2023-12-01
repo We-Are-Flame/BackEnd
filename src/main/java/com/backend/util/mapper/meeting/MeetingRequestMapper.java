@@ -1,9 +1,9 @@
 package com.backend.util.mapper.meeting;
 
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
-import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;

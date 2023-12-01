@@ -1,8 +1,8 @@
 package com.backend.dto.chat.response.delete;
 
-import com.backend.dto.bases.BaseResponse;
-import com.backend.dto.bases.ResponseMessage;
-import com.backend.dto.bases.ResponseStatus;
+import com.backend.dto.common.BaseResponse;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.ResponseStatus;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class RoomDeleteResponse extends BaseResponse {
     private final Long id;
+
     public static RoomDeleteResponse success(Long id) {
         return RoomDeleteResponse.builder()
                 .id(id)

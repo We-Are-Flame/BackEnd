@@ -1,4 +1,4 @@
-package com.backend.dto.bases;
+package com.backend.dto.common;
 
 import java.time.LocalDateTime;
 import lombok.Builder;

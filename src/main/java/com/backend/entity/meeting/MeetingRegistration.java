@@ -47,4 +47,12 @@ public class MeetingRegistration {
     public boolean isUserContained(User user) {
         return this.user.isSameId(user);
     }
+
+    public boolean isNotOwner() {
+        return this.role != RegistrationRole.OWNER;
+    }
+
+    public void updateStatus(RegistrationStatus newStatus) {
+        this.status = newStatus;
+    }
 }

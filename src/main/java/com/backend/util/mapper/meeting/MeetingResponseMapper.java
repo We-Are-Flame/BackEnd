@@ -1,16 +1,16 @@
 package com.backend.util.mapper.meeting;
 
-import com.backend.dto.meeting.response.read.MeetingDetailResponse;
-import com.backend.dto.meeting.response.read.MeetingResponse;
-import com.backend.dto.meeting.response.read.MyMeetingResponse;
-import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
-import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
-import com.backend.dto.meeting.response.read.output.HostOutput;
-import com.backend.dto.meeting.response.read.output.MeetingImageOutput;
-import com.backend.dto.meeting.response.read.output.InfoOutput;
-import com.backend.dto.meeting.response.read.output.LocationOutput;
-import com.backend.dto.meeting.response.read.output.StatusOutput;
-import com.backend.dto.meeting.response.read.output.TimeOutput;
+import com.backend.dto.meeting.response.MeetingDetailResponse;
+import com.backend.dto.meeting.response.MeetingResponse;
+import com.backend.dto.meeting.response.MyMeetingResponse;
+import com.backend.dto.meeting.response.output.DetailInfoOutput;
+import com.backend.dto.meeting.response.output.DetailTimeOutput;
+import com.backend.dto.meeting.response.output.HostOutput;
+import com.backend.dto.meeting.response.output.InfoOutput;
+import com.backend.dto.meeting.response.output.LocationOutput;
+import com.backend.dto.meeting.response.output.MeetingImageOutput;
+import com.backend.dto.meeting.response.output.StatusOutput;
+import com.backend.dto.meeting.response.output.TimeOutput;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
@@ -45,7 +45,7 @@ public class MeetingResponseMapper {
                 .locationOutput(buildLocation(meeting.getMeetingAddress()))
                 .timeOutput(buildDetailTime(meeting.getMeetingTime(), meeting.getCreatedAt()))
                 .hostOutput(buildHost(meeting.getHost()))
-                .status(status)
+                .statusOutput(status)
                 .build();
     }
 
@@ -87,7 +87,6 @@ public class MeetingResponseMapper {
         List<String> imageUrls = images.stream()
                 .map(MeetingImage::getImageUrl)
                 .collect(Collectors.toList());
-
 
         return MeetingImageOutput.builder()
                 .thumbnailUrl(thumbnailUrl)

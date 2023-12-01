@@ -1,6 +1,5 @@
 package com.backend.entity.user;
 
-import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoomUser;
 import com.backend.entity.meeting.Meeting;
 import jakarta.persistence.CascadeType;
@@ -14,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -55,10 +53,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
-    public void updateNickname(String nickname){
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
-    public void updateProfileImage(String profileImage){
+
+    public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
 
@@ -69,9 +68,11 @@ public class User {
     public void updateNotification(Boolean isNotification) {
         this.setting.updateNotification(isNotification);
     }
+
     public void addChatUser(ChatRoomUser roomUser) {
         this.chatRoomUsers.add(roomUser);
     }
+
     public void deleteRoomUser(ChatRoomUser roomUser) {
         this.chatRoomUsers.remove(roomUser);
     }

@@ -1,21 +1,15 @@
 package com.backend.dto.registration.response;
 
-import com.backend.dto.bases.BaseResponse;
-import com.backend.dto.bases.ResponseMessage;
-import com.backend.dto.bases.ResponseStatus;
+import com.backend.entity.meeting.RegistrationStatus;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
-public class RegistrationResponse extends BaseResponse {
+@Builder
+public class RegistrationResponse {
     private final Long id;
-
-    public static RegistrationResponse success(Long id) {
-        return RegistrationResponse.builder()
-                .id(id)
-                .status(ResponseStatus.SUCCESS)
-                .message(ResponseMessage.REGISTRATION_CREATION_SUCCESS.getMessage())
-                .build();
-    }
+    private final String nickname;
+    private final String profileImage;
+    private final Integer temperature;
+    private final RegistrationStatus participateStatus;
 }

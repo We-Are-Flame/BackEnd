@@ -17,7 +17,8 @@ public class ChatCreateRequest {
     @JsonProperty("sender_id")
     private Long senderId;
     private String message;
-    public void updateMessage(String message){
+
+    public void updateMessage(String message) {
         this.message = message;
     }
 

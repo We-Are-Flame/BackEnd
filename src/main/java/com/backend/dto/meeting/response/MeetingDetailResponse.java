@@ -1,11 +1,11 @@
-package com.backend.dto.meeting.response.read;
+package com.backend.dto.meeting.response;
 
-import com.backend.dto.meeting.response.read.output.DetailInfoOutput;
-import com.backend.dto.meeting.response.read.output.DetailTimeOutput;
-import com.backend.dto.meeting.response.read.output.HostOutput;
-import com.backend.dto.meeting.response.read.output.MeetingImageOutput;
-import com.backend.dto.meeting.response.read.output.LocationOutput;
-import com.backend.dto.meeting.response.read.output.StatusOutput;
+import com.backend.dto.meeting.response.output.DetailInfoOutput;
+import com.backend.dto.meeting.response.output.DetailTimeOutput;
+import com.backend.dto.meeting.response.output.HostOutput;
+import com.backend.dto.meeting.response.output.LocationOutput;
+import com.backend.dto.meeting.response.output.MeetingImageOutput;
+import com.backend.dto.meeting.response.output.StatusOutput;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Builder;
@@ -30,5 +30,7 @@ public class MeetingDetailResponse {
 
     @JsonProperty("host")
     private final HostOutput hostOutput;
-    private final StatusOutput status;
+
+    @JsonProperty("status")
+    private final StatusOutput statusOutput;
 }

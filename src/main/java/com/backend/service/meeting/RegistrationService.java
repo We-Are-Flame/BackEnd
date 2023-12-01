@@ -1,5 +1,8 @@
 package com.backend.service.meeting;
 
+import com.backend.annotation.CheckIsOwner;
+import com.backend.dto.registration.response.RegistrationResponse;
+import com.backend.dto.registration.response.RegistrationResponseList;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
@@ -10,33 +13,81 @@ import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
 import com.backend.repository.meeting.MeetingRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RegistrationService {
     private final MeetingRegistrationRepository meetingRegistrationRepository;
     private final MeetingRepository meetingRepository;
 
-    @Transactional
     public void createOwnerStatus(Meeting meeting, User user) {
-        MeetingRegistration registration = MeetingRegistration.builder()
-                .meeting(meeting)
-                .user(user)
-                .role(RegistrationRole.OWNER)
-                .status(RegistrationStatus.ACCEPTED)
-                .build();
-
+        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.OWNER,
+                RegistrationStatus.ACCEPTED);
         meetingRegistrationRepository.save(registration);
     }
 
-    @Transactional
     public Long applyMeeting(Long meetingId, User user) {
         Meeting meeting = getMeeting(meetingId);
-        checkForDuplicateRegistration(meeting, user);
-        return createRegistration(meeting, user).getId();
+        checkRegistrationDuplication(meeting, user);
+        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.MEMBER,
+                RegistrationStatus.PENDING);
+        return saveRegistration(registration).getId();
+    }
+
+    @CheckIsOwner
+    public Long cancelMeeting(Long meetingId, User user) {
+        Meeting meeting = getMeeting(meetingId);
+        MeetingRegistration registration = findRegistration(meeting, user);
+        deleteRegistration(registration);
+        return registration.getId();
+    }
+
+    @CheckIsOwner
+    @Transactional(readOnly = true)
+    public RegistrationResponseList getRegistration(Long meetingId, User user) {
+        Meeting meeting = getMeeting(meetingId);
+        List<RegistrationResponse> responseList = fetchRegistrationResponses(meeting);
+        return new RegistrationResponseList(responseList.size(), responseList);
+    }
+
+    @CheckIsOwner
+    public Long acceptApply(Long meetingId, Long registrationId, User user) {
+        return updateRegistrationStatus(registrationId, RegistrationStatus.ACCEPTED);
+    }
+
+    @CheckIsOwner
+    public Long rejectApply(Long meetingId, Long registrationId, User user) {
+        return updateRegistrationStatus(registrationId, RegistrationStatus.REJECTED);
+    }
+
+    @CheckIsOwner
+    public Long acceptBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+        return processBulkUpdate(registrationIds, RegistrationStatus.ACCEPTED);
+    }
+
+    @CheckIsOwner
+    public Long rejectBulkApply(Long meetingId, List<Long> registrationIds, User user) {
+        return processBulkUpdate(registrationIds, RegistrationStatus.REJECTED);
+    }
+
+    private Long updateRegistrationStatus(Long registrationId, RegistrationStatus status) {
+        MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+
+        registration.updateStatus(status);
+        meetingRegistrationRepository.save(registration);
+
+        return registration.getId();
+    }
+
+    private Long processBulkUpdate(List<Long> registrationIds, RegistrationStatus status) {
+        registrationIds.forEach(registrationId -> updateRegistrationStatus(registrationId, status));
+        return registrationIds.isEmpty() ? null : registrationIds.get(registrationIds.size() - 1);
     }
 
     private Meeting getMeeting(Long meetingId) {
@@ -44,21 +95,51 @@ public class RegistrationService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    private void checkForDuplicateRegistration(Meeting meeting, User user) {
+    private void checkRegistrationDuplication(Meeting meeting, User user) {
         if (meetingRegistrationRepository.existsByMeetingAndUser(meeting, user)) {
             throw new AlreadyExistsException(ErrorMessages.ALREADY_REGISTRATER);
         }
     }
 
-    private MeetingRegistration createRegistration(Meeting meeting, User user) {
-        MeetingRegistration registration = MeetingRegistration.builder()
+    private MeetingRegistration findRegistration(Meeting meeting, User user) {
+        return meetingRegistrationRepository.findByMeetingAndUser(meeting, user)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+    }
+
+    private void deleteRegistration(MeetingRegistration registration) {
+        meetingRegistrationRepository.delete(registration);
+    }
+
+    private MeetingRegistration buildRegistration(Meeting meeting, User user, RegistrationRole role,
+                                                  RegistrationStatus status) {
+        return MeetingRegistration.builder()
                 .meeting(meeting)
                 .user(user)
-                .role(RegistrationRole.MEMBER)
-                .status(RegistrationStatus.PENDING)
+                .role(role)
+                .status(status)
                 .build();
+    }
 
-        // 등록을 저장하고 ID를 반환
+    private MeetingRegistration saveRegistration(MeetingRegistration registration) {
         return meetingRegistrationRepository.save(registration);
     }
+
+    private List<RegistrationResponse> fetchRegistrationResponses(Meeting meeting) {
+        return meetingRegistrationRepository.findByMeeting(meeting).stream()
+                .filter(MeetingRegistration::isNotOwner)
+                .map(this::convertToRegistrationResponse)
+                .toList();
+    }
+
+    private RegistrationResponse convertToRegistrationResponse(MeetingRegistration registration) {
+        User registeredUser = registration.getUser();
+        return RegistrationResponse.builder()
+                .id(registration.getId())
+                .nickname(registeredUser.getNickname())
+                .profileImage(registeredUser.getProfileImage())
+                .temperature(registeredUser.getTemperature())
+                .participateStatus(registration.getStatus())
+                .build();
+    }
 }
+

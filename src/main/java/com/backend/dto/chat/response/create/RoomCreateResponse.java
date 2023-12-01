@@ -1,8 +1,8 @@
 package com.backend.dto.chat.response.create;
 
-import com.backend.dto.bases.BaseResponse;
-import com.backend.dto.bases.ResponseMessage;
-import com.backend.dto.bases.ResponseStatus;
+import com.backend.dto.common.BaseResponse;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.ResponseStatus;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class RoomCreateResponse extends BaseResponse {
     private final String id;
+
     public static RoomCreateResponse success(String id) {
         return RoomCreateResponse.builder()
                 .id(id)

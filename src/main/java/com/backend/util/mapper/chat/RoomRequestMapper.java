@@ -6,12 +6,11 @@ import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.chat.MessageType;
 import com.backend.entity.user.User;
-
 import java.util.List;
 
 public class RoomRequestMapper {
 
-    public static ChatMessage toChatMessage(ChatCreateRequest chatDto, ChatRoom chatRoom, User sender){
+    public static ChatMessage toChatMessage(ChatCreateRequest chatDto, ChatRoom chatRoom, User sender) {
         return ChatMessage.builder()
                 .messageType(chatDto.getMessageType())
                 .chatRoom(chatRoom)

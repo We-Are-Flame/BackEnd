@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.response.read;
+package com.backend.dto.meeting.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

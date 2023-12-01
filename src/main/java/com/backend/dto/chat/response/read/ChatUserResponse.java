@@ -14,7 +14,7 @@ public class ChatUserResponse {
     @JsonProperty("profile_image")
     private String profileImage;
 
-    public static ChatUserResponse from(User user){
+    public static ChatUserResponse from(User user) {
         return ChatUserResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())

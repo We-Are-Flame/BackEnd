@@ -1,5 +1,7 @@
 package com.backend.service.user;
 
+import static com.backend.util.mapper.user.UserResponseMapper.buildUserNotification;
+
 import com.backend.dto.user.request.update.UserUpdateRequest;
 import com.backend.dto.user.response.read.UserResponse;
 import com.backend.entity.user.User;
@@ -9,8 +11,6 @@ import com.backend.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.backend.util.mapper.user.UserResponseMapper.buildUserNotification;
 
 @Service
 @RequiredArgsConstructor

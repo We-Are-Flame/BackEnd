@@ -2,17 +2,18 @@ package com.backend.controller.meeting;
 
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
-import com.backend.dto.meeting.response.create.MeetingCreateResponse;
-import com.backend.dto.meeting.response.read.MeetingDetailResponse;
-import com.backend.dto.meeting.response.read.MeetingResponse;
-import com.backend.dto.meeting.response.read.MyMeetingResponseList;
+import com.backend.dto.meeting.response.MeetingDetailResponse;
+import com.backend.dto.meeting.response.MeetingResponse;
+import com.backend.dto.meeting.response.MyMeetingResponseList;
+import com.backend.dto.meeting.response.NotEndResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.MeetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +31,10 @@ public class MeetingController {
 
     @PostMapping
     @CheckUserNotNull
-    public ResponseEntity<MeetingCreateResponse> createMeeting(@RequestBody MeetingCreateRequest request,
-                                                               @CurrentMember User user) {
+    public ResponseEntity<SuccessResponse> createMeeting(@RequestBody MeetingCreateRequest request,
+                                                         @CurrentMember User user) {
         Long id = meetingService.createMeeting(request, user);
-        MeetingCreateResponse response = MeetingCreateResponse.success(id);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.MEETING_CREATION);
         return ResponseEntity.ok(response);
     }
 
@@ -54,15 +55,23 @@ public class MeetingController {
 
     @CheckUserNotNull
     @DeleteMapping("/{meetingId}")
-    public ResponseEntity<Void> deleteMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
-        meetingService.deleteMeeting(meetingId, user);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<SuccessResponse> deleteMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
+        Long id = meetingService.deleteMeeting(meetingId, user);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.DELETE_MEETING);
+        return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
     @GetMapping("/my")
     public ResponseEntity<MyMeetingResponseList> getMyMeetings(@CurrentMember User user) {
         MyMeetingResponseList meetings = meetingService.readMyMeetings(user);
+        return ResponseEntity.ok(meetings);
+    }
+
+    @CheckUserNotNull
+    @GetMapping("/my/not-end")
+    public ResponseEntity<NotEndResponseList> getMyNotEndMeetings(@CurrentMember User user) {
+        NotEndResponseList meetings = meetingService.getNotEndMeetings(user);
         return ResponseEntity.ok(meetings);
     }
 }

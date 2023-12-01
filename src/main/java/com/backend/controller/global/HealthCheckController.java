@@ -18,9 +18,10 @@ public class HealthCheckController {
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("잘 돌아감 ㅇㅇ");
     }
+
     @CheckUserNotNull
     @GetMapping("/token-check")
-    public ResponseEntity<TokenValidateResponse> tokenValidate(@CurrentMember User user){
+    public ResponseEntity<TokenValidateResponse> tokenValidate(@CurrentMember User user) {
         return ResponseEntity.ok(TokenValidateResponse.success(user.getId()));
     }
 }

@@ -1,4 +1,4 @@
-package com.backend.dto.meeting.response.read.output;
+package com.backend.dto.meeting.response.output;
 
 import com.backend.dto.meeting.dto.TimeDTO;
 import lombok.Getter;
