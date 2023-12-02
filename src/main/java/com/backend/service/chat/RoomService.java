@@ -1,17 +1,8 @@
 package com.backend.service.chat;
 
-import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoom;
-import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoomUser;
-import static com.backend.util.mapper.chat.RoomResponseMapper.buildRoomCreateMessage;
-import static com.backend.util.mapper.chat.RoomResponseMapper.toChatRoomUser;
-import static com.backend.util.mapper.chat.RoomResponseMapper.toChatUserResponses;
-import static com.backend.util.mapper.chat.RoomResponseMapper.toRoomResponses;
-
 import com.backend.dto.chat.request.create.RoomCreateRequest;
-import com.backend.dto.chat.response.read.ChatUserResponse;
-import com.backend.dto.chat.response.read.ChatUserResponseList;
-import com.backend.dto.chat.response.read.RoomResponse;
-import com.backend.dto.chat.response.read.RoomResponseList;
+import com.backend.dto.chat.request.update.RoomUpdateRequest;
+import com.backend.dto.chat.response.read.*;
 import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.chat.ChatRoomUser;
@@ -26,12 +17,15 @@ import com.backend.repository.chat.ChatMessageRepository;
 import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.chat.ChatRoomUserRepository;
 import com.backend.repository.meeting.MeetingRepository;
-import com.backend.service.user.UserService;
+import com.backend.repository.user.UserRepository;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.backend.util.mapper.chat.RoomResponseMapper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +37,11 @@ public class RoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final MeetingRepository meetingRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Transactional
     public RoomResponseList getMyChatRooms(Long userId) {
-        User user = userService.fetchUser(userId);
+        User user = fetchUser(userId);
         List<RoomResponse> roomResponses = toRoomResponses(user);
 
         return new RoomResponseList(roomResponses, roomResponses.size());
@@ -56,7 +50,7 @@ public class RoomService {
     @Transactional
     public String createChatRoom(RoomCreateRequest request, Long userId) {
         Meeting meeting = fetchMeeting(request);
-        User user = userService.fetchUser(userId);
+        User user = fetchUser(userId);
 
         checkIsMeetingOwner(meeting, user);
         checkDuplicateChatRoom(meeting);
@@ -73,7 +67,7 @@ public class RoomService {
 
     @Transactional
     public Long deleteChatRoom(Long userId, String roomId) {
-        User user = userService.fetchUser(userId);
+        User user = fetchUser(userId);
         ChatRoom chatRoom = fetchRoom(roomId);
         ChatRoomUser chatRoomUser = toChatRoomUser(user, chatRoom);
 
@@ -88,7 +82,7 @@ public class RoomService {
 
     @Transactional
     public Long addUserInChatRoom(Long userId, String roomId) {
-        User user = userService.fetchUser(userId);
+        User user = fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
         checkUserAlreadyInChatRoom(user, room);
@@ -103,7 +97,7 @@ public class RoomService {
 
     @Transactional
     public Long exitUserFromChatRoom(Long userId, String roomId) {
-        User user = userService.fetchUser(userId);
+        User user = fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
 
         ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
@@ -116,16 +110,49 @@ public class RoomService {
         return user.getId();
     }
 
+    public RoomNotificationResponse getRoomNotification(Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+
+        return buildNotificationResponse(chatRoomUser);
+    }
+
     public ChatUserResponseList getRoomUserList(String roomId) {
         ChatRoom room = fetchRoom(roomId);
         List<ChatUserResponse> chatUserResponses = toChatUserResponses(room);
         return new ChatUserResponseList(chatUserResponses, chatUserResponses.size());
     }
 
+    @Transactional
+    public Long updateRoomNotification(RoomUpdateRequest.Notification request, Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+        System.out.println("request = " + request.getIsNotification());
+        chatRoomUser.updateRoomNotification(request.getIsNotification());
+        return user.getId();
+    }
+
+    @Transactional
+    public Long updateRoomTitle(RoomUpdateRequest.Title request, Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+        checkIsChatRoomOwner(chatRoomUser);
+        room.updateChatRoomName(request.getTitle());
+        return room.getId();
+    }
+
 
     private ChatRoomUser findChatRoomUser(ChatRoom room, User user) {
         return chatRoomUserRepository.findByChatRoomAndUser(room, user)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND_IN_CHAT_ROOM));
+    }
+
+    public User fetchUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.NOT_EXIST_USER));
     }
 
     private ChatRoom fetchRoom(String roomId) {

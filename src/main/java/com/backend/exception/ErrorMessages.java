@@ -15,7 +15,6 @@ public class ErrorMessages {
     public static final String USER_DOES_NOT_OWN_CHAT_ROOM = "해당 채팅방의 방장이 아닙니다.";
     public static final String ALREADY_EXIST_CHAT_ROOM = "이미 해당 모임의 채팅방이 만들어져 있습니다.";
     public static final String ALREADY_EXIST_CHAT_USER = "이미 채팅방에 입장해 있습니다.";
-
     public static final String CANNOT_CANCEL_OWNER_REGISTRATION = "Host이시면 신청 취소를 하실 수 없습니다.";
     public static final String REGISTRATION_NOT_FOUND = "모임에 대한 신청 정보를 찾을 수 없습니다.";
 }

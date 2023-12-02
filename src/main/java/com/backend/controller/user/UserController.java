@@ -40,9 +40,8 @@ public class UserController {
 
     @PutMapping("profile-image")
     @CheckUserNotNull
-    ResponseEntity<UserUpdateResponse.ProfileImage> updateProfileImage(
-            @RequestBody UserUpdateRequest.ProfileImage request,
-            @CurrentMember User user) {
+    ResponseEntity<UserUpdateResponse.ProfileImage> updateProfileImage(@RequestBody UserUpdateRequest.ProfileImage request,
+                                                                       @CurrentMember User user) {
         Long id = userService.updateProfileImage(request, user.getId());
         UserUpdateResponse.ProfileImage response = UserUpdateResponse.ProfileImage.success(id);
         return ResponseEntity.ok(response);
@@ -57,9 +56,8 @@ public class UserController {
 
     @PutMapping("notification")
     @CheckUserNotNull
-    ResponseEntity<UserUpdateResponse.Notification> updateUserNotification(
-            @RequestBody UserUpdateRequest.Notification request,
-            @CurrentMember User user) {
+    ResponseEntity<UserUpdateResponse.Notification> updateUserNotification(@RequestBody UserUpdateRequest.Notification request,
+                                                                           @CurrentMember User user) {
         Long id = userService.updateUserNotification(request, user.getId());
         UserUpdateResponse.Notification response = UserUpdateResponse.Notification.success(id);
         return ResponseEntity.ok(response);

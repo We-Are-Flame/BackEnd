@@ -39,4 +39,8 @@ public class ChatRoomUser {
 
     private Boolean isOwner;
     private Boolean isRoomNotification;
+
+    public void updateRoomNotification(Boolean isRoomNotification){
+        this.isRoomNotification = isRoomNotification;
+    }
 }

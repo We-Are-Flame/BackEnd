@@ -68,4 +68,8 @@ public class ChatRoom extends BaseEntity {
     public void deleteRoomUser(ChatRoomUser chatRoomUser) {
         this.roomUsers.remove(chatRoomUser);
     }
+
+    public void updateChatRoomName(String title) {
+        this.chatRoomName = title;
+    }
 }

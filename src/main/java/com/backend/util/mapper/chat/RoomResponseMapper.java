@@ -1,6 +1,7 @@
 package com.backend.util.mapper.chat;
 
 import com.backend.dto.chat.request.create.RoomCreateRequest;
+import com.backend.dto.chat.response.read.RoomNotificationResponse;
 import com.backend.dto.chat.response.read.ChatUserResponse;
 import com.backend.dto.chat.response.read.RoomResponse;
 import com.backend.dto.chat.response.read.output.RoomStatusOutput;
@@ -74,6 +75,12 @@ public class RoomResponseMapper {
         return RoomStatusOutput.builder()
                 .isOwner(user.getIsOwner())
                 .isExpire(meeting.isExpired())
+                .build();
+    }
+
+    public static RoomNotificationResponse buildNotificationResponse(ChatRoomUser my) {
+        return RoomNotificationResponse.builder()
+                .isNotification(my.getIsRoomNotification())
                 .build();
     }
 

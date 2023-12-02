@@ -15,7 +15,8 @@ public enum ResponseMessage {
     CHAT_ROOM_CREATION_SUCCESS("채팅방이 성공적으로 생성되었습니다."),
     CHAT_ROOM_DELETE_SUCCESS("채팅방이 성공적으로 삭제되었습니다."),
     CHAT_ROOM_USER_ENTER_SUCCESS("유저가 채팅방에 성공적으로 입장했습니다."),
-    CHAT_ROOM_USER_EXIT_SUCCESS("유저가 채팅방에서 성공적으로 퇴장되었습니다.");
+    CHAT_ROOM_USER_EXIT_SUCCESS("유저가 채팅방에서 성공적으로 퇴장되었습니다."),
+    CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS("해당 유저의 채팅방 알림이 성공적으로 변경되었습니다.");
 
     private final String message;
 
