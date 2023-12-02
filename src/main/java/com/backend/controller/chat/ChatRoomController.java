@@ -3,27 +3,24 @@ package com.backend.controller.chat;
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.chat.request.create.RoomCreateRequest;
+import com.backend.dto.chat.request.update.RoomUpdateRequest;
 import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
 import com.backend.dto.chat.response.create.RoomCreateResponse;
-import com.backend.dto.chat.response.delete.ChatRoomUserExitResponse;
+import com.backend.dto.chat.response.delete.RoomUserExitResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
+import com.backend.dto.chat.response.read.RoomNotificationResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
 import com.backend.dto.chat.response.read.RoomResponseList;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
 import com.backend.entity.user.User;
 import com.backend.service.chat.ChatService;
 import com.backend.service.chat.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,26 +67,51 @@ public class ChatRoomController {
 
     @DeleteMapping("{roomId}/user")
     @CheckUserNotNull
-    public ResponseEntity<ChatRoomUserExitResponse> exitUserFromChatRoom(@CurrentMember User user,
-                                                                         @PathVariable String roomId) {
+    public ResponseEntity<RoomUserExitResponse> exitUserFromChatRoom(@CurrentMember User user,
+                                                                     @PathVariable String roomId) {
         Long id = roomService.exitUserFromChatRoom(user.getId(), roomId);
-        ChatRoomUserExitResponse response = ChatRoomUserExitResponse.success(id);
+        RoomUserExitResponse response = RoomUserExitResponse.success(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{roomId}/users")
-    @ResponseBody
     public ResponseEntity<ChatUserResponseList> getUserList(@PathVariable String roomId) {
         ChatUserResponseList roomUsers = roomService.getRoomUserList(roomId);
         return ResponseEntity.ok(roomUsers);
     }
 
     @GetMapping("/{roomId}/messages")
-    @ResponseBody
     public ResponseEntity<ChatResponseList> getMessages(@PathVariable String roomId) {
         ChatResponseList roomMessages = chatService.findRoomMessages(roomId);
         return ResponseEntity.ok(roomMessages);
     }
 
+    @GetMapping("/{roomId}/notification")
+    @CheckUserNotNull
+    public ResponseEntity<RoomNotificationResponse> getChatRoomNotification(@CurrentMember User user,
+                                                                            @PathVariable String roomId) {
+        RoomNotificationResponse response = roomService.getRoomNotification(user.getId(), roomId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{roomId}/notification")
+    @CheckUserNotNull
+    public ResponseEntity<SuccessResponse> updateChatRoomNotification(@RequestBody RoomUpdateRequest.Notification request,
+                                                                      @CurrentMember User user,
+                                                                      @PathVariable String roomId) {
+        Long id = roomService.updateRoomNotification(request, user.getId(), roomId);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{roomId}/title")
+    @CheckUserNotNull
+    public ResponseEntity<SuccessResponse> updateChatRoomNotification(@RequestBody RoomUpdateRequest.Title request,
+                                                                      @CurrentMember User user,
+                                                                      @PathVariable String roomId) {
+        Long id = roomService.updateRoomTitle(request, user.getId(), roomId);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS);
+        return ResponseEntity.ok(response);
+    }
 
 }

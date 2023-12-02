@@ -8,11 +8,11 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class ChatRoomUserExitResponse extends BaseResponse {
+public class RoomUserExitResponse extends BaseResponse {
     private final Long id;
 
-    public static ChatRoomUserExitResponse success(Long id) {
-        return ChatRoomUserExitResponse.builder()
+    public static RoomUserExitResponse success(Long id) {
+        return RoomUserExitResponse.builder()
                 .id(id)
                 .status(ResponseStatus.SUCCESS)
                 .message(ResponseMessage.CHAT_ROOM_USER_EXIT_SUCCESS.getMessage())
