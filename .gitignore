@@ -2,6 +2,8 @@
 application*.yml
 /src/main/generated/
 
+kitching-1f68b-firebase-adminsdk-iovye-440b797d4c.json
+
 HELP.md
 .gradle
 build/
