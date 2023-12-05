@@ -60,6 +60,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public MyMeetingResponseList readMyMeetings(User user) {
         List<MyMeetingResponse> participatedMeetings = meetingRepository.findAllByHost(user);
+        participatedMeetings.forEach(meeting -> meeting.assignTimeStatus(meeting.getTimeOutput()));
 
         return new MyMeetingResponseList(participatedMeetings, participatedMeetings.size());
     }
@@ -67,10 +68,10 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public MyMeetingResponseList readParticipatedMeetings(User user) {
         List<MyMeetingResponse> participatedMeetings = meetingRepository.findAllParticipatedByUser(user);
+        participatedMeetings.forEach(meeting -> meeting.assignTimeStatus(meeting.getTimeOutput()));
 
         return new MyMeetingResponseList(participatedMeetings, participatedMeetings.size());
     }
-
 
     @Transactional
     public Long deleteMeeting(Long meetingId) {

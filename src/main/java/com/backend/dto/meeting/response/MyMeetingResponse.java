@@ -10,11 +10,12 @@ import lombok.Getter;
 @Getter
 public class MyMeetingResponse {
     private final long id;
+    private TimeStatus status;
     private final String thumbnailUrl;
     private final InfoOutput infoOutput;
     private final LocationOutput locationOutput;
     private final TimeOutput timeOutput;
-    private List<String> hashtags; // List<String>으로 변경
+    private List<String> hashtags;
 
     @QueryProjection
     public MyMeetingResponse(long id, String thumbnailUrl, InfoOutput infoOutput,
@@ -28,5 +29,9 @@ public class MyMeetingResponse {
 
     public void assignHashtag(List<String> hashtags) {
         this.hashtags = hashtags;
+    }
+
+    public void assignTimeStatus(TimeOutput timeOutput) {
+        this.status = TimeStatus.determineTimeStatus(timeOutput);
     }
 }
