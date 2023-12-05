@@ -8,7 +8,7 @@ import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
 import com.backend.dto.chat.response.create.RoomCreateResponse;
 import com.backend.dto.chat.response.delete.RoomUserExitResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
-import com.backend.dto.chat.response.read.RoomNotificationResponse;
+import com.backend.dto.chat.response.read.RoomDetailResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
 import com.backend.dto.chat.response.read.RoomResponseList;
@@ -88,9 +88,9 @@ public class ChatRoomController {
 
     @GetMapping("/{roomId}/notification")
     @CheckUserNotNull
-    public ResponseEntity<RoomNotificationResponse> getChatRoomNotification(@CurrentMember User user,
-                                                                            @PathVariable String roomId) {
-        RoomNotificationResponse response = roomService.getRoomNotification(user.getId(), roomId);
+    public ResponseEntity<RoomDetailResponse.Notification> getChatRoomNotification(@CurrentMember User user,
+                                                                                   @PathVariable String roomId) {
+        RoomDetailResponse.Notification response = roomService.getRoomNotification(user.getId(), roomId);
         return ResponseEntity.ok(response);
     }
 
@@ -104,13 +104,37 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{roomId}/title")
+    @CheckUserNotNull
+    public ResponseEntity<RoomDetailResponse.Title> getChatRoomTitle(@CurrentMember User user,
+                                                                      @PathVariable String roomId) {
+        RoomDetailResponse.Title response = roomService.getRoomTitle(roomId);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{roomId}/title")
     @CheckUserNotNull
     public ResponseEntity<SuccessResponse> updateChatRoomNotification(@RequestBody RoomUpdateRequest.Title request,
                                                                       @CurrentMember User user,
                                                                       @PathVariable String roomId) {
         Long id = roomService.updateRoomTitle(request, user.getId(), roomId);
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_TITLE_UPDATE_SUCCESS);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{roomId}/thumbnail")
+    @CheckUserNotNull
+    public ResponseEntity<RoomDetailResponse.Thumbnail> getChatRoomThumbnail(@CurrentMember User user,
+                                                                             @PathVariable String roomId) {
+        RoomDetailResponse.Thumbnail response = roomService.getRoomThumbnail(roomId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{roomId}/host")
+    @CheckUserNotNull
+    ResponseEntity<RoomDetailResponse.Host> getUserNotification(@CurrentMember User user,
+                                                                @PathVariable String roomId) {
+        RoomDetailResponse.Host response = roomService.getUserIsRoomHost(user.getId(), roomId);
         return ResponseEntity.ok(response);
     }
 
