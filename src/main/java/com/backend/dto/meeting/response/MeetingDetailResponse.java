@@ -15,6 +15,7 @@ import lombok.Getter;
 @Builder
 public class MeetingDetailResponse {
     private final Long id;
+    private final String category;
     private final List<String> hashtags;
     @JsonProperty("info")
     private final DetailInfoOutput detailInfoOutput;

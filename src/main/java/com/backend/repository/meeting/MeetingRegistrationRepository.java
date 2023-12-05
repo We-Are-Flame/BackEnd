@@ -2,6 +2,7 @@ package com.backend.repository.meeting;
 
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingRegistration;
+import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import java.util.List;
 import java.util.Optional;
@@ -12,5 +13,5 @@ public interface MeetingRegistrationRepository extends JpaRepository<MeetingRegi
 
     Optional<MeetingRegistration> findByMeetingAndUser(Meeting meeting, User user);
 
-    List<MeetingRegistration> findByMeeting(Meeting meeting);
+    List<MeetingRegistration> findByMeetingAndStatus(Meeting meeting, RegistrationStatus status);
 }

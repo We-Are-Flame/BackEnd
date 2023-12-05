@@ -9,7 +9,7 @@ import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.CommentRepository;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;

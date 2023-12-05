@@ -37,9 +37,6 @@ public class User {
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Meeting> meetings;
-
     private String nickname;
 
     private String profileImage;
@@ -48,6 +45,9 @@ public class User {
     private Integer temperature = 365;
 
     private String email;
+
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Meeting> meetings;
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

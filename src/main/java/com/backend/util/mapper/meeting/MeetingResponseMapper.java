@@ -2,7 +2,6 @@ package com.backend.util.mapper.meeting;
 
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
-import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.dto.meeting.response.output.DetailInfoOutput;
 import com.backend.dto.meeting.response.output.DetailTimeOutput;
 import com.backend.dto.meeting.response.output.HostOutput;
@@ -39,6 +38,7 @@ public class MeetingResponseMapper {
     public static MeetingDetailResponse toMeetingDetailResponse(Meeting meeting, StatusOutput status) {
         return MeetingDetailResponse.builder()
                 .id(meeting.getId())
+                .category(meeting.getCategory())
                 .hashtags(extractHashTags(meeting))
                 .detailInfoOutput(buildDetailInfo(meeting))
                 .imageOutput(buildImage(meeting.getMeetingImages(), meeting.getThumbnailUrl()))
@@ -46,17 +46,6 @@ public class MeetingResponseMapper {
                 .timeOutput(buildDetailTime(meeting.getMeetingTime(), meeting.getCreatedAt()))
                 .hostOutput(buildHost(meeting.getHost()))
                 .statusOutput(status)
-                .build();
-    }
-
-    public static MyMeetingResponse toMyMeetingResponse(Meeting meeting) {
-        return MyMeetingResponse.builder()
-                .id(meeting.getId())
-                .thumbnailUrl(meeting.getThumbnailUrl())
-                .hashtags(extractHashTags(meeting))
-                .infoOutput(buildInfo(meeting))
-                .locationOutput(buildLocation(meeting.getMeetingAddress()))
-                .timeOutput(buildTime(meeting.getMeetingTime()))
                 .build();
     }
 

@@ -75,6 +75,9 @@ dependencies {
 
     //Chat 웹소켓 설정
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //FCM
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('bootBuildImage') {
@@ -85,11 +88,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-//Submodule 세팅
 task copyPrivate(type: Copy) {
     copy {
         from './config'
-        include "*.yml"
+        include "*.yml", "*.json"
         into 'src/main/resources'
     }
 }

@@ -3,7 +3,7 @@ package com.backend.service.auth;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.JwtAuthenticationException;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.repository.user.UserRepository;
 import com.backend.util.wrapper.UserWrapper;
 import jakarta.servlet.http.HttpServletRequest;

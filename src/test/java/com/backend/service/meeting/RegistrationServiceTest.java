@@ -14,7 +14,7 @@ import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import com.backend.exception.AlreadyExistsException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;

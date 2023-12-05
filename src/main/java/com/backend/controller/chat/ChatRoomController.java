@@ -6,8 +6,8 @@ import com.backend.dto.chat.request.create.RoomCreateRequest;
 import com.backend.dto.chat.request.update.RoomUpdateRequest;
 import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
 import com.backend.dto.chat.response.create.RoomCreateResponse;
-import com.backend.dto.chat.response.delete.RoomUserExitResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
+import com.backend.dto.chat.response.delete.RoomUserExitResponse;
 import com.backend.dto.chat.response.read.RoomDetailResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
@@ -20,7 +20,14 @@ import com.backend.service.chat.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -96,9 +103,10 @@ public class ChatRoomController {
 
     @PutMapping("/{roomId}/notification")
     @CheckUserNotNull
-    public ResponseEntity<SuccessResponse> updateChatRoomNotification(@RequestBody RoomUpdateRequest.Notification request,
-                                                                      @CurrentMember User user,
-                                                                      @PathVariable String roomId) {
+    public ResponseEntity<SuccessResponse> updateChatRoomNotification(
+            @RequestBody RoomUpdateRequest.Notification request,
+            @CurrentMember User user,
+            @PathVariable String roomId) {
         Long id = roomService.updateRoomNotification(request, user.getId(), roomId);
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS);
         return ResponseEntity.ok(response);

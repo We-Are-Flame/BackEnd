@@ -20,6 +20,7 @@ import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -97,5 +98,22 @@ public class Meeting extends BaseEntity {
 
     public boolean isExpired() {
         return this.meetingTime.isBeforeNow();
+    }
+
+    public void addCurrentParticipants() {
+        currentParticipants++;
+    }
+
+    public void enrichWithHashtags() {
+        if (meetingHashtags != null) {
+            Set<Hashtag> hashtags = meetingHashtags.stream()
+                    .map(MeetingHashtag::getHashtag)
+                    .collect(Collectors.toSet());
+            this.assignHashtags(hashtags);
+        }
+    }
+
+    public String getCategory() {
+        return category.getName();
     }
 }
