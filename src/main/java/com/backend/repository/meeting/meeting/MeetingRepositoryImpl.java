@@ -2,6 +2,7 @@ package com.backend.repository.meeting.meeting;
 
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.entity.meeting.Meeting;
+import com.backend.entity.meeting.QCategory;
 import com.backend.entity.meeting.QComment;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
@@ -55,6 +56,7 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         Meeting meeting = queryBuilder.createBaseMeetingQuery()
                 .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
                 .leftJoin(QMeeting.meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
+                .leftJoin(QMeeting.meeting.category, QCategory.category).fetchJoin()
                 .where(QMeeting.meeting.id.eq(meetingId))
                 .fetchOne();
 

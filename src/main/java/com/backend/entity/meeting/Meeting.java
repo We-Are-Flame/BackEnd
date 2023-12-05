@@ -112,4 +112,8 @@ public class Meeting extends BaseEntity {
             this.assignHashtags(hashtags);
         }
     }
+
+    public String getCategory() {
+        return category.getName();
+    }
 }

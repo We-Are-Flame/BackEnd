@@ -38,6 +38,7 @@ public class MeetingResponseMapper {
     public static MeetingDetailResponse toMeetingDetailResponse(Meeting meeting, StatusOutput status) {
         return MeetingDetailResponse.builder()
                 .id(meeting.getId())
+                .category(meeting.getCategory())
                 .hashtags(extractHashTags(meeting))
                 .detailInfoOutput(buildDetailInfo(meeting))
                 .imageOutput(buildImage(meeting.getMeetingImages(), meeting.getThumbnailUrl()))
