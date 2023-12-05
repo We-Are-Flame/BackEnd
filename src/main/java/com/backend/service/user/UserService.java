@@ -44,7 +44,8 @@ public class UserService {
         return user.getId();
     }
 
-    public UserResponse.Notification getUserNotification(User user) {
+    public UserResponse.Notification getUserNotification(Long userId) {
+        User user = fetchUser(userId);
         return buildUserNotification(user);
     }
 
