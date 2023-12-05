@@ -25,4 +25,11 @@ public class RoomDetailResponse {
         String thumbnail;
     }
 
+    @Builder
+    @Getter
+    public static class Host{
+        @JsonProperty("is_host")
+        Boolean isHost;
+    }
+
 }

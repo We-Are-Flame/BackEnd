@@ -95,4 +95,10 @@ public class RoomResponseMapper {
                 .thumbnail(room.getMeeting().getThumbnailUrl())
                 .build();
     }
+
+    public static RoomDetailResponse.Host buildRoomHostResponse(ChatRoomUser chatRoomUser) {
+        return RoomDetailResponse.Host.builder()
+                .isHost(chatRoomUser.getIsOwner())
+                .build();
+    }
 }

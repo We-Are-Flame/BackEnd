@@ -153,6 +153,14 @@ public class RoomService {
     }
 
 
+    public RoomDetailResponse.Host getUserIsRoomHost(Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+        return buildRoomHostResponse(chatRoomUser);
+    }
+
+
     private void checkAndDeleteEmptyRoom(ChatRoom room) {
         if (room.getRoomUsers().isEmpty()) {
             chatRoomRepository.deleteById(room.getId());

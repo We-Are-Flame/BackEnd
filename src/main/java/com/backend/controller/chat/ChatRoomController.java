@@ -118,7 +118,7 @@ public class ChatRoomController {
                                                                       @CurrentMember User user,
                                                                       @PathVariable String roomId) {
         Long id = roomService.updateRoomTitle(request, user.getId(), roomId);
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_NOTIFICATION_UPDATE_SUCCESS);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.CHAT_ROOM_TITLE_UPDATE_SUCCESS);
         return ResponseEntity.ok(response);
     }
 
@@ -127,6 +127,14 @@ public class ChatRoomController {
     public ResponseEntity<RoomDetailResponse.Thumbnail> getChatRoomThumbnail(@CurrentMember User user,
                                                                              @PathVariable String roomId) {
         RoomDetailResponse.Thumbnail response = roomService.getRoomThumbnail(roomId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{roomId}/host")
+    @CheckUserNotNull
+    ResponseEntity<RoomDetailResponse.Host> getUserNotification(@CurrentMember User user,
+                                                                @PathVariable String roomId) {
+        RoomDetailResponse.Host response = roomService.getUserIsRoomHost(user.getId(), roomId);
         return ResponseEntity.ok(response);
     }
 

@@ -29,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("nickname")
+    @PutMapping("/nickname")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.Nickname> updateNickName(@RequestBody UserUpdateRequest.Nickname request,
                                                                @CurrentMember User user) {
@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("profile-image")
+    @PutMapping("/profile-image")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.ProfileImage> updateProfileImage(@RequestBody UserUpdateRequest.ProfileImage request,
                                                                        @CurrentMember User user) {
@@ -47,14 +47,14 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("notification")
+    @GetMapping("/notification")
     @CheckUserNotNull
     ResponseEntity<UserResponse.Notification> getUserNotification(@CurrentMember User user) {
         UserResponse.Notification response = userService.getUserNotification(user);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("notification")
+    @PutMapping("/notification")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.Notification> updateUserNotification(@RequestBody UserUpdateRequest.Notification request,
                                                                            @CurrentMember User user) {
