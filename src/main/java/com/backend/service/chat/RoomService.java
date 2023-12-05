@@ -12,7 +12,9 @@ import com.backend.dto.chat.request.create.RoomCreateRequest;
 import com.backend.dto.chat.request.update.RoomUpdateRequest;
 import com.backend.dto.chat.response.read.ChatUserResponse;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
-import com.backend.dto.chat.response.read.RoomNotificationResponse;
+import com.backend.dto.chat.response.read.RoomDetailResponse;
+import com.backend.dto.chat.response.read.RoomDetailResponse.Notification;
+import com.backend.dto.chat.response.read.RoomDetailResponse.Title;
 import com.backend.dto.chat.response.read.RoomResponse;
 import com.backend.dto.chat.response.read.RoomResponseList;
 import com.backend.entity.chat.ChatMessage;
@@ -30,6 +32,7 @@ import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.chat.ChatRoomUserRepository;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.repository.user.UserRepository;
+import com.backend.util.mapper.chat.RoomResponseMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,15 +121,6 @@ public class RoomService {
         checkAndDeleteEmptyRoom(room);
         return user.getId();
     }
-
-    public RoomNotificationResponse getRoomNotification(Long userId, String roomId) {
-        User user = fetchUser(userId);
-        ChatRoom room = fetchRoom(roomId);
-        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
-
-        return buildNotificationResponse(chatRoomUser);
-    }
-
     public ChatUserResponseList getRoomUserList(String roomId) {
         ChatRoom room = fetchRoom(roomId);
         List<ChatUserResponse> chatUserResponses = toChatUserResponses(room);
@@ -138,7 +132,6 @@ public class RoomService {
         User user = fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
         ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
-        System.out.println("request = " + request.getIsNotification());
         chatRoomUser.updateRoomNotification(request.getIsNotification());
         return user.getId();
     }
@@ -153,6 +146,38 @@ public class RoomService {
         return room.getId();
     }
 
+    public Notification getRoomNotification(Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+
+        return buildNotificationResponse(chatRoomUser);
+    }
+
+    public Title getRoomTitle(String roomId) {
+        ChatRoom room = fetchRoom(roomId);
+        return RoomResponseMapper.buildTitleResponse(room);
+    }
+
+    public RoomDetailResponse.Thumbnail getRoomThumbnail(String roomId) {
+        ChatRoom room = fetchRoom(roomId);
+        return RoomResponseMapper.buildThumbnailResponse(room);
+    }
+
+
+    public RoomDetailResponse.Host getUserIsRoomHost(Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+        return RoomResponseMapper.buildRoomHostResponse(chatRoomUser);
+    }
+
+
+    private void checkAndDeleteEmptyRoom(ChatRoom room) {
+        if (room.getRoomUsers().isEmpty()) {
+            chatRoomRepository.deleteById(room.getId());
+        }
+    }
 
     private ChatRoomUser findChatRoomUser(ChatRoom room, User user) {
         return chatRoomUserRepository.findByChatRoomAndUser(room, user)
@@ -195,12 +220,6 @@ public class RoomService {
     private void checkIsMeetingOwner(Meeting meeting, User user) {
         if (!meeting.getHost().equals(user)) {
             throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
-        }
-    }
-
-    private void checkAndDeleteEmptyRoom(ChatRoom room) {
-        if (room.getRoomUsers().isEmpty()) {
-            chatRoomRepository.deleteById(room.getId());
         }
     }
 }
