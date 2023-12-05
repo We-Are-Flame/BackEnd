@@ -33,7 +33,7 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "setting_id")
     private Setting setting;
 
