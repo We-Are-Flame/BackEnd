@@ -109,15 +109,6 @@ public class RoomService {
         checkAndDeleteEmptyRoom(room);
         return user.getId();
     }
-
-    public RoomNotificationResponse getRoomNotification(Long userId, String roomId) {
-        User user = fetchUser(userId);
-        ChatRoom room = fetchRoom(roomId);
-        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
-
-        return buildNotificationResponse(chatRoomUser);
-    }
-
     public ChatUserResponseList getRoomUserList(String roomId) {
         ChatRoom room = fetchRoom(roomId);
         List<ChatUserResponse> chatUserResponses = toChatUserResponses(room);
@@ -129,7 +120,6 @@ public class RoomService {
         User user = fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
         ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
-        System.out.println("request = " + request.getIsNotification());
         chatRoomUser.updateRoomNotification(request.getIsNotification());
         return user.getId();
     }
@@ -144,6 +134,30 @@ public class RoomService {
         return room.getId();
     }
 
+    public RoomDetailResponse.Notification getRoomNotification(Long userId, String roomId) {
+        User user = fetchUser(userId);
+        ChatRoom room = fetchRoom(roomId);
+        ChatRoomUser chatRoomUser = findChatRoomUser(room, user);
+
+        return buildNotificationResponse(chatRoomUser);
+    }
+
+    public RoomDetailResponse.Title getRoomTitle(String roomId) {
+        ChatRoom room = fetchRoom(roomId);
+        return buildTitleResponse(room);
+    }
+
+    public RoomDetailResponse.Thumbnail getRoomThumbnail(String roomId) {
+        ChatRoom room = fetchRoom(roomId);
+        return buildThumbnailResponse(room);
+    }
+
+
+    private void checkAndDeleteEmptyRoom(ChatRoom room) {
+        if (room.getRoomUsers().isEmpty()) {
+            chatRoomRepository.deleteById(room.getId());
+        }
+    }
 
     private ChatRoomUser findChatRoomUser(ChatRoom room, User user) {
         return chatRoomUserRepository.findByChatRoomAndUser(room, user)
@@ -186,12 +200,6 @@ public class RoomService {
     private void checkIsMeetingOwner(Meeting meeting, User user) {
         if (!meeting.getHost().equals(user)) {
             throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
-        }
-    }
-
-    private void checkAndDeleteEmptyRoom(ChatRoom room) {
-        if (room.getRoomUsers().isEmpty()) {
-            chatRoomRepository.deleteById(room.getId());
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.backend.util.mapper.chat;
 
 import com.backend.dto.chat.request.create.RoomCreateRequest;
-import com.backend.dto.chat.response.read.RoomNotificationResponse;
+import com.backend.dto.chat.response.read.RoomDetailResponse;
 import com.backend.dto.chat.response.read.ChatUserResponse;
 import com.backend.dto.chat.response.read.RoomResponse;
 import com.backend.dto.chat.response.read.output.RoomStatusOutput;
@@ -78,10 +78,21 @@ public class RoomResponseMapper {
                 .build();
     }
 
-    public static RoomNotificationResponse buildNotificationResponse(ChatRoomUser my) {
-        return RoomNotificationResponse.builder()
+    public static RoomDetailResponse.Notification buildNotificationResponse(ChatRoomUser my) {
+        return RoomDetailResponse.Notification.builder()
                 .isNotification(my.getIsRoomNotification())
                 .build();
     }
 
+    public static RoomDetailResponse.Title buildTitleResponse(ChatRoom room) {
+        return RoomDetailResponse.Title.builder()
+                .title(room.getChatRoomName())
+                .build();
+    }
+
+    public static RoomDetailResponse.Thumbnail buildThumbnailResponse(ChatRoom room) {
+        return RoomDetailResponse.Thumbnail.builder()
+                .thumbnail(room.getMeeting().getThumbnailUrl())
+                .build();
+    }
 }
