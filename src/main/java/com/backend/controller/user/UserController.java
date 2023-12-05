@@ -51,7 +51,7 @@ public class UserController {
     @GetMapping("/notification")
     @CheckUserNotNull
     ResponseEntity<UserResponse.Notification> getUserNotification(@CurrentMember User user) {
-        UserResponse.Notification response = userService.getUserNotification(user);
+        UserResponse.Notification response = userService.getUserNotification(user.getId());
         return ResponseEntity.ok(response);
     }
 
