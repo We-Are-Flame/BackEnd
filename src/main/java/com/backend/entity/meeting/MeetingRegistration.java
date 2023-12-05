@@ -55,4 +55,10 @@ public class MeetingRegistration {
     public void updateStatus(RegistrationStatus newStatus) {
         this.status = newStatus;
     }
+
+    public void checkIfPending() {
+        if (!this.status.equals(RegistrationStatus.PENDING)) {
+            throw new IllegalStateException("PENDING상태에서만 변경될 수 있습니다!");
+        }
+    }
 }

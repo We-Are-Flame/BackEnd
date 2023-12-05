@@ -44,48 +44,28 @@ public class RegistrationController {
     @PreAuthorize("hasAuthority('ROLE_HOST')")
     @GetMapping("/{meetingId}/registrations")
     public ResponseEntity<RegistrationResponseList> getApply(@PathVariable Long meetingId, @CurrentMember User user) {
-        RegistrationResponseList response = registrationService.getRegistration(meetingId);
+        RegistrationResponseList response = registrationService.getRegistrations(meetingId);
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
     @PreAuthorize("hasAuthority('ROLE_HOST')")
-    @PostMapping("/{meetingId}/registrations/{registrationId}/accept")
-    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
+    @PostMapping("/{meetingId}/accept")
+    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long meetingId,
+                                                       @RequestBody BulkApplyRequest request,
                                                        @CurrentMember User user) {
-        Long id = registrationService.acceptApply(registrationId);
+        Long id = registrationService.acceptApply(request.getRegistrationIds());
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
     @PreAuthorize("hasAuthority('ROLE_HOST')")
-    @PostMapping("/{meetingId}/registrations/{registrationId}/reject")
-    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long meetingId, @PathVariable Long registrationId,
+    @PostMapping("/{meetingId}/reject")
+    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long meetingId,
+                                                       @RequestBody BulkApplyRequest request,
                                                        @CurrentMember User user) {
-        Long id = registrationService.rejectApply(registrationId);
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
-        return ResponseEntity.ok(response);
-    }
-
-    @CheckUserNotNull
-    @PreAuthorize("hasAuthority('ROLE_HOST')")
-    @PostMapping("/{meetingId}/registrations/bulk-accept")
-    public ResponseEntity<SuccessResponse> acceptApplyBulk(@PathVariable Long meetingId,
-                                                           @RequestBody BulkApplyRequest request,
-                                                           @CurrentMember User user) {
-        Long id = registrationService.acceptBulkApply(request.getRegistrationIds());
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
-        return ResponseEntity.ok(response);
-    }
-
-    @CheckUserNotNull
-    @PreAuthorize("hasAuthority('ROLE_HOST')")
-    @PostMapping("/{meetingId}/registrations/bulk-reject")
-    public ResponseEntity<SuccessResponse> rejectApplyBulk(@PathVariable Long meetingId,
-                                                           @RequestBody BulkApplyRequest request,
-                                                           @CurrentMember User user) {
-        Long id = registrationService.rejectBulkApply(request.getRegistrationIds());
+        Long id = registrationService.rejectApply(request.getRegistrationIds());
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
         return ResponseEntity.ok(response);
     }

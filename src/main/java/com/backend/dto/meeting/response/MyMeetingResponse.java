@@ -10,11 +10,11 @@ import lombok.Getter;
 @Getter
 public class MyMeetingResponse {
     private final long id;
-    private TimeStatus status;
     private final String thumbnailUrl;
     private final InfoOutput infoOutput;
     private final LocationOutput locationOutput;
     private final TimeOutput timeOutput;
+    private TimeStatus status;
     private List<String> hashtags;
 
     @QueryProjection
