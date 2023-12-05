@@ -11,7 +11,7 @@ import com.backend.exception.AlreadyExistsException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +41,7 @@ public class RegistrationService {
     public Long cancelMeeting(Long meetingId, User user) {
         Meeting meeting = getMeeting(meetingId);
         MeetingRegistration registration = findRegistration(meeting, user);
+        ///TODO [HJ] 여기 이미 수락됐으면 취소 안되도록 변경
         deleteRegistration(registration);
         return registration.getId();
     }
@@ -71,6 +72,12 @@ public class RegistrationService {
     private Long updateRegistrationStatus(Long registrationId, RegistrationStatus status) {
         MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+
+        if (status.equals(RegistrationStatus.ACCEPTED)) {
+            Meeting updateMeeting = registration.getMeeting();
+            updateMeeting.addCurrentParticipants();
+            meetingRepository.save(updateMeeting);
+        }
 
         registration.updateStatus(status);
         meetingRegistrationRepository.save(registration);
@@ -135,4 +142,3 @@ public class RegistrationService {
                 .build();
     }
 }
-

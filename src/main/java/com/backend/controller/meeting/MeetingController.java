@@ -8,7 +8,6 @@ import com.backend.dto.meeting.request.create.MeetingCreateRequest;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponseList;
-import com.backend.dto.meeting.response.NotEndResponseList;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.MeetingService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +57,7 @@ public class MeetingController {
     @PreAuthorize("hasAuthority('ROLE_HOST')")
     @DeleteMapping("/{meetingId}")
     public ResponseEntity<SuccessResponse> deleteMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
-        Long id = meetingService.deleteMeeting(meetingId, user);
+        Long id = meetingService.deleteMeeting(meetingId);
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.DELETE_MEETING);
         return ResponseEntity.ok(response);
     }
@@ -71,9 +70,9 @@ public class MeetingController {
     }
 
     @CheckUserNotNull
-    @GetMapping("/my/not-end")
-    public ResponseEntity<NotEndResponseList> getMyNotEndMeetings(@CurrentMember User user) {
-        NotEndResponseList meetings = meetingService.getNotEndMeetings(user);
+    @GetMapping("/participated")
+    public ResponseEntity<MyMeetingResponseList> getParticipatedMeetings(@CurrentMember User user) {
+        MyMeetingResponseList meetings = meetingService.readParticipatedMeetings(user);
         return ResponseEntity.ok(meetings);
     }
 }

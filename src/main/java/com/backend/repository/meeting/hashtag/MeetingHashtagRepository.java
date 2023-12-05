@@ -1,4 +1,4 @@
-package com.backend.repository.meeting;
+package com.backend.repository.meeting.hashtag;
 
 import com.backend.entity.meeting.MeetingHashtag;
 import org.springframework.data.jpa.repository.JpaRepository;

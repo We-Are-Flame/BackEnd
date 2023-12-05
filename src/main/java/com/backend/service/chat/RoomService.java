@@ -1,8 +1,20 @@
 package com.backend.service.chat;
 
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoom;
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildChatRoomUser;
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildNotificationResponse;
+import static com.backend.util.mapper.chat.RoomResponseMapper.buildRoomCreateMessage;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toChatRoomUser;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toChatUserResponses;
+import static com.backend.util.mapper.chat.RoomResponseMapper.toRoomResponses;
+
 import com.backend.dto.chat.request.create.RoomCreateRequest;
 import com.backend.dto.chat.request.update.RoomUpdateRequest;
-import com.backend.dto.chat.response.read.*;
+import com.backend.dto.chat.response.read.ChatUserResponse;
+import com.backend.dto.chat.response.read.ChatUserResponseList;
+import com.backend.dto.chat.response.read.RoomNotificationResponse;
+import com.backend.dto.chat.response.read.RoomResponse;
+import com.backend.dto.chat.response.read.RoomResponseList;
 import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.chat.ChatRoomUser;
@@ -16,16 +28,13 @@ import com.backend.exception.NotFoundException;
 import com.backend.repository.chat.ChatMessageRepository;
 import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.chat.ChatRoomUserRepository;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.repository.user.UserRepository;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.backend.util.mapper.chat.RoomResponseMapper.*;
 
 @Service
 @RequiredArgsConstructor

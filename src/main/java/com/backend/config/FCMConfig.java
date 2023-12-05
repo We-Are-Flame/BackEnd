@@ -32,7 +32,7 @@ public class FCMConfig {
                     firebaseApp = app;
                 }
             }
-        }else{
+        } else {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(refreshToken))
                     .build();

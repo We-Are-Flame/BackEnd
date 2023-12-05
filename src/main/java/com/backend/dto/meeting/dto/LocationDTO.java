@@ -1,11 +1,13 @@
 package com.backend.dto.meeting.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
+@AllArgsConstructor
 public class LocationDTO {
     @Schema(example = "경북 구미시", description = "주소명")
     private final String location;

@@ -5,15 +5,14 @@ import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponseList;
-import com.backend.dto.meeting.response.NotEndResponse;
-import com.backend.dto.meeting.response.NotEndResponseList;
 import com.backend.dto.meeting.response.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.CustomSort;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
@@ -60,23 +59,23 @@ public class MeetingService {
 
     @Transactional(readOnly = true)
     public MyMeetingResponseList readMyMeetings(User user) {
-        List<Meeting> myMeetings = meetingRepository.findAllByHost(user);
-        List<MyMeetingResponse> myMeetingResponses = myMeetings.stream()
-                .map(MeetingResponseMapper::toMyMeetingResponse)
-                .toList();
-        return new MyMeetingResponseList(myMeetingResponses, myMeetingResponses.size());
-    }
+        List<MyMeetingResponse> participatedMeetings = meetingRepository.findAllByHost(user);
 
-    @Transactional
-    public Long deleteMeeting(Long meetingId, User user) {
-        meetingRepository.deleteMeetingWithAllDetails(meetingId);
-        return meetingId;
+        return new MyMeetingResponseList(participatedMeetings, participatedMeetings.size());
     }
 
     @Transactional(readOnly = true)
-    public NotEndResponseList getNotEndMeetings(User user) {
-        List<NotEndResponse> notEndResponses = meetingRepository.getNotEndMeetings(user);
-        return new NotEndResponseList(notEndResponses, notEndResponses.size());
+    public MyMeetingResponseList readParticipatedMeetings(User user) {
+        List<MyMeetingResponse> participatedMeetings = meetingRepository.findAllParticipatedByUser(user);
+
+        return new MyMeetingResponseList(participatedMeetings, participatedMeetings.size());
+    }
+
+
+    @Transactional
+    public Long deleteMeeting(Long meetingId) {
+        meetingRepository.deleteMeetingWithAllDetails(meetingId);
+        return meetingId;
     }
 
     private Meeting prepareMeeting(MeetingCreateRequest request, User user) {

@@ -1,4 +1,4 @@
-package com.backend.service.meeting;
+package com.backend.repository.meeting.meeting;
 
 import com.backend.entity.meeting.QMeeting;
 import com.querydsl.core.types.Order;
@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.core.types.dsl.DateTimePath;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
@@ -30,7 +31,14 @@ public enum CustomSort {
         return Sort.by(new Sort.Order(customSort.direction, customSort.field));
     }
 
-    public static CustomSort fromString(String key) {
+    public static OrderSpecifier[] createPageableSort(Pageable pageable) {
+        return pageable.getSort().stream()
+                .flatMap(order -> CustomSort.fromString(order.getProperty()).toOrderSpecifiers()
+                        .stream())
+                .toArray(OrderSpecifier[]::new);
+    }
+
+    private static CustomSort fromString(String key) {
         return switch (key.toLowerCase()) {
             case "new" -> NEW;
             case "title" -> TITLE;
@@ -39,18 +47,17 @@ public enum CustomSort {
         };
     }
 
-    public List<OrderSpecifier<?>> toOrderSpecifiers(QMeeting meeting) {
+    private List<OrderSpecifier<?>> toOrderSpecifiers() {
         return switch (this) {
-            case NEW -> createOrderSpecifiers(meeting, meeting.createdAt, Order.DESC);
-            case TITLE -> createOrderSpecifiers(meeting, meeting.title, Order.ASC);
-            case SOON -> createSoonOrderSpecifiers(meeting);
-            default -> List.of(new OrderSpecifier<>(Order.ASC, meeting.id));
+            case NEW -> createOrderSpecifiers(QMeeting.meeting.createdAt, Order.DESC);
+            case TITLE -> createOrderSpecifiers(QMeeting.meeting.title, Order.ASC);
+            case SOON -> createSoonOrderSpecifiers();
+            default -> List.of(new OrderSpecifier<>(Order.ASC, QMeeting.meeting.id));
         };
     }
 
-    private List<OrderSpecifier<?>> createOrderSpecifiers(QMeeting meeting, ComparableExpressionBase<?> path,
-                                                          Order order) {
-        DateTimePath<LocalDateTime> endTimePath = meeting.meetingTime.endTime;
+    private List<OrderSpecifier<?>> createOrderSpecifiers(ComparableExpressionBase<?> path, Order order) {
+        DateTimePath<LocalDateTime> endTimePath = QMeeting.meeting.meetingTime.endTime;
         LocalDateTime now = LocalDateTime.now();
 
         // 현재 시간을 지난 endTime에 대한 정렬 우선순위 설정
@@ -66,9 +73,9 @@ public enum CustomSort {
         return List.of(prioritySpecifier, originalOrderSpecifier);
     }
 
-    private List<OrderSpecifier<?>> createSoonOrderSpecifiers(QMeeting meeting) {
-        DateTimePath<LocalDateTime> startTimePath = meeting.meetingTime.startTime;
-        DateTimePath<LocalDateTime> endTimePath = meeting.meetingTime.endTime;
+    private List<OrderSpecifier<?>> createSoonOrderSpecifiers() {
+        DateTimePath<LocalDateTime> startTimePath = QMeeting.meeting.meetingTime.startTime;
+        DateTimePath<LocalDateTime> endTimePath = QMeeting.meeting.meetingTime.endTime;
         LocalDateTime now = LocalDateTime.now();
 
         // 현재 시간과 비교하여 우선순위 정렬
