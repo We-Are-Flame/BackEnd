@@ -62,11 +62,11 @@ public class RoomResponseMapper {
                 .build();
     }
 
-    public static ChatRoomUser buildChatRoomUser(ChatRoom room, User user) {
+    public static ChatRoomUser buildChatRoomUser(ChatRoom room, User user, Boolean isOwner) {
         return ChatRoomUser.builder()
                 .chatRoom(room)
                 .user(user)
-                .isOwner(Boolean.TRUE)
+                .isOwner(isOwner)
                 .isRoomNotification(Boolean.TRUE)
                 .build();
     }

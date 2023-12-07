@@ -62,7 +62,7 @@ public class RoomService {
 
     @Transactional
     public String createChatRoom(RoomCreateRequest request, Long userId) {
-        Meeting meeting = fetchMeeting(request);
+        Meeting meeting = fetchMeeting(request.getMeetingId());
         User user = fetchUser(userId);
 
         checkIsMeetingOwner(meeting, user);
@@ -70,7 +70,7 @@ public class RoomService {
 
         ChatRoom chatRoom = buildChatRoom(request, meeting);
         chatRoomRepository.save(chatRoom);
-        addUserInChatRoom(user.getId(), chatRoom.getUuid());
+        addUserInChatRoom(user.getId(), meeting.getId(), chatRoom.getUuid());
 
         ChatMessage roomCreateMessage = buildRoomCreateMessage(chatRoom, user);
         chatMessageRepository.save(roomCreateMessage);
@@ -87,20 +87,23 @@ public class RoomService {
         checkIsChatRoomOwner(chatRoomUser);
 
         Long chatRoomId = chatRoom.getId();
-        chatRoomRepository.deleteById(chatRoom.getId());
+        chatRoomRepository.deleteById(chatRoomId);
         user.deleteRoomUser(chatRoomUser);
 
         return chatRoomId;
     }
 
     @Transactional
-    public Long addUserInChatRoom(Long userId, String roomId) {
+    public Long addUserInChatRoom(Long userId, Long meetingId, String roomId) {
         User user = fetchUser(userId);
         ChatRoom room = fetchRoom(roomId);
+        Meeting meeting = fetchMeeting(meetingId);
 
         checkUserAlreadyInChatRoom(user, room);
 
-        ChatRoomUser chatRoomUser = buildChatRoomUser(room, user);
+        Boolean isOwner = meeting.getHost().equals(user);
+        ChatRoomUser chatRoomUser = buildChatRoomUser(room, user, isOwner);
+
         chatRoomUserRepository.save(chatRoomUser);
 
         user.addChatUser(chatRoomUser);
@@ -149,14 +152,16 @@ public class RoomService {
     }
 
     @Transactional
-    public void addUsersInChatRoom(List<User> users, String roomId) {
+    public void addUsersInChatRoom(List<User> users, Long meetingId, String roomId) {
         ChatRoom room = fetchRoom(roomId);
+        Meeting meeting = fetchMeeting(meetingId);
         List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
         for (User user : users) {
             checkUserAlreadyInChatRoom(user, room);
+            Boolean isOwner = meeting.getHost().equals(user);
 
-            ChatRoomUser chatRoomUser = buildChatRoomUser(room, user);
+            ChatRoomUser chatRoomUser = buildChatRoomUser(room, user, isOwner);
 
             chatRoomUsers.add(chatRoomUser);
             user.addChatUser(chatRoomUser);
@@ -215,8 +220,8 @@ public class RoomService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.ROOM_NOT_FOUND));
     }
 
-    private Meeting fetchMeeting(RoomCreateRequest request) {
-        return meetingRepository.findById(request.getMeetingId())
+    private Meeting fetchMeeting(Long meetingId) {
+        return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
