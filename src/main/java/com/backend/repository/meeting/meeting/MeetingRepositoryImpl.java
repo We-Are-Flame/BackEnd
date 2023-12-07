@@ -11,6 +11,7 @@ import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
 import com.backend.entity.meeting.QMeetingImage;
 import com.backend.entity.meeting.QMeetingRegistration;
+import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import com.backend.repository.meeting.hashtag.HashtagRepository;
@@ -91,7 +92,8 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         List<MyMeetingResponse> meetings = queryBuilder.createBaseMyMeetingQuery()
                 .leftJoin(qMeeting.registrations, qMeetingRegistration)
                 .where(qMeetingRegistration.user.eq(user)
-                        .and(qMeetingRegistration.status.eq(RegistrationStatus.ACCEPTED)))
+                        .and(qMeetingRegistration.status.eq(RegistrationStatus.ACCEPTED))
+                        .and(qMeetingRegistration.role.eq(RegistrationRole.MEMBER)))
                 .fetch();
 
         hashtagRepository.findHashtagByMeetings(meetings);
