@@ -60,9 +60,12 @@ public class RegistrationService {
 
     public AcceptResponse acceptApply(Long meetingId, List<Long> registrationIds) {
         ChatRoom chatRoom = fetchChatRoom(meetingId);
-        addUserToChatRoom(chatRoom, registrationIds);
+        List<User> users = fetchUsersByRegistration(registrationIds);
+
+        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
         updateRegistrationsStatus(registrationIds, RegistrationStatus.ACCEPTED);
-        return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds);
+
+        return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds, users);
     }
 
     public RejectResponse rejectApply(List<Long> registrationIds) {
@@ -78,11 +81,6 @@ public class RegistrationService {
             registration.updateStatus(status);
         });
         meetingRegistrationRepository.saveAll(registrations);
-    }
-
-    private void addUserToChatRoom(ChatRoom chatRoom, List<Long> registrationIds) {
-        List<User> users = fetchUsersByRegistration(registrationIds);
-        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
     }
 
     private void countRegistrations(MeetingRegistration registration, RegistrationStatus status) {
