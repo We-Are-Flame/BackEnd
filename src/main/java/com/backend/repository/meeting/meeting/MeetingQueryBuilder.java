@@ -44,7 +44,7 @@ public class MeetingQueryBuilder {
                         )
                 ))
                 .from(qMeeting)
-                .orderBy(qMeeting.meetingTime.startTime.desc());
+                .orderBy(CustomSort.getSoonOrderSpecifiers());
     }
 
     public JPAQuery<Meeting> createBaseMeetingQuery() {

@@ -31,11 +31,16 @@ public enum CustomSort {
         return Sort.by(new Sort.Order(customSort.direction, customSort.field));
     }
 
-    public static OrderSpecifier[] createPageableSort(Pageable pageable) {
+    public static OrderSpecifier<?>[] createPageableSort(Pageable pageable) {
         return pageable.getSort().stream()
                 .flatMap(order -> CustomSort.fromString(order.getProperty()).toOrderSpecifiers()
                         .stream())
                 .toArray(OrderSpecifier[]::new);
+    }
+
+    public static OrderSpecifier<?>[] getSoonOrderSpecifiers() {
+        List<OrderSpecifier<?>> specifiers = SOON.toOrderSpecifiers();
+        return specifiers.toArray(new OrderSpecifier<?>[0]);
     }
 
     private static CustomSort fromString(String key) {
