@@ -13,6 +13,7 @@ import com.backend.exception.AlreadyExistsException;
 import com.backend.exception.BadRequestException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
+import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.service.chat.RoomService;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService {
     private final MeetingRegistrationRepository meetingRegistrationRepository;
     private final MeetingRepository meetingRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final RoomService roomService;
 
     public void createOwnerStatus(Meeting meeting, User user) {
@@ -57,10 +59,13 @@ public class RegistrationService {
     }
 
     public AcceptResponse acceptApply(Long meetingId, List<Long> registrationIds) {
-        ChatRoom chatRoom = fetchMeeting(meetingId).getChatRoom();
-        addUserToChatRoom(chatRoom, registrationIds);
+        ChatRoom chatRoom = fetchChatRoom(meetingId);
+        List<User> users = fetchUsersByRegistration(registrationIds);
+
+        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
         updateRegistrationsStatus(registrationIds, RegistrationStatus.ACCEPTED);
-        return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds);
+
+        return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds, users);
     }
 
     public RejectResponse rejectApply(List<Long> registrationIds) {
@@ -76,11 +81,6 @@ public class RegistrationService {
             registration.updateStatus(status);
         });
         meetingRegistrationRepository.saveAll(registrations);
-    }
-
-    private void addUserToChatRoom(ChatRoom chatRoom, List<Long> registrationIds) {
-        List<User> users = fetchUsersByRegistration(registrationIds);
-        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
     }
 
     private void countRegistrations(MeetingRegistration registration, RegistrationStatus status) {
@@ -106,6 +106,11 @@ public class RegistrationService {
                 .stream()
                 .map(RegistrationResponseMapper::buildRegistrationResponse)
                 .toList();
+    }
+
+    private ChatRoom fetchChatRoom(Long meetingId) {
+        return chatRoomRepository.findByMeetingId(meetingId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
     private List<User> fetchUsersByRegistration(List<Long> registrationIds) {

@@ -12,6 +12,8 @@ import lombok.Getter;
 public class AcceptResponse {
     private final List<Long> registrationIds;
 
+    private final List<UserInfo> userInfos;
+
     private final String roomId;
 
     @Builder.Default
@@ -22,4 +24,7 @@ public class AcceptResponse {
 
     @Builder.Default
     private final String message = ResponseMessage.APPLY_ACCEPT.getMessage();
+
+    public record UserInfo(Long userId, String nickname) {
+    }
 }
