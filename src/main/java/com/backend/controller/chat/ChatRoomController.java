@@ -8,9 +8,9 @@ import com.backend.dto.chat.response.create.ChatRoomUserEnterResponse;
 import com.backend.dto.chat.response.create.RoomCreateResponse;
 import com.backend.dto.chat.response.delete.RoomDeleteResponse;
 import com.backend.dto.chat.response.delete.RoomUserExitResponse;
-import com.backend.dto.chat.response.read.RoomDetailResponse;
 import com.backend.dto.chat.response.read.ChatResponseList;
 import com.backend.dto.chat.response.read.ChatUserResponseList;
+import com.backend.dto.chat.response.read.RoomDetailResponse;
 import com.backend.dto.chat.response.read.RoomResponseList;
 import com.backend.dto.common.ResponseMessage;
 import com.backend.dto.common.SuccessResponse;
@@ -115,7 +115,7 @@ public class ChatRoomController {
     @GetMapping("/{roomId}/title")
     @CheckUserNotNull
     public ResponseEntity<RoomDetailResponse.Title> getChatRoomTitle(@CurrentMember User user,
-                                                                      @PathVariable String roomId) {
+                                                                     @PathVariable String roomId) {
         RoomDetailResponse.Title response = roomService.getRoomTitle(roomId);
         return ResponseEntity.ok(response);
     }

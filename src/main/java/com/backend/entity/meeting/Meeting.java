@@ -1,6 +1,7 @@
 package com.backend.entity.meeting;
 
 import com.backend.entity.base.BaseEntity;
+import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
@@ -15,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
@@ -60,15 +62,18 @@ public class Meeting extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User host;
 
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private Set<MeetingImage> meetingImages;
 
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private Set<MeetingHashtag> meetingHashtags;
 
     @Builder.Default
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private List<MeetingRegistration> registrations = new ArrayList<>();
+
+    @OneToOne(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
 
     @Transient
     private Set<Hashtag> hashtags;

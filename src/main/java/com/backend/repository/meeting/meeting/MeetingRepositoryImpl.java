@@ -134,7 +134,6 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .where(QComment.comment.meeting.id.eq(meetingId))
                 .execute();
 
-
         queryFactory.delete(QMeeting.meeting)
                 .where(QMeeting.meeting.id.eq(meetingId))
                 .execute();
