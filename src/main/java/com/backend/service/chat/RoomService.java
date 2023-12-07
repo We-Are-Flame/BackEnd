@@ -33,6 +33,7 @@ import com.backend.repository.chat.ChatRoomUserRepository;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.repository.user.UserRepository;
 import com.backend.util.mapper.chat.RoomResponseMapper;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +122,7 @@ public class RoomService {
         checkAndDeleteEmptyRoom(room);
         return user.getId();
     }
+
     public ChatUserResponseList getRoomUserList(String roomId) {
         ChatRoom room = fetchRoom(roomId);
         List<ChatUserResponse> chatUserResponses = toChatUserResponses(room);
@@ -145,6 +147,25 @@ public class RoomService {
         room.updateChatRoomName(request.getTitle());
         return room.getId();
     }
+
+    @Transactional
+    public void addUsersInChatRoom(List<User> users, String roomId) {
+        ChatRoom room = fetchRoom(roomId);
+        List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
+
+        for (User user : users) {
+            checkUserAlreadyInChatRoom(user, room);
+
+            ChatRoomUser chatRoomUser = buildChatRoomUser(room, user);
+
+            chatRoomUsers.add(chatRoomUser);
+            user.addChatUser(chatRoomUser);
+            room.addRoomUser(chatRoomUser);
+        }
+
+        chatRoomUserRepository.saveAll(chatRoomUsers);
+    }
+
 
     public Notification getRoomNotification(Long userId, String roomId) {
         User user = fetchUser(userId);

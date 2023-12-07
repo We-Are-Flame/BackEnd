@@ -1,10 +1,12 @@
 package com.backend.service.meeting;
 
+import com.backend.dto.registration.response.AcceptResponse;
 import com.backend.dto.registration.response.RegistrationResponse;
 import com.backend.dto.registration.response.RegistrationResponseList;
+import com.backend.dto.registration.response.RejectResponse;
+import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingRegistration;
-import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
 import com.backend.exception.AlreadyExistsException;
@@ -13,6 +15,9 @@ import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
 import com.backend.repository.meeting.meeting.MeetingRepository;
+import com.backend.service.chat.RoomService;
+import com.backend.util.mapper.registration.RegistrationRequestMapper;
+import com.backend.util.mapper.registration.RegistrationResponseMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,107 +29,58 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService {
     private final MeetingRegistrationRepository meetingRegistrationRepository;
     private final MeetingRepository meetingRepository;
+    private final RoomService roomService;
 
     public void createOwnerStatus(Meeting meeting, User user) {
-        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.OWNER,
-                RegistrationStatus.ACCEPTED);
+        MeetingRegistration registration = RegistrationRequestMapper.buildOwner(meeting, user);
         meetingRegistrationRepository.save(registration);
     }
 
     public Long applyMeeting(Long meetingId, User user) {
-        Meeting meeting = findMeetingById(meetingId);
-        checkRegistrationDuplication(meeting, user);
-        MeetingRegistration registration = buildRegistration(meeting, user, RegistrationRole.MEMBER,
-                RegistrationStatus.PENDING);
+        Meeting meeting = fetchMeeting(meetingId);
+        checkDuplicate(meeting, user);
+        MeetingRegistration registration = RegistrationRequestMapper.buildPending(meeting, user);
         return meetingRegistrationRepository.save(registration).getId();
     }
 
     public Long cancelMeeting(Long meetingId, User user) {
-        MeetingRegistration registration = findRegistrationByMeetingAndUser(meetingId, user);
-        try {
-            registration.checkIfPending();
-            meetingRegistrationRepository.delete(registration);
-        } catch (IllegalStateException e) {
-            handleIllegalStateException(e);
-        }
+        MeetingRegistration registration = fetchMeetingByUser(meetingId, user);
+        checkIfPending(registration);
+        meetingRegistrationRepository.delete(registration);
         return registration.getId();
     }
 
     @Transactional(readOnly = true)
     public RegistrationResponseList getRegistrations(Long meetingId) {
-        List<RegistrationResponse> responseList = fetchRegistrationResponses(findMeetingById(meetingId));
+        List<RegistrationResponse> responseList = fetchRegistration(meetingId);
         return new RegistrationResponseList(responseList.size(), responseList);
     }
 
-    public Long acceptApply(List<Long> registrationIds) {
-        return processBulkUpdate(registrationIds, RegistrationStatus.ACCEPTED);
+    public AcceptResponse acceptApply(Long meetingId, List<Long> registrationIds) {
+        ChatRoom chatRoom = fetchMeeting(meetingId).getChatRoom();
+        addUserToChatRoom(chatRoom, registrationIds);
+        updateRegistrationsStatus(registrationIds, RegistrationStatus.ACCEPTED);
+        return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds);
     }
 
-    public Long rejectApply(List<Long> registrationIds) {
-        return processBulkUpdate(registrationIds, RegistrationStatus.REJECTED);
+    public RejectResponse rejectApply(List<Long> registrationIds) {
+        updateRegistrationsStatus(registrationIds, RegistrationStatus.REJECTED);
+        return RegistrationResponseMapper.buildReject(registrationIds);
     }
 
-    private Meeting findMeetingById(Long meetingId) {
-        return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
-    }
-
-    private MeetingRegistration findRegistrationByMeetingAndUser(Long meetingId, User user) {
-        return meetingRegistrationRepository.findByMeetingAndUser(findMeetingById(meetingId), user)
-                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
-    }
-
-    private void checkRegistrationDuplication(Meeting meeting, User user) {
-        if (meetingRegistrationRepository.existsByMeetingAndUser(meeting, user)) {
-            throw new AlreadyExistsException(ErrorMessages.ALREADY_REGISTERED);
-        }
-    }
-
-    private MeetingRegistration buildRegistration(Meeting meeting, User user, RegistrationRole role,
-                                                  RegistrationStatus status) {
-        return MeetingRegistration.builder()
-                .meeting(meeting)
-                .user(user)
-                .role(role)
-                .status(status)
-                .build();
-    }
-
-    private Long processBulkUpdate(List<Long> registrationIds, RegistrationStatus status) {
-        registrationIds.forEach(registrationId -> updateRegistrationStatus(registrationId, status));
-        return registrationIds.get(registrationIds.size() - 1);
-    }
-
-    private List<RegistrationResponse> fetchRegistrationResponses(Meeting meeting) {
-        return meetingRegistrationRepository.findByMeetingAndStatus(meeting, RegistrationStatus.PENDING)
-                .stream()
-                .filter(MeetingRegistration::isNotOwner)
-                .map(this::convertToRegistrationResponse)
-                .toList();
-    }
-
-    private RegistrationResponse convertToRegistrationResponse(MeetingRegistration registration) {
-        User registeredUser = registration.getUser();
-        return RegistrationResponse.builder()
-                .id(registration.getId())
-                .nickname(registeredUser.getNickname())
-                .profileImage(registeredUser.getProfileImage())
-                .temperature(registeredUser.getTemperature())
-                .participateStatus(registration.getStatus())
-                .build();
-    }
-
-    private void updateRegistrationStatus(Long registrationId, RegistrationStatus status) {
-        try {
-            MeetingRegistration registration = meetingRegistrationRepository.findById(registrationId)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
-            registration.checkIfPending();
+    private void updateRegistrationsStatus(List<Long> registrationIds, RegistrationStatus status) {
+        List<MeetingRegistration> registrations = meetingRegistrationRepository.findByIdIn(registrationIds);
+        registrations.forEach(registration -> {
+            checkIfPending(registration);
             countRegistrations(registration, status);
             registration.updateStatus(status);
-            meetingRegistrationRepository.save(registration);
-        } catch (IllegalStateException e) {
-            handleIllegalStateException(e);
-        }
+        });
+        meetingRegistrationRepository.saveAll(registrations);
+    }
+
+    private void addUserToChatRoom(ChatRoom chatRoom, List<Long> registrationIds) {
+        List<User> users = fetchUsersByRegistration(registrationIds);
+        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
     }
 
     private void countRegistrations(MeetingRegistration registration, RegistrationStatus status) {
@@ -135,7 +91,46 @@ public class RegistrationService {
         }
     }
 
-    private void handleIllegalStateException(IllegalStateException e) {
-        throw new BadRequestException(e.getMessage());
+    private Meeting fetchMeeting(Long meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
+    }
+
+    private MeetingRegistration fetchMeetingByUser(Long meetingId, User user) {
+        return meetingRegistrationRepository.findByMeetingIdAndUser(meetingId, user)
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.REGISTRATION_NOT_FOUND));
+    }
+
+    private List<RegistrationResponse> fetchRegistration(Long meetingId) {
+        return meetingRegistrationRepository.findAllInPending(meetingId)
+                .stream()
+                .map(RegistrationResponseMapper::buildRegistrationResponse)
+                .toList();
+    }
+
+    private List<User> fetchUsersByRegistration(List<Long> registrationIds) {
+        List<User> users = meetingRegistrationRepository.findUsersByRegistrationIds(registrationIds);
+
+        checkUsersEmpty(users);
+
+        return users;
+    }
+
+    private void checkDuplicate(Meeting meeting, User user) {
+        if (meetingRegistrationRepository.existsByMeetingAndUser(meeting, user)) {
+            throw new AlreadyExistsException(ErrorMessages.ALREADY_REGISTERED);
+        }
+    }
+
+    private void checkIfPending(MeetingRegistration registration) {
+        if (!registration.getStatus().equals(RegistrationStatus.PENDING)) {
+            throw new BadRequestException(ErrorMessages.CAN_CHANGE_IN_PENDING);
+        }
+    }
+
+    private void checkUsersEmpty(List<User> users) {
+        if (users.isEmpty()) {
+            throw new NotFoundException(ErrorMessages.NOT_EXIST_USERS);
+        }
     }
 }

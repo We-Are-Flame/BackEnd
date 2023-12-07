@@ -48,17 +48,7 @@ public class MeetingRegistration {
         return this.user.isSameId(user);
     }
 
-    public boolean isNotOwner() {
-        return this.role != RegistrationRole.OWNER;
-    }
-
     public void updateStatus(RegistrationStatus newStatus) {
         this.status = newStatus;
-    }
-
-    public void checkIfPending() {
-        if (!this.status.equals(RegistrationStatus.PENDING)) {
-            throw new IllegalStateException("PENDING상태에서만 변경될 수 있습니다!");
-        }
     }
 }

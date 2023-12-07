@@ -5,7 +5,9 @@ import com.backend.annotation.CurrentMember;
 import com.backend.dto.common.ResponseMessage;
 import com.backend.dto.common.SuccessResponse;
 import com.backend.dto.registration.request.BulkApplyRequest;
+import com.backend.dto.registration.response.AcceptResponse;
 import com.backend.dto.registration.response.RegistrationResponseList;
+import com.backend.dto.registration.response.RejectResponse;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.RegistrationService;
 import lombok.RequiredArgsConstructor;
@@ -51,22 +53,20 @@ public class RegistrationController {
     @CheckUserNotNull
     @PreAuthorize("hasAuthority('ROLE_HOST')")
     @PostMapping("/{meetingId}/accept")
-    public ResponseEntity<SuccessResponse> acceptApply(@PathVariable Long meetingId,
-                                                       @RequestBody BulkApplyRequest request,
-                                                       @CurrentMember User user) {
-        Long id = registrationService.acceptApply(request.getRegistrationIds());
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_ACCEPT);
+    public ResponseEntity<AcceptResponse> acceptApply(@PathVariable Long meetingId,
+                                                      @RequestBody BulkApplyRequest request,
+                                                      @CurrentMember User user) {
+        AcceptResponse response = registrationService.acceptApply(meetingId, request.getRegistrationIds());
         return ResponseEntity.ok(response);
     }
 
     @CheckUserNotNull
     @PreAuthorize("hasAuthority('ROLE_HOST')")
     @PostMapping("/{meetingId}/reject")
-    public ResponseEntity<SuccessResponse> rejectApply(@PathVariable Long meetingId,
-                                                       @RequestBody BulkApplyRequest request,
-                                                       @CurrentMember User user) {
-        Long id = registrationService.rejectApply(request.getRegistrationIds());
-        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.APPLY_REJECT);
+    public ResponseEntity<RejectResponse> rejectApply(@PathVariable Long meetingId,
+                                                      @RequestBody BulkApplyRequest request,
+                                                      @CurrentMember User user) {
+        RejectResponse response = registrationService.rejectApply(request.getRegistrationIds());
         return ResponseEntity.ok(response);
     }
 }
