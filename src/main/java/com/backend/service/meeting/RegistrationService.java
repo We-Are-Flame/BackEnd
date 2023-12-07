@@ -62,7 +62,7 @@ public class RegistrationService {
         ChatRoom chatRoom = fetchChatRoom(meetingId);
         List<User> users = fetchUsersByRegistration(registrationIds);
 
-        roomService.addUsersInChatRoom(users, chatRoom.getUuid());
+        roomService.addUsersInChatRoom(users, meetingId, chatRoom.getUuid());
         updateRegistrationsStatus(registrationIds, RegistrationStatus.ACCEPTED);
 
         return RegistrationResponseMapper.buildAccept(chatRoom.getUuid(), registrationIds, users);
