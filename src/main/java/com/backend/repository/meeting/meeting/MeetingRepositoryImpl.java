@@ -141,7 +141,6 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
 
     @Override
     public boolean isOwner(Long meetingId, Long userId) {
-        log.info("isOwner called with meetingId: {}, userId: {}", meetingId, userId);
         QMeeting meeting = QMeeting.meeting;
 
         return queryFactory

@@ -11,4 +11,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     void deleteByUuid(String roomId);
 
     Optional<ChatRoom> findByMeeting(Meeting meeting);
+
+    Optional<ChatRoom> findByMeetingId(Long meetingId);
 }
