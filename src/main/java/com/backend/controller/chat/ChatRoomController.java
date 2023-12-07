@@ -20,14 +20,7 @@ import com.backend.service.chat.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,24 +44,6 @@ public class ChatRoomController {
                                                          @CurrentMember User user) {
         String id = roomService.createChatRoom(request, user.getId());
         RoomCreateResponse response = RoomCreateResponse.success(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("{roomId}")
-    @CheckUserNotNull
-    public ResponseEntity<ChatRoomUserEnterResponse> enterUserInChatRoom(@CurrentMember User user,
-                                                                         @PathVariable String roomId) {
-        Long id = roomService.addUserInChatRoom(user.getId(), roomId);
-        ChatRoomUserEnterResponse response = ChatRoomUserEnterResponse.success(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("{roomId}")
-    @CheckUserNotNull
-    public ResponseEntity<RoomDeleteResponse> deleteChatRoom(@CurrentMember User user,
-                                                             @PathVariable String roomId) {
-        Long id = roomService.deleteChatRoom(user.getId(), roomId);
-        RoomDeleteResponse response = RoomDeleteResponse.success(id);
         return ResponseEntity.ok(response);
     }
 
