@@ -36,16 +36,16 @@ public class MeetingService {
 
     @Transactional
     public Long createMeeting(MeetingCreateRequest request, User user) {
-        Meeting meeting = prepareMeeting(request, user);
+        Meeting meeting = buildMeeting(request, user);
         meetingRepository.save(meeting);
-        handleMeetingAssets(request, meeting);
+        handleMeetingDetails(request, meeting);
         registerOwner(meeting, user);
         return meeting.getId();
     }
 
     @Transactional(readOnly = true)
-    public Page<MeetingResponse> readMeetings(int start, int end, String sort) {
-        Pageable pageable = createPageable(start, end, sort);
+    public Page<MeetingResponse> readMeetings(int index, int size, String sort) {
+        Pageable pageable = PageRequest.of(index, size, CustomSort.getSort(sort));
         Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
         return meetings.map(MeetingResponseMapper::toMeetingResponse);
     }
@@ -79,23 +79,18 @@ public class MeetingService {
         return meetingId;
     }
 
-    private Meeting prepareMeeting(MeetingCreateRequest request, User user) {
+    private Meeting buildMeeting(MeetingCreateRequest request, User user) {
         Category category = categoryService.findCategory(request.getCategory());
         return MeetingRequestMapper.toMeeting(request, category, user);
     }
 
-    private void handleMeetingAssets(MeetingCreateRequest request, Meeting meeting) {
+    private void handleMeetingDetails(MeetingCreateRequest request, Meeting meeting) {
         hashtagService.processMeetingHashtags(request.getHashtagInput(), meeting);
         imagesService.saveMeetingImages(meeting, request.getImageInput());
     }
 
     private void registerOwner(Meeting meeting, User user) {
         registrationService.createOwnerStatus(meeting, user);
-    }
-
-    private Pageable createPageable(int start, int end, String sort) {
-        int page = start / end;
-        return PageRequest.of(page, end, CustomSort.getSort(sort));
     }
 
     private Meeting fetchMeeting(Long meetingId) {
