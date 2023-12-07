@@ -1,6 +1,9 @@
 package com.backend.repository.meeting.meeting;
 
 import com.backend.dto.meeting.response.MyMeetingResponse;
+import com.backend.entity.chat.QChatMessage;
+import com.backend.entity.chat.QChatRoom;
+import com.backend.entity.chat.QChatRoomUser;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.QCategory;
 import com.backend.entity.meeting.QComment;
@@ -96,10 +99,26 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         return meetings;
     }
 
-
     @Override
     @Transactional
     public void deleteMeetingWithAllDetails(Long meetingId) {
+        Long chatRoomId = queryFactory.select(QChatRoom.chatRoom.id)
+                .from(QChatRoom.chatRoom)
+                .where(QChatRoom.chatRoom.meeting.id.eq(meetingId))
+                .fetchOne();
+
+        if (chatRoomId != null) {
+            queryFactory.delete(QChatMessage.chatMessage)
+                    .where(QChatMessage.chatMessage.chatRoom.id.eq(chatRoomId))
+                    .execute();
+            queryFactory.delete(QChatRoomUser.chatRoomUser)
+                    .where(QChatRoomUser.chatRoomUser.chatRoom.id.eq(chatRoomId))
+                    .execute();
+            queryFactory.delete(QChatRoom.chatRoom)
+                    .where(QChatRoom.chatRoom.meeting.id.eq(meetingId))
+                    .execute();
+        }
+
         queryFactory.delete(QMeetingImage.meetingImage)
                 .where(QMeetingImage.meetingImage.meeting.id.eq(meetingId))
                 .execute();
@@ -112,6 +131,7 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         queryFactory.delete(QComment.comment)
                 .where(QComment.comment.meeting.id.eq(meetingId))
                 .execute();
+
 
         queryFactory.delete(QMeeting.meeting)
                 .where(QMeeting.meeting.id.eq(meetingId))
