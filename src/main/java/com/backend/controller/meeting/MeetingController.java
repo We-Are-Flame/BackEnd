@@ -40,10 +40,10 @@ public class MeetingController {
 
     @GetMapping
     public ResponseEntity<Page<MeetingResponse>> getAllMeetings(
-            @RequestParam int start,
-            @RequestParam int end,
+            @RequestParam int index,
+            @RequestParam int size,
             @RequestParam String sort) {
-        Page<MeetingResponse> meetings = meetingService.readMeetings(start, end, sort);
+        Page<MeetingResponse> meetings = meetingService.readMeetings(index, size, sort);
         return ResponseEntity.ok(meetings);
     }
 
