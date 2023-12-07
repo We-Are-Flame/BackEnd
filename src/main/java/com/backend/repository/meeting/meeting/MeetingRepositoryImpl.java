@@ -1,11 +1,11 @@
 package com.backend.repository.meeting.meeting;
 
+import com.backend.dto.meeting.response.MeetingDetailResponse;
+import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.entity.chat.QChatMessage;
 import com.backend.entity.chat.QChatRoom;
 import com.backend.entity.chat.QChatRoomUser;
-import com.backend.entity.meeting.Meeting;
-import com.backend.entity.meeting.QCategory;
 import com.backend.entity.meeting.QComment;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
@@ -14,12 +14,9 @@ import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
-import com.backend.repository.meeting.hashtag.HashtagRepository;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,19 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final HashtagRepository hashtagRepository;
     private final MeetingQueryBuilder queryBuilder;
 
     @Override
-    public Page<Meeting> findAllWithDetails(Pageable pageable) {
-        JPAQuery<Meeting> query = queryBuilder.createBaseMeetingQuery()
-                .orderBy(CustomSort.createPageableSort(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
-
-        List<Meeting> meetings = query.fetch().stream()
-                .peek(Meeting::enrichWithHashtags)
-                .collect(Collectors.toList());
+    public Page<MeetingResponse> findAllWithDetails(Pageable pageable) {
+        List<MeetingResponse> meetings = queryBuilder.createAllMeetingQuery(pageable);
 
         long total = Optional.ofNullable(queryFactory.select(QMeeting.meeting.count())
                         .from(QMeeting.meeting)
@@ -56,18 +45,8 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     }
 
     @Override
-    public Optional<Meeting> findMeetingWithDetailsById(Long meetingId) {
-        Meeting meeting = queryBuilder.createBaseMeetingQuery()
-                .leftJoin(QMeeting.meeting.meetingImages, QMeetingImage.meetingImage).fetchJoin()
-                .leftJoin(QMeeting.meeting.registrations, QMeetingRegistration.meetingRegistration).fetchJoin()
-                .leftJoin(QMeeting.meeting.category, QCategory.category).fetchJoin()
-                .where(QMeeting.meeting.id.eq(meetingId))
-                .fetchOne();
-
-        assert meeting != null;
-
-        meeting.enrichWithHashtags();
-
+    public Optional<MeetingDetailResponse> findMeetingWithDetailsById(Long meetingId) {
+        MeetingDetailResponse meeting = queryBuilder.createDetailMeetingQuery(meetingId);
         return Optional.of(meeting);
     }
 
@@ -75,13 +54,9 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     public List<MyMeetingResponse> findAllByHost(User host) {
         QMeeting qMeeting = QMeeting.meeting;
 
-        List<MyMeetingResponse> meetings = queryBuilder.createBaseMyMeetingQuery()
+        return queryBuilder.createBaseMyMeetingQuery()
                 .where(qMeeting.host.eq(host))
                 .fetch();
-
-        hashtagRepository.findHashtagByMeetings(meetings);
-
-        return meetings;
     }
 
     @Override
@@ -89,16 +64,12 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
         QMeeting qMeeting = QMeeting.meeting;
         QMeetingRegistration qMeetingRegistration = QMeetingRegistration.meetingRegistration;
 
-        List<MyMeetingResponse> meetings = queryBuilder.createBaseMyMeetingQuery()
+        return queryBuilder.createBaseMyMeetingQuery()
                 .leftJoin(qMeeting.registrations, qMeetingRegistration)
                 .where(qMeetingRegistration.user.eq(user)
                         .and(qMeetingRegistration.status.eq(RegistrationStatus.ACCEPTED))
                         .and(qMeetingRegistration.role.eq(RegistrationRole.MEMBER)))
                 .fetch();
-
-        hashtagRepository.findHashtagByMeetings(meetings);
-
-        return meetings;
     }
 
     @Override

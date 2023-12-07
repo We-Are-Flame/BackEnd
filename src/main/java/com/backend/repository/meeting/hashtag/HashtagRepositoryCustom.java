@@ -1,8 +1,8 @@
 package com.backend.repository.meeting.hashtag;
 
-import com.backend.dto.meeting.response.MyMeetingResponse;
 import java.util.List;
+import java.util.Map;
 
 public interface HashtagRepositoryCustom {
-    void findHashtagByMeetings(List<MyMeetingResponse> meetings);
+    Map<Long, List<String>> findHashtagByMeetings(List<Long> meetingIds);
 }

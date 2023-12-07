@@ -14,7 +14,6 @@ import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.meeting.CustomSort;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
-import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,15 +45,12 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public Page<MeetingResponse> readMeetings(int index, int size, String sort) {
         Pageable pageable = PageRequest.of(index, size, CustomSort.getSort(sort));
-        Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
-        return meetings.map(MeetingResponseMapper::toMeetingResponse);
+        return meetingRepository.findAllWithDetails(pageable);
     }
 
     @Transactional(readOnly = true)
     public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
-        Meeting meeting = fetchMeeting(meetingId);
-        StatusOutput status = buildMeetingStatus(meeting, user);
-        return MeetingResponseMapper.toMeetingDetailResponse(meeting, status);
+        return fetchMeeting(meetingId);
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +89,7 @@ public class MeetingService {
         registrationService.createOwnerStatus(meeting, user);
     }
 
-    private Meeting fetchMeeting(Long meetingId) {
+    private MeetingDetailResponse fetchMeeting(Long meetingId) {
         return meetingRepository.findMeetingWithDetailsById(meetingId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
