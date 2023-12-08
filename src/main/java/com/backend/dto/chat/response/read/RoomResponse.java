@@ -4,6 +4,7 @@ import com.backend.dto.chat.response.read.output.RoomStatusOutput;
 import com.backend.entity.chat.ChatMessage;
 import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.chat.ChatRoomUser;
+import com.backend.entity.chat.MessageType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -21,6 +22,9 @@ public class RoomResponse {
 
     @JsonProperty("last_message")
     private String lastMessage;
+
+    @JsonProperty("last_message_type")
+    private MessageType lastMessageType;
 
     @JsonProperty("last_date_time")
     private LocalDateTime lastDateTime;
@@ -42,6 +46,7 @@ public class RoomResponse {
                 .lastDateTime(chatMessage.getCreatedAt())
                 .isNotification(chatRoomUser.getIsRoomNotification())
                 .thumbnailUrl(chatRoom.getMeeting().getThumbnailUrl())
+                .lastMessageType(chatMessage.getMessageType())
                 .status(status)
                 .build();
     }
