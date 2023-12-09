@@ -42,8 +42,9 @@ public class MeetingController {
     public ResponseEntity<Page<MeetingResponse>> getAllMeetings(
             @RequestParam int index,
             @RequestParam int size,
-            @RequestParam String sort) {
-        Page<MeetingResponse> meetings = meetingService.readMeetings(index, size, sort);
+            @RequestParam String sort,
+            @RequestParam(required = false) String category) {
+        Page<MeetingResponse> meetings = meetingService.readMeetings(index, size, sort, category);
         return ResponseEntity.ok(meetings);
     }
 

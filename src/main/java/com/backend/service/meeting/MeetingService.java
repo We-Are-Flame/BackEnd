@@ -11,7 +11,7 @@ import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
-import com.backend.repository.meeting.meeting.CustomSort;
+import com.backend.common.CustomSort;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import java.util.List;
@@ -45,9 +45,17 @@ public class MeetingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MeetingResponse> readMeetings(int index, int size, String sort) {
+    public Page<MeetingResponse> readMeetings(int index, int size, String sort, String categoryName) {
         Pageable pageable = PageRequest.of(index, size, CustomSort.getSort(sort));
-        return meetingRepository.findAllWithDetails(pageable);
+        Category category = getCategory(categoryName);
+        return meetingRepository.findAllWithDetails(pageable, category);
+    }
+
+    private Category getCategory(String categoryName) {
+        if (categoryName == null) {
+            return null;
+        }
+        return categoryService.findCategory(categoryName);
     }
 
     @Transactional(readOnly = true)

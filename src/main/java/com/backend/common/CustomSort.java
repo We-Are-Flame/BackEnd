@@ -1,4 +1,4 @@
-package com.backend.repository.meeting.meeting;
+package com.backend.common;
 
 import com.backend.entity.meeting.QMeeting;
 import com.querydsl.core.types.Order;
