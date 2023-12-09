@@ -6,10 +6,14 @@ import com.backend.dto.meeting.response.output.HostOutput;
 import com.backend.dto.meeting.response.output.LocationOutput;
 import com.backend.dto.meeting.response.output.MeetingImageOutput;
 import com.backend.dto.meeting.response.output.StatusOutput;
+import com.backend.entity.meeting.RegistrationRole;
+import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.util.etc.StringUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 
 @Getter
@@ -31,14 +35,18 @@ public class MeetingDetailResponse {
 
     @JsonProperty("host")
     private final HostOutput hostOutput;
-
+    @JsonIgnore
+    private final RegistrationStatus registrationStatus;
+    @JsonIgnore
+    private final RegistrationRole registrationRole;
     @JsonProperty("status")
     private StatusOutput statusOutput;
 
     @QueryProjection
     public MeetingDetailResponse(long id, String category, String hashtag, DetailInfoOutput detailInfoOutput,
                                  MeetingImageOutput imageOutput, LocationOutput locationOutput,
-                                 DetailTimeOutput timeOutput, HostOutput hostOutput) {
+                                 DetailTimeOutput timeOutput, HostOutput hostOutput,
+                                 RegistrationStatus registrationStatus, RegistrationRole registrationRole) {
         this.id = id;
         this.category = category;
         this.hashtags = StringUtil.split(hashtag);
@@ -47,5 +55,11 @@ public class MeetingDetailResponse {
         this.locationOutput = locationOutput;
         this.timeOutput = timeOutput;
         this.hostOutput = hostOutput;
+        this.registrationStatus = Optional.ofNullable(registrationStatus).orElse(RegistrationStatus.NONE);
+        this.registrationRole = Optional.ofNullable(registrationRole).orElse(RegistrationRole.MEMBER);
+    }
+
+    public void updateStatus(StatusOutput statusOutput) {
+        this.statusOutput = statusOutput;
     }
 }

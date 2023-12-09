@@ -42,7 +42,7 @@ public class Meeting extends BaseEntity {
     private String thumbnailUrl;
 
     @Builder.Default
-    private Integer currentParticipants = 0;
+    private Integer currentParticipants = 1;
     private Integer maxParticipants;
 
     @Embedded

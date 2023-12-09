@@ -17,5 +17,9 @@ public class DetailInfoOutput extends InfoDTO {
         this.currentParticipants = currentParticipants;
         this.description = description;
     }
+
+    public boolean isFull() {
+        return currentParticipants.equals(getMaxParticipants());
+    }
 }
 

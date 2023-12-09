@@ -36,18 +36,23 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     public Page<MeetingResponse> findAllWithDetails(Pageable pageable) {
         List<MeetingResponse> meetings = queryBuilder.createAllMeetingQuery(pageable);
 
-        long total = Optional.ofNullable(queryFactory.select(QMeeting.meeting.count())
-                        .from(QMeeting.meeting)
-                        .fetchOne())
-                .orElse(0L);
+        long total = countTotalMeetings();
 
         return new PageImpl<>(meetings, pageable, total);
     }
 
+    private long countTotalMeetings() {
+        QMeeting qMeeting = QMeeting.meeting;
+        return Optional.ofNullable(queryFactory.select(qMeeting.count())
+                        .from(qMeeting)
+                        .fetchOne())
+                .orElse(0L);
+    }
+
     @Override
-    public Optional<MeetingDetailResponse> findMeetingWithDetailsById(Long meetingId) {
-        MeetingDetailResponse meeting = queryBuilder.createDetailMeetingQuery(meetingId);
-        return Optional.of(meeting);
+    public Optional<MeetingDetailResponse> findMeetingWithDetailsById(Long meetingId, Optional<Long> userId) {
+        MeetingDetailResponse meeting = queryBuilder.createDetailMeetingQuery(meetingId, userId);
+        return Optional.ofNullable(meeting);
     }
 
     @Override
@@ -75,38 +80,47 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     @Override
     @Transactional
     public void deleteMeetingWithAllDetails(Long meetingId) {
-        Long chatRoomId = queryFactory.select(QChatRoom.chatRoom.id)
-                .from(QChatRoom.chatRoom)
-                .where(QChatRoom.chatRoom.meeting.id.eq(meetingId))
+        QChatRoom qChatRoom = QChatRoom.chatRoom;
+        QChatMessage qChatMessage = QChatMessage.chatMessage;
+        QChatRoomUser qChatRoomUser = QChatRoomUser.chatRoomUser;
+        QMeetingImage qMeetingImage = QMeetingImage.meetingImage;
+        QMeetingHashtag qMeetingHashtag = QMeetingHashtag.meetingHashtag;
+        QMeetingRegistration qMeetingRegistration = QMeetingRegistration.meetingRegistration;
+        QComment qComment = QComment.comment;
+        QMeeting qMeeting = QMeeting.meeting;
+
+        Long chatRoomId = queryFactory.select(qChatRoom.id)
+                .from(qChatRoom)
+                .where(qChatRoom.meeting.id.eq(meetingId))
                 .fetchOne();
 
         if (chatRoomId != null) {
-            queryFactory.delete(QChatMessage.chatMessage)
-                    .where(QChatMessage.chatMessage.chatRoom.id.eq(chatRoomId))
+            queryFactory.delete(qChatMessage)
+                    .where(qChatMessage.chatRoom.id.eq(chatRoomId))
                     .execute();
-            queryFactory.delete(QChatRoomUser.chatRoomUser)
-                    .where(QChatRoomUser.chatRoomUser.chatRoom.id.eq(chatRoomId))
+            queryFactory.delete(qChatRoomUser)
+                    .where(qChatRoomUser.chatRoom.id.eq(chatRoomId))
                     .execute();
-            queryFactory.delete(QChatRoom.chatRoom)
-                    .where(QChatRoom.chatRoom.meeting.id.eq(meetingId))
+            queryFactory.delete(qChatRoom)
+                    .where(qChatRoom.meeting.id.eq(meetingId))
                     .execute();
         }
 
-        queryFactory.delete(QMeetingImage.meetingImage)
-                .where(QMeetingImage.meetingImage.meeting.id.eq(meetingId))
+        queryFactory.delete(qMeetingImage)
+                .where(qMeetingImage.meeting.id.eq(meetingId))
                 .execute();
-        queryFactory.delete(QMeetingHashtag.meetingHashtag)
-                .where(QMeetingHashtag.meetingHashtag.meeting.id.eq(meetingId))
+        queryFactory.delete(qMeetingHashtag)
+                .where(qMeetingHashtag.meeting.id.eq(meetingId))
                 .execute();
-        queryFactory.delete(QMeetingRegistration.meetingRegistration)
-                .where(QMeetingRegistration.meetingRegistration.meeting.id.eq(meetingId))
+        queryFactory.delete(qMeetingRegistration)
+                .where(qMeetingRegistration.meeting.id.eq(meetingId))
                 .execute();
-        queryFactory.delete(QComment.comment)
-                .where(QComment.comment.meeting.id.eq(meetingId))
+        queryFactory.delete(qComment)
+                .where(qComment.meeting.id.eq(meetingId))
                 .execute();
 
-        queryFactory.delete(QMeeting.meeting)
-                .where(QMeeting.meeting.id.eq(meetingId))
+        queryFactory.delete(qMeeting)
+                .where(qMeeting.id.eq(meetingId))
                 .execute();
     }
 

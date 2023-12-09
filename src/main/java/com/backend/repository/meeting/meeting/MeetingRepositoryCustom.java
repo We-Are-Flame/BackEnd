@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 public interface MeetingRepositoryCustom {
     Page<MeetingResponse> findAllWithDetails(Pageable pageable);
 
-    Optional<MeetingDetailResponse> findMeetingWithDetailsById(Long id);
+    Optional<MeetingDetailResponse> findMeetingWithDetailsById(Long meetingId, Optional<Long> userId);
 
     List<MyMeetingResponse> findAllByHost(User host);
 
