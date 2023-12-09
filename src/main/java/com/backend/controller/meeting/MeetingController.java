@@ -48,6 +48,19 @@ public class MeetingController {
         return ResponseEntity.ok(meetings);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<MeetingResponse>> searchMeetings(
+            @RequestParam int index,
+            @RequestParam int size,
+            @RequestParam String sort,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String hashtag) {
+
+        Page<MeetingResponse> meetings = meetingService.searchByKeword(index, size, sort, title, hashtag);
+
+        return ResponseEntity.ok(meetings);
+    }
+
     @GetMapping("/{meetingId}")
     public ResponseEntity<MeetingDetailResponse> getMeeting(@PathVariable Long meetingId, @CurrentMember User user) {
         MeetingDetailResponse meeting = meetingService.readOneMeeting(meetingId, user);

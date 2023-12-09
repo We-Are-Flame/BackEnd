@@ -19,6 +19,10 @@ public interface MeetingRepositoryCustom {
 
     List<MyMeetingResponse> findAllParticipatedByUser(User user);
 
+    Page<MeetingResponse> findByTitle(String title, Pageable pageable);
+
+    Page<MeetingResponse> findByHashtag(String hashtag, Pageable pageable);
+
     void deleteMeetingWithAllDetails(Long meetingId);
 
     boolean isOwner(Long meetingId, Long userId);
