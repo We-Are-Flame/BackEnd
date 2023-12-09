@@ -1,5 +1,6 @@
 package com.backend.repository.meeting.meeting;
 
+import com.backend.common.CustomSort;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
@@ -29,11 +30,9 @@ import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -45,20 +44,7 @@ public class MeetingQueryBuilder {
     private static final String GROUP_CONCAT_DISTINCT = "GROUP_CONCAT(DISTINCT {0})";
     private final JPAQueryFactory queryFactory;
 
-    private static JPQLQuery<MeetingDetailResponse> createJoinRegistration(Optional<Long> userId,
-                                                                           QMeeting qMeeting,
-                                                                           QMeetingRegistration qMeetingRegistration,
-                                                                           JPQLQuery<MeetingDetailResponse> query) {
-        if (userId.isPresent()) {
-            query = query.leftJoin(qMeeting.registrations, qMeetingRegistration)
-                    .on(qMeetingRegistration.user.id.eq(userId.get()))
-                    .groupBy(qMeetingRegistration.status, qMeetingRegistration.role);
-        }
-
-        return query;
-    }
-
-    public List<MeetingResponse> createAllMeetingQuery(Pageable pageable) {
+    public JPAQuery<MeetingResponse> createAllMeetingQuery() {
         QUser qUser = QUser.user;
         QMeeting qMeeting = QMeeting.meeting;
         QHashtag qHashtag = QHashtag.hashtag;
@@ -99,11 +85,7 @@ public class MeetingQueryBuilder {
                         qMeeting.meetingAddress.latitude,
                         qMeeting.meetingAddress.longitude, qMeeting.meetingTime.startTime, qMeeting.meetingTime.endTime,
                         qMeeting.meetingTime.duration,
-                        qMeeting.host.nickname, qMeeting.host.profileImage)
-                .orderBy(CustomSort.createPageableSort(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                        qMeeting.host.nickname, qMeeting.host.profileImage);
     }
 
     public MeetingDetailResponse createDetailMeetingQuery(Long meetingId, Optional<Long> userId) {
@@ -186,6 +168,19 @@ public class MeetingQueryBuilder {
         } else {
             return Expressions.constant(RegistrationStatus.NONE);
         }
+    }
+
+    private JPQLQuery<MeetingDetailResponse> createJoinRegistration(Optional<Long> userId,
+                                                                    QMeeting qMeeting,
+                                                                    QMeetingRegistration qMeetingRegistration,
+                                                                    JPQLQuery<MeetingDetailResponse> query) {
+        if (userId.isPresent()) {
+            query = query.leftJoin(qMeeting.registrations, qMeetingRegistration)
+                    .on(qMeetingRegistration.user.id.eq(userId.get()))
+                    .groupBy(qMeetingRegistration.status, qMeetingRegistration.role);
+        }
+
+        return query;
     }
 
     public JPAQuery<MyMeetingResponse> createBaseMyMeetingQuery() {

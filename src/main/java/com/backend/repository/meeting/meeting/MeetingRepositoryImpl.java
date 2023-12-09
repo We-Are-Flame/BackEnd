@@ -1,11 +1,13 @@
 package com.backend.repository.meeting.meeting;
 
+import com.backend.common.CustomSort;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.entity.chat.QChatMessage;
 import com.backend.entity.chat.QChatRoom;
 import com.backend.entity.chat.QChatRoomUser;
+import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.QComment;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
@@ -14,6 +16,7 @@ import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -33,12 +36,14 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
     private final MeetingQueryBuilder queryBuilder;
 
     @Override
-    public Page<MeetingResponse> findAllWithDetails(Pageable pageable) {
-        List<MeetingResponse> meetings = queryBuilder.createAllMeetingQuery(pageable);
+    public Page<MeetingResponse> findAllWithDetails(Pageable pageable, Category category) {
+        JPAQuery<MeetingResponse> query = queryBuilder.createAllMeetingQuery();
 
-        long total = countTotalMeetings();
+        if (category != null) {
+            query.where(QMeeting.meeting.category.name.eq(category.getName()));
+        }
 
-        return new PageImpl<>(meetings, pageable, total);
+        return executeQueryWithPagination(query, pageable);
     }
 
     private long countTotalMeetings() {
@@ -47,6 +52,33 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                         .from(qMeeting)
                         .fetchOne())
                 .orElse(0L);
+    }
+
+    @Override
+    public Page<MeetingResponse> findByTitle(String title, Pageable pageable) {
+        JPAQuery<MeetingResponse> query = queryBuilder.createAllMeetingQuery();
+        query.where(QMeeting.meeting.title.containsIgnoreCase(title));
+
+        return executeQueryWithPagination(query, pageable);
+    }
+
+    @Override
+    public Page<MeetingResponse> findByHashtag(String hashtag, Pageable pageable) {
+        JPAQuery<MeetingResponse> query = queryBuilder.createAllMeetingQuery();
+        query.where(QMeetingHashtag.meetingHashtag.hashtag.name.containsIgnoreCase(hashtag));
+
+        return executeQueryWithPagination(query, pageable);
+    }
+
+    private Page<MeetingResponse> executeQueryWithPagination(JPAQuery<MeetingResponse> query, Pageable pageable) {
+        List<MeetingResponse> meetings = query
+                .orderBy(CustomSort.createPageableSort(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = countTotalMeetings();
+        return new PageImpl<>(meetings, pageable, total);
     }
 
     @Override

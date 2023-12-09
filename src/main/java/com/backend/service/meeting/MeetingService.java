@@ -9,9 +9,10 @@ import com.backend.dto.meeting.response.output.StatusOutput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
+import com.backend.exception.BadRequestException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
-import com.backend.repository.meeting.meeting.CustomSort;
+import com.backend.common.CustomSort;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import java.util.List;
@@ -39,15 +40,19 @@ public class MeetingService {
     public Long createMeeting(MeetingCreateRequest request, User user) {
         Meeting meeting = buildMeeting(request, user);
         meetingRepository.save(meeting);
-        handleMeetingDetails(request, meeting);
-        registerOwner(meeting, user);
+
+        hashtagService.processMeetingHashtags(request.getHashtagInput(), meeting);
+        imagesService.saveMeetingImages(meeting, request.getImageInput());
+        registrationService.createOwnerStatus(meeting, user);
+
         return meeting.getId();
     }
 
     @Transactional(readOnly = true)
-    public Page<MeetingResponse> readMeetings(int index, int size, String sort) {
-        Pageable pageable = PageRequest.of(index, size, CustomSort.getSort(sort));
-        return meetingRepository.findAllWithDetails(pageable);
+    public Page<MeetingResponse> readMeetings(int index, int size, String sort, String categoryName) {
+        Pageable pageable = createPagable(index, size, sort);
+        Category category = fetchCategory(categoryName);
+        return meetingRepository.findAllWithDetails(pageable, category);
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +60,32 @@ public class MeetingService {
         MeetingDetailResponse response = fetchMeeting(meetingId, user);
         determineUserStatus(response);
         return response;
+    }
+
+    public void determineUserStatus(MeetingDetailResponse response) {
+        boolean isOwner = response.getRegistrationRole().isOwner(response.getRegistrationRole());
+        boolean isExpired = response.getTimeOutput().isExpired();
+        boolean isFull = response.getDetailInfoOutput().isFull();
+
+        StatusOutput statusOutput = StatusOutput.builder()
+                .isOwner(isOwner)
+                .participateStatus(response.getRegistrationStatus())
+                .isExpire(isExpired)
+                .isFull(isFull)
+                .build();
+
+        response.updateStatus(statusOutput);
+    }
+
+    public Page<MeetingResponse> searchByKeword(int index, int size, String sort, String title, String hashtag) {
+        Pageable pageable = createPagable(index, size, sort);
+        checkIsKeywordNull(title, hashtag);
+
+        if (title != null) {
+            return meetingRepository.findByTitle(title, pageable);
+        } else {
+            return meetingRepository.findByHashtag(hashtag, pageable);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -84,13 +115,15 @@ public class MeetingService {
         return MeetingRequestMapper.toMeeting(request, category, user);
     }
 
-    private void handleMeetingDetails(MeetingCreateRequest request, Meeting meeting) {
-        hashtagService.processMeetingHashtags(request.getHashtagInput(), meeting);
-        imagesService.saveMeetingImages(meeting, request.getImageInput());
+    private Pageable createPagable(int index, int size, String sort) {
+        return PageRequest.of(index, size, CustomSort.getSort(sort));
     }
 
-    private void registerOwner(Meeting meeting, User user) {
-        registrationService.createOwnerStatus(meeting, user);
+    private Category fetchCategory(String categoryName) {
+        if (categoryName == null) {
+            return null;
+        }
+        return categoryService.findCategory(categoryName);
     }
 
     private MeetingDetailResponse fetchMeeting(Long meetingId, User user) {
@@ -98,18 +131,9 @@ public class MeetingService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    public void determineUserStatus(MeetingDetailResponse response) {
-        boolean isOwner = response.getRegistrationRole().isOwner(response.getRegistrationRole());
-        boolean isExpired = response.getTimeOutput().isExpired();
-        boolean isFull = response.getDetailInfoOutput().isFull();
-
-        StatusOutput statusOutput = StatusOutput.builder()
-                .isOwner(isOwner)
-                .participateStatus(response.getRegistrationStatus())
-                .isExpire(isExpired)
-                .isFull(isFull)
-                .build();
-
-        response.updateStatus(statusOutput);
+    private static void checkIsKeywordNull(String title, String hashtag) {
+        if ((title == null) == (hashtag == null)) {
+            throw new BadRequestException(ErrorMessages.DUPLICATE_KEYWORD_TYPE);
+        }
     }
 }
