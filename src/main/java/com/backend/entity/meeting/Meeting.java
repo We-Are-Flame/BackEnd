@@ -20,7 +20,6 @@ import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +42,7 @@ public class Meeting extends BaseEntity {
     private String thumbnailUrl;
 
     @Builder.Default
-    private Integer currentParticipants = 0;
+    private Integer currentParticipants = 1;
     private Integer maxParticipants;
 
     @Embedded
@@ -73,10 +72,6 @@ public class Meeting extends BaseEntity {
     @Transient
     private Set<Hashtag> hashtags;
 
-    public void assignHashtags(Set<Hashtag> hashtags) {
-        this.hashtags = hashtags;
-    }
-
     public boolean isUserOwner(User user) {
         return user != null && this.host.isSameId(user);
     }
@@ -102,15 +97,6 @@ public class Meeting extends BaseEntity {
 
     public void addCurrentParticipants() {
         currentParticipants++;
-    }
-
-    public void enrichWithHashtags() {
-        if (meetingHashtags != null) {
-            Set<Hashtag> hashtags = meetingHashtags.stream()
-                    .map(MeetingHashtag::getHashtag)
-                    .collect(Collectors.toSet());
-            this.assignHashtags(hashtags);
-        }
     }
 
     public String getCategory() {

@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.backend.dto.presigned.ImageRequestList;
 import com.backend.dto.presigned.ImageResponse;
 import com.backend.dto.presigned.ImageResponseList;
-import com.backend.util.S3Util;
+import com.backend.util.etc.S3Util;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

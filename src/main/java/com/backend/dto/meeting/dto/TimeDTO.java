@@ -1,5 +1,6 @@
 package com.backend.dto.meeting.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,4 +15,9 @@ public class TimeDTO {
     private final LocalDateTime startTime;
     @Schema(example = "2023-11-20T00:00:00.000Z", description = "시작 시간")
     private final LocalDateTime endTime;
+
+    @JsonIgnore
+    public boolean isExpired() {
+        return endTime.isBefore(LocalDateTime.now());
+    }
 }

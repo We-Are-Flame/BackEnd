@@ -1,4 +1,4 @@
-package com.backend.util;
+package com.backend.util.etc;
 
 import com.backend.config.properties.S3Properties;
 import lombok.RequiredArgsConstructor;

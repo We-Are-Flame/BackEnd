@@ -14,8 +14,8 @@ import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.meeting.CustomSort;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
-import com.backend.util.mapper.meeting.MeetingResponseMapper;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+///TODO [HJ]  리팩토링에 따른 예외처리, 상태 초기화 진행해야함.
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -46,15 +47,14 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public Page<MeetingResponse> readMeetings(int index, int size, String sort) {
         Pageable pageable = PageRequest.of(index, size, CustomSort.getSort(sort));
-        Page<Meeting> meetings = meetingRepository.findAllWithDetails(pageable);
-        return meetings.map(MeetingResponseMapper::toMeetingResponse);
+        return meetingRepository.findAllWithDetails(pageable);
     }
 
     @Transactional(readOnly = true)
     public MeetingDetailResponse readOneMeeting(Long meetingId, User user) {
-        Meeting meeting = fetchMeeting(meetingId);
-        StatusOutput status = buildMeetingStatus(meeting, user);
-        return MeetingResponseMapper.toMeetingDetailResponse(meeting, status);
+        MeetingDetailResponse response = fetchMeeting(meetingId, user);
+        determineUserStatus(response);
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -93,16 +93,23 @@ public class MeetingService {
         registrationService.createOwnerStatus(meeting, user);
     }
 
-    private Meeting fetchMeeting(Long meetingId) {
-        return meetingRepository.findMeetingWithDetailsById(meetingId)
+    private MeetingDetailResponse fetchMeeting(Long meetingId, User user) {
+        return meetingRepository.findMeetingWithDetailsById(meetingId, Optional.ofNullable(user).map(User::getId))
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
     }
 
-    private StatusOutput buildMeetingStatus(Meeting meeting, User user) {
-        return StatusOutput.builder()
-                .isOwner(meeting.isUserOwner(user))
-                .participateStatus(meeting.determineParticipationStatus(user))
-                .isExpire(meeting.isExpired())
+    public void determineUserStatus(MeetingDetailResponse response) {
+        boolean isOwner = response.getRegistrationRole().isOwner(response.getRegistrationRole());
+        boolean isExpired = response.getTimeOutput().isExpired();
+        boolean isFull = response.getDetailInfoOutput().isFull();
+
+        StatusOutput statusOutput = StatusOutput.builder()
+                .isOwner(isOwner)
+                .participateStatus(response.getRegistrationStatus())
+                .isExpire(isExpired)
+                .isFull(isFull)
                 .build();
+
+        response.updateStatus(statusOutput);
     }
 }

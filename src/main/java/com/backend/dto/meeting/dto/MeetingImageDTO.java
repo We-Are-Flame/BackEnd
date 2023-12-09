@@ -3,11 +3,13 @@ package com.backend.dto.meeting.dto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
+@AllArgsConstructor
 public class MeetingImageDTO {
     @Schema(example = "썸네일.jpg", description = "썸네일 링크")
     private final String thumbnailUrl;
