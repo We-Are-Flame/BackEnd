@@ -2,18 +2,18 @@ package com.backend.controller.user;
 
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
 import com.backend.dto.user.request.update.UserUpdateRequest;
+import com.backend.dto.user.response.read.MailResponse;
 import com.backend.dto.user.response.read.UserResponse;
 import com.backend.dto.user.response.update.UserUpdateResponse;
 import com.backend.entity.user.User;
 import com.backend.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,6 +62,32 @@ public class UserController {
             @CurrentMember User user) {
         Long id = userService.updateUserNotification(request, user.getId());
         UserUpdateResponse.Notification response = UserUpdateResponse.Notification.success(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("email/verification")
+    @CheckUserNotNull
+    public ResponseEntity<MailResponse> getIsVerification(@CurrentMember User user){
+        MailResponse response = userService.isVerification(user.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/email/verification")
+    @CheckUserNotNull
+    public ResponseEntity<SuccessResponse> sendMessage(@CurrentMember User user,
+                                                       @RequestParam("email") @Valid String email) {
+        userService.sendCodeToEmail(user.getId(), email);
+        SuccessResponse response = SuccessResponse.create(user.getId(), ResponseMessage.MAIL_SEND_SUCCESS);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/email/verification")
+    @CheckUserNotNull
+    public ResponseEntity<SuccessResponse> verificationEmail(@CurrentMember User user,
+                                                             @RequestParam("email") @Valid  String email,
+                                                             @RequestParam("code") String authCode) {
+        Long id = userService.verifiedCode(user.getId(), email, authCode);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.MAIL_VERIFICATION_SUCCESS);
         return ResponseEntity.ok(response);
     }
 }
