@@ -1,6 +1,5 @@
 package com.backend.repository.meeting.meeting;
 
-import com.backend.common.CustomSort;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
@@ -23,6 +22,7 @@ import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.QUser;
+import com.backend.strategy.CustomSort;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.Expressions;

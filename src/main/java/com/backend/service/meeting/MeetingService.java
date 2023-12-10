@@ -12,8 +12,8 @@ import com.backend.entity.user.User;
 import com.backend.exception.BadRequestException;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
-import com.backend.common.CustomSort;
 import com.backend.repository.meeting.meeting.MeetingRepository;
+import com.backend.strategy.CustomSort;
 import com.backend.util.mapper.meeting.MeetingRequestMapper;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-///TODO [HJ]  리팩토링에 따른 예외처리, 상태 초기화 진행해야함.
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -35,6 +34,12 @@ public class MeetingService {
     private final RegistrationService registrationService;
     private final CategoryService categoryService;
     private final HashtagService hashtagService;
+
+    private static void checkIsKeywordNull(String title, String hashtag) {
+        if ((title == null) == (hashtag == null)) {
+            throw new BadRequestException(ErrorMessages.DUPLICATE_KEYWORD_TYPE);
+        }
+    }
 
     @Transactional
     public Long createMeeting(MeetingCreateRequest request, User user) {
@@ -129,11 +134,5 @@ public class MeetingService {
     private MeetingDetailResponse fetchMeeting(Long meetingId, User user) {
         return meetingRepository.findMeetingWithDetailsById(meetingId, Optional.ofNullable(user).map(User::getId))
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.MEETING_NOT_FOUND));
-    }
-
-    private static void checkIsKeywordNull(String title, String hashtag) {
-        if ((title == null) == (hashtag == null)) {
-            throw new BadRequestException(ErrorMessages.DUPLICATE_KEYWORD_TYPE);
-        }
     }
 }

@@ -76,4 +76,8 @@ public class User {
     public void deleteRoomUser(ChatRoomUser roomUser) {
         this.chatRoomUsers.remove(roomUser);
     }
+
+    public void updateTemperature(int newTemperature) {
+        this.temperature = newTemperature;
+    }
 }
