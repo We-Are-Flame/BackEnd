@@ -78,6 +78,13 @@ dependencies {
 
     //FCM
     implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+    //SMTP
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+    implementation 'org.freemarker:freemarker:2.3.31'
+
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('bootBuildImage') {

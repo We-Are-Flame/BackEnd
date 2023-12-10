@@ -26,14 +26,4 @@ public class RoomRequestMapper {
                 .toList();
     }
 
-    public static ChatCreateRequest buildLeaveRoomMessage(String roomId, User user) {
-        return ChatCreateRequest.builder()
-                .messageType(MessageType.LEAVE)
-                .roomId(roomId)
-                .sender(user.getNickname())
-                .senderId(user.getId())
-                .message(user.getNickname() + " 님이 퇴장 했습니다.")
-                .build();
-    }
-
 }
