@@ -27,14 +27,6 @@ public class NotificationService {
     private final EmittersRepository emittersRepository;
     private final NotificationRepository notificationRepository;
 
-    private static Notification buildNotification(User user, NotificationType type) {
-        return Notification.builder()
-                .user(user)
-                .type(type)
-                .isRead(false)
-                .build();
-    }
-
     public SseEmitter subscribe(Long userId) {
         SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
         emittersRepository.addEmitter(userId, sseEmitter);
@@ -100,6 +92,14 @@ public class NotificationService {
                 }
             }
         }
+    }
+
+    private  Notification buildNotification(User user, NotificationType type) {
+        return Notification.builder()
+                .user(user)
+                .type(type)
+                .isRead(false)
+                .build();
     }
 
     private List<Long> fetchUserIds(Meeting meeting, User rater) {
