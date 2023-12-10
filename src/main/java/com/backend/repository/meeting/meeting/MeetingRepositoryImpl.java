@@ -1,6 +1,5 @@
 package com.backend.repository.meeting.meeting;
 
-import com.backend.common.CustomSort;
 import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
@@ -16,6 +15,7 @@ import com.backend.entity.meeting.QMeetingRegistration;
 import com.backend.entity.meeting.RegistrationRole;
 import com.backend.entity.meeting.RegistrationStatus;
 import com.backend.entity.user.User;
+import com.backend.strategy.CustomSort;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;

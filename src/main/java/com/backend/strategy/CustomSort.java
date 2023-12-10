@@ -1,4 +1,4 @@
-package com.backend.common;
+package com.backend.strategy;
 
 import com.backend.entity.meeting.QMeeting;
 import com.querydsl.core.types.Order;

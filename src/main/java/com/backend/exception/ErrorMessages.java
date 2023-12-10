@@ -20,5 +20,6 @@ public class ErrorMessages {
     public static final String CAN_CHANGE_IN_PENDING = "PENDING상태에서만 변경될 수 있습니다!";
     public static final String NOT_EXIST_USERS = "id에 대한 사용자가 존재하지 않습니다.";
     public static final String DUPLICATE_KEYWORD_TYPE = "해시태그, 또는 검색만 키워드에 추가되어야 합니다!";
+    public static final String INVALID_RATING = "유효하지 않은 별점입니다";
 }
 

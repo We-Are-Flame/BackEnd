@@ -150,9 +150,9 @@ public class RegistrationService {
     }
 
     private void sendApplyNotification(Meeting meeting) {
-        notificationService.sendNotification(meeting.getHost(),
-                NotificationType.MEETING_REQUEST,
-                meeting.getTitle());
+        notificationService.sendNotification(meeting.getHost(), meeting,
+                NotificationType.MEETING_REQUEST
+        );
     }
 
     private void sendAcceptOrReject(RegistrationStatus status, MeetingRegistration registration) {
@@ -166,9 +166,8 @@ public class RegistrationService {
         }
 
         notificationService.sendNotification(
-                registration.getUser(),
-                notificationType,
-                registration.getMeeting().getTitle()
+                registration.getUser(), registration.getMeeting(),
+                notificationType
         );
     }
 

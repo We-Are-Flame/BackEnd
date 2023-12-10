@@ -7,7 +7,6 @@ import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.user.UserRepository;
-import com.backend.util.JwtMocking;
 import com.backend.util.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
         log.info("사용자 Access 토큰 : {} ", accessToken);
+//        log.info("모킹 Access 토큰 : {} ", JwtMocking.createMockJwt(tokenCreationTime));
 
         LoginResponse resBody = LoginResponse.builder()
                 .id(user.getId())

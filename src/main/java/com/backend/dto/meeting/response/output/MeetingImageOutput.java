@@ -3,7 +3,6 @@ package com.backend.dto.meeting.response.output;
 import com.backend.dto.meeting.dto.MeetingImageDTO;
 import com.backend.util.etc.StringUtil;
 import com.querydsl.core.annotations.QueryProjection;
-import java.util.Arrays;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
