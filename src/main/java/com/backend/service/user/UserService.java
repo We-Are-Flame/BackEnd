@@ -101,7 +101,9 @@ public class UserService {
 
     private void checkAlreadyVerified(Long userId) {
         User user = fetchUser(userId);
-        if (!user.getSchoolEmail().isEmpty()) { throw new AlreadyExistsException(ErrorMessages.ALREADY_VERIFIED_EMAIL);}
+        if (user.getSchoolEmail() != null ) {
+            throw new AlreadyExistsException(ErrorMessages.ALREADY_VERIFIED_EMAIL);
+        }
     }
 
     private void checkDuplicatedEmail(String email) {
