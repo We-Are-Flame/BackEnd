@@ -36,22 +36,6 @@ public class JwtTokenProvider {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    private static String generateErrorMessage(JwtException e) {
-        if (e instanceof SignatureException) {
-            return "시그니처가 일치하지 않습니다!";
-        }
-        if (e instanceof ExpiredJwtException) {
-            return "토큰이 만료되었습니다!";
-        }
-        if (e instanceof MalformedJwtException) {
-            return "잘못된 형식의 토큰입니다!";
-        }
-        if (e instanceof UnsupportedJwtException) {
-            return "지원하지 않는 토큰입니다!";
-        }
-        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
-    }
-
     public String sign(User user, Date now) {
         Claims claims = Jwts.claims().setSubject(user.getNickname());
         claims.put("userId", user.getId());
@@ -93,5 +77,21 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    private String generateErrorMessage(JwtException e) {
+        if (e instanceof SignatureException) {
+            return "시그니처가 일치하지 않습니다!";
+        }
+        if (e instanceof ExpiredJwtException) {
+            return "토큰이 만료되었습니다!";
+        }
+        if (e instanceof MalformedJwtException) {
+            return "잘못된 형식의 토큰입니다!";
+        }
+        if (e instanceof UnsupportedJwtException) {
+            return "지원하지 않는 토큰입니다!";
+        }
+        return "요청 형식은 맞았으나 올바른 토큰이 아닙니다!\n" + e.getMessage();
     }
 }

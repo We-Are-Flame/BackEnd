@@ -82,4 +82,8 @@ public class User {
     public void updateSchoolEmail(String schoolEmail) {
         this.schoolEmail = schoolEmail;
     }
+
+    public void updateTemperature(int newTemperature) {
+        this.temperature = newTemperature;
+    }
 }

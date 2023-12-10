@@ -42,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
         log.info("사용자 Access 토큰 : {} ", accessToken);
+//        log.info("모킹 Access 토큰 : {} ", JwtMocking.createMockJwt(tokenCreationTime));
 
         LoginResponse resBody = LoginResponse.builder()
                 .id(user.getId())

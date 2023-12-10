@@ -8,6 +8,7 @@ import com.backend.entity.chat.ChatRoom;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingRegistration;
 import com.backend.entity.meeting.RegistrationStatus;
+import com.backend.entity.notification.NotificationType;
 import com.backend.entity.user.User;
 import com.backend.exception.AlreadyExistsException;
 import com.backend.exception.BadRequestException;
@@ -17,6 +18,7 @@ import com.backend.repository.chat.ChatRoomRepository;
 import com.backend.repository.meeting.MeetingRegistrationRepository;
 import com.backend.repository.meeting.meeting.MeetingRepository;
 import com.backend.service.chat.RoomService;
+import com.backend.service.notification.NotificationService;
 import com.backend.util.mapper.registration.RegistrationRequestMapper;
 import com.backend.util.mapper.registration.RegistrationResponseMapper;
 import java.util.List;
@@ -31,6 +33,9 @@ public class RegistrationService {
     private final MeetingRegistrationRepository meetingRegistrationRepository;
     private final MeetingRepository meetingRepository;
     private final ChatRoomRepository chatRoomRepository;
+
+    private final NotificationService notificationService;
+
     private final RoomService roomService;
 
     public void createOwnerStatus(Meeting meeting, User user) {
@@ -41,7 +46,10 @@ public class RegistrationService {
     public Long applyMeeting(Long meetingId, User user) {
         Meeting meeting = fetchMeeting(meetingId);
         checkDuplicate(meeting, user);
+
         MeetingRegistration registration = RegistrationRequestMapper.buildPending(meeting, user);
+        sendApplyNotification(meeting);
+
         return meetingRegistrationRepository.save(registration).getId();
     }
 
@@ -79,6 +87,8 @@ public class RegistrationService {
             checkIfPending(registration);
             countRegistrations(registration, status);
             registration.updateStatus(status);
+
+            sendAcceptOrReject(status, registration);
         });
         meetingRegistrationRepository.saveAll(registrations);
     }
@@ -138,4 +148,28 @@ public class RegistrationService {
             throw new NotFoundException(ErrorMessages.NOT_EXIST_USERS);
         }
     }
+
+    private void sendApplyNotification(Meeting meeting) {
+        notificationService.sendNotification(meeting.getHost(), meeting,
+                NotificationType.MEETING_REQUEST
+        );
+    }
+
+    private void sendAcceptOrReject(RegistrationStatus status, MeetingRegistration registration) {
+        NotificationType notificationType;
+        if (status == RegistrationStatus.ACCEPTED) {
+            notificationType = NotificationType.MEETING_ACCEPTED;
+        } else if (status == RegistrationStatus.REJECTED) {
+            notificationType = NotificationType.MEETING_REJECTED;
+        } else {
+            throw new IllegalArgumentException("Unexpected status: " + status);
+        }
+
+        notificationService.sendNotification(
+                registration.getUser(), registration.getMeeting(),
+                notificationType
+        );
+    }
+
+
 }

@@ -10,4 +10,5 @@ public class StatusOutput {
     private final Boolean isOwner;
     private final RegistrationStatus participateStatus;
     private final Boolean isExpire;
+    private final Boolean isFull;
 }
