@@ -7,6 +7,7 @@ import com.backend.entity.chat.QChatMessage;
 import com.backend.entity.chat.QChatRoom;
 import com.backend.entity.chat.QChatRoomUser;
 import com.backend.entity.meeting.Category;
+import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.QComment;
 import com.backend.entity.meeting.QMeeting;
 import com.backend.entity.meeting.QMeetingHashtag;
@@ -18,6 +19,7 @@ import com.backend.entity.user.User;
 import com.backend.strategy.CustomSort;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -166,5 +168,16 @@ public class MeetingRepositoryImpl implements MeetingRepositoryCustom {
                 .where(meeting.id.eq(meetingId)
                         .and(meeting.host.id.eq(userId)))
                 .fetchOne() != null;
+    }
+
+    @Override
+    public List<Meeting> findForEvaluation(LocalDateTime endTime) {
+        QMeeting qMeeting = QMeeting.meeting;
+
+        return queryFactory
+                .selectFrom(qMeeting)
+                .where(qMeeting.meetingTime.endTime.before(endTime)
+                        .and(qMeeting.isEvaluated.eq(false)))
+                .fetch();
     }
 }

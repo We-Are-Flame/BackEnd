@@ -4,7 +4,9 @@ import com.backend.dto.meeting.response.MeetingDetailResponse;
 import com.backend.dto.meeting.response.MeetingResponse;
 import com.backend.dto.meeting.response.MyMeetingResponse;
 import com.backend.entity.meeting.Category;
+import com.backend.entity.meeting.Meeting;
 import com.backend.entity.user.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -26,5 +28,7 @@ public interface MeetingRepositoryCustom {
     void deleteMeetingWithAllDetails(Long meetingId);
 
     boolean isOwner(Long meetingId, Long userId);
+
+    List<Meeting> findForEvaluation(LocalDateTime endTime);
 }
 
