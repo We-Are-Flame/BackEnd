@@ -19,5 +19,12 @@ public class ErrorMessages {
     public static final String REGISTRATION_NOT_FOUND = "모임에 대한 신청 정보를 찾을 수 없습니다.";
     public static final String CAN_CHANGE_IN_PENDING = "PENDING상태에서만 변경될 수 있습니다!";
     public static final String NOT_EXIST_USERS = "id에 대한 사용자가 존재하지 않습니다.";
+    public static final String UNABLE_TO_SEND_EMAIL = "학교인증 메일을 전송할 수 없습니다.";
+    public static final String ALREADY_VERIFIED_EMAIL = "해당 유저는 이미 학교 인증 되었습니다.";
+    public static final String ALREADY_CERTIFICATED_SCHOOL_EMAIL = "해당 이메일은 이미 학교 인증 되었습니다.";
+    public static final String NO_SUCH_ALGORITHM = "랜덤 알고리즘을 찾을 수 없습니다.";
+    public static final String NO_MATCH_AUTH_CODE = "인증 번호가 일치하지 않습니다.";
+
+
 }
 

@@ -46,6 +46,8 @@ public class User {
 
     private String email;
 
+    private String schoolEmail;
+
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Meeting> meetings;
 
@@ -75,5 +77,9 @@ public class User {
 
     public void deleteRoomUser(ChatRoomUser roomUser) {
         this.chatRoomUsers.remove(roomUser);
+    }
+
+    public void updateSchoolEmail(String schoolEmail) {
+        this.schoolEmail = schoolEmail;
     }
 }

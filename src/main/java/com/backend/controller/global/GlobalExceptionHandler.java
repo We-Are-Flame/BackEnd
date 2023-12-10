@@ -1,10 +1,7 @@
 package com.backend.controller.global;
 
 import com.backend.dto.common.ErrorResponse;
-import com.backend.exception.AccessDeniedException;
-import com.backend.exception.AlreadyExistsException;
-import com.backend.exception.BadRequestException;
-import com.backend.exception.NotFoundException;
+import com.backend.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -41,5 +38,13 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(ApiNotWorkException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(ApiNotWorkException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
 }
 
