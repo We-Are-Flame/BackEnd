@@ -1,4 +1,4 @@
-JwtMocking.java
+/src/main/java/com/backend/util/JwtMocking.java
 
 ### 설정파일 및 Q객체 Ignore ###
 application*.yml
