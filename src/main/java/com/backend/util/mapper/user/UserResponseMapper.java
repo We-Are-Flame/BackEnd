@@ -13,8 +13,10 @@ public class UserResponseMapper {
     }
 
     public static MailResponse buildMailResponse(User user) {
+        boolean isVerified = user.getSchoolEmail() != null;
+
         return MailResponse.builder()
-                .isVerified(!user.getSchoolEmail().isEmpty())
+                .isVerified(isVerified)
                 .build();
     }
 }
