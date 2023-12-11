@@ -9,6 +9,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 
@@ -16,12 +17,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@EnableAsync
 public class MailService {
     private static final String FROM_EMAIL = "kitching.noreply@gmail.com";
 
     private final JavaMailSender emailSender;
 
-    @Async("mailExecutor")
+    @Async
     public void sendEmail(String toEmail, String title, String authCode) {
         try {
             SimpleMailMessage message = createEmailForm(toEmail, title, authCode);
