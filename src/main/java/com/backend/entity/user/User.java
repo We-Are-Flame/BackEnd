@@ -55,6 +55,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
+    public Boolean getIsSchoolVerified() { return this.schoolEmail != null; }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
