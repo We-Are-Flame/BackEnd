@@ -18,17 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.util.mail.AuthCodeGenerator;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
 public class UserService {
-
-    private final Map<String, String> authCodeMap = new ConcurrentHashMap<>();
     private static final String AUTH_CODE_PREFIX = "AuthCode ";
     private static final String AUTH_MAIL_TITLE = "Kitching 학교 인증 메일";
 
@@ -70,12 +66,12 @@ public class UserService {
         return buildMailResponse(user);
     }
 
-    @Transactional
     public void sendCodeToEmail(Long userId, String toEmail) {
         checkAlreadyVerified(userId);
         checkDuplicatedEmail(toEmail);
         String authCode = AuthCodeGenerator.createCode();
-        authCodeMap.put(AUTH_CODE_PREFIX + toEmail, authCode);
+        redisService.setValues(AUTH_CODE_PREFIX + toEmail,
+                authCode, Duration.ofMillis(authCodeExpirationMillis));
 
         mailService.sendEmail(toEmail, AUTH_MAIL_TITLE, authCode);
     }
@@ -85,14 +81,14 @@ public class UserService {
         checkDuplicatedEmail(email);
 
         User user = fetchUser(userId);
-        String mapKey = AUTH_CODE_PREFIX + email;
-        String storedAuthCode = authCodeMap.get(mapKey);
+        String redisKey = AUTH_CODE_PREFIX + email;
+        String redisAuthCode = redisService.getValues(redisKey);
 
-        if (!storedAuthCode.equals(authCode)) {
-            throw new BadRequestException(ErrorMessages.NO_MATCH_AUTH_CODE);
-        }
+        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
+        if (!authResult) throw new BadRequestException(ErrorMessages.NO_MATCH_AUTH_CODE);
 
         user.updateSchoolEmail(email);
+        redisService.deleteValues(redisKey);
 
         return user.getId();
     }
