@@ -16,25 +16,21 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Transactional
     public void setValues(String key, String data) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
         values.set(key, data);
     }
 
-    @Transactional
     public void setValues(String key, String data, Duration duration) {
         redisTemplate.opsForValue().set(key, data, duration);
     }
 
-    @Transactional(readOnly = true)
     public String getValues(String key) {
         ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
         Object value = valueOps.get(key);
         return value == null ? "false" :value.toString();
     }
 
-    @Transactional
     public void deleteValues(String key) {
         redisTemplate.delete(key);
     }
