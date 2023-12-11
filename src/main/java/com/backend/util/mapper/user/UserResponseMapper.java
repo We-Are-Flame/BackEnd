@@ -13,7 +13,7 @@ public class UserResponseMapper {
     }
 
     public static MailResponse buildMailResponse(User user) {
-        boolean isVerified = user.getSchoolEmail() != null;
+        boolean isVerified = user.getIsSchoolVerified();
 
         return MailResponse.builder()
                 .isVerified(isVerified)

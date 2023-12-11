@@ -23,12 +23,15 @@ public class UserResponse {
         private final Integer temperature;
         @JsonProperty("my_meetings")
         private final Integer myMeetings;
+        @JsonProperty("is_school_verified")
+        private final Boolean isSchoolVerified;
 
         public static MyPage from(User user) {
             return MyPage.builder()
                     .nickname(user.getNickname())
                     .profileImage(user.getProfileImage())
                     .temperature(user.getTemperature())
+                    .isSchoolVerified(user.getIsSchoolVerified())
                     .myMeetings(user.getMeetings().size())
                     .build();
         }
