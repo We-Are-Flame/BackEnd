@@ -4,13 +4,14 @@ import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.common.ResponseMessage;
 import com.backend.dto.common.SuccessResponse;
+import com.backend.dto.user.request.create.MailVerificationRequest;
+import com.backend.dto.user.request.update.MailVerificationUpdateRequest;
 import com.backend.dto.user.request.update.UserUpdateRequest;
 import com.backend.dto.user.response.read.MailResponse;
 import com.backend.dto.user.response.read.UserResponse;
 import com.backend.dto.user.response.update.UserUpdateResponse;
 import com.backend.entity.user.User;
 import com.backend.service.user.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,8 +76,8 @@ public class UserController {
     @PostMapping("/email/verification")
     @CheckUserNotNull
     public ResponseEntity<SuccessResponse> sendMessage(@CurrentMember User user,
-                                                       @RequestParam("email") String email) {
-        userService.sendCodeToEmail(user.getId(), email);
+                                                       MailVerificationRequest request) {
+        userService.sendCodeToEmail(user.getId(), request.getEmail());
         SuccessResponse response = SuccessResponse.create(user.getId(), ResponseMessage.MAIL_SEND_SUCCESS);
         return ResponseEntity.ok(response);
     }
@@ -84,9 +85,8 @@ public class UserController {
     @PutMapping("/email/verification")
     @CheckUserNotNull
     public ResponseEntity<SuccessResponse> verificationEmail(@CurrentMember User user,
-                                                             @RequestParam("email")  String email,
-                                                             @RequestParam("code") String authCode) {
-        Long id = userService.verifiedCode(user.getId(), email, authCode);
+                                                             MailVerificationUpdateRequest request) {
+        Long id = userService.verifiedCode(user.getId(), request.getEmail(), request.getAuthCode());
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.MAIL_VERIFICATION_SUCCESS);
         return ResponseEntity.ok(response);
     }
