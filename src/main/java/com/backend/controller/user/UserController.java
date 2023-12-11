@@ -75,7 +75,7 @@ public class UserController {
     @PostMapping("/email/verification")
     @CheckUserNotNull
     public ResponseEntity<SuccessResponse> sendMessage(@CurrentMember User user,
-                                                       @RequestParam("email") @Valid String email) {
+                                                       @RequestParam("email") String email) {
         userService.sendCodeToEmail(user.getId(), email);
         SuccessResponse response = SuccessResponse.create(user.getId(), ResponseMessage.MAIL_SEND_SUCCESS);
         return ResponseEntity.ok(response);
@@ -84,7 +84,7 @@ public class UserController {
     @PutMapping("/email/verification")
     @CheckUserNotNull
     public ResponseEntity<SuccessResponse> verificationEmail(@CurrentMember User user,
-                                                             @RequestParam("email") @Valid  String email,
+                                                             @RequestParam("email")  String email,
                                                              @RequestParam("code") String authCode) {
         Long id = userService.verifiedCode(user.getId(), email, authCode);
         SuccessResponse response = SuccessResponse.create(id, ResponseMessage.MAIL_VERIFICATION_SUCCESS);
