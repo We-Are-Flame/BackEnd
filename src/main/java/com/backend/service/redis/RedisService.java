@@ -23,9 +23,7 @@ public class RedisService {
     }
 
     public void setValues(String key, String data, Duration duration) {
-        log.info("");
         redisTemplate.opsForValue().set(key, data, duration);
-        log.info("");
     }
 
     public String getValues(String key) {
