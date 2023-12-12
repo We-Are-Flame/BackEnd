@@ -12,4 +12,5 @@ public class RegistrationResponse {
     private final String profileImage;
     private final Integer temperature;
     private final RegistrationStatus participateStatus;
+    private final Boolean isSchoolEmail;
 }

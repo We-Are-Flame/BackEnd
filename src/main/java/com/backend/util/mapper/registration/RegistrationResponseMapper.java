@@ -35,6 +35,7 @@ public class RegistrationResponseMapper {
                 .profileImage(registeredUser.getProfileImage())
                 .temperature(registeredUser.getTemperature())
                 .participateStatus(registration.getStatus())
+                .isSchoolEmail(registeredUser.getIsSchoolVerified())
                 .build();
     }
 }
