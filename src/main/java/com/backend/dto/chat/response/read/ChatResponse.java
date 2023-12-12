@@ -21,6 +21,8 @@ public class ChatResponse {
     private String time;
     @JsonProperty("profile_image")
     private String profileImage;
+    @JsonProperty("is_school_verified")
+    private Boolean isSchoolVerified;
 
     public static ChatResponse from(ChatMessage chatMessage) {
         return ChatResponse.builder()
@@ -31,6 +33,7 @@ public class ChatResponse {
                 .message(chatMessage.getMessage())
                 .profileImage(chatMessage.getSender().getProfileImage())
                 .time(String.valueOf(chatMessage.getCreatedAt()))
+                .isSchoolVerified(chatMessage.getSender().getIsSchoolVerified())
                 .build();
     }
 }
