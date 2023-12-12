@@ -9,6 +9,7 @@ import lombok.Data;
 public class CommentResponse {
     private String profileImage;
     private String nickname;
+    private Boolean isSchoolEmail;
     private String description;
     private LocalDateTime createdAt;
 }
