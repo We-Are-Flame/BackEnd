@@ -73,7 +73,7 @@ public class UserService {
         redisService.setValues(AUTH_CODE_PREFIX + toEmail,
                 authCode, Duration.ofMillis(authCodeExpirationMillis));
 
-        mailService.sendEmail(toEmail, AUTH_MAIL_TITLE, authCode);
+        mailService.sendMessageQueue(toEmail, AUTH_MAIL_TITLE, authCode);
     }
 
     @Transactional
