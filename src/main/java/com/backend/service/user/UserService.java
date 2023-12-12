@@ -1,8 +1,5 @@
 package com.backend.service.user;
 
-import static com.backend.util.mapper.user.UserResponseMapper.buildMailResponse;
-import static com.backend.util.mapper.user.UserResponseMapper.buildUserNotification;
-
 import com.backend.dto.user.request.update.UserUpdateRequest;
 import com.backend.dto.user.response.read.MailResponse;
 import com.backend.dto.user.response.read.UserResponse;
@@ -19,6 +16,8 @@ import com.backend.util.mail.AuthCodeGenerator;
 
 import java.time.Duration;
 import java.util.Optional;
+
+import static com.backend.util.mapper.user.UserResponseMapper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -95,6 +94,11 @@ public class UserService {
     public UserResponse.Notification getUserNotification(Long userId) {
         User user = fetchUser(userId);
         return buildUserNotification(user);
+    }
+
+
+    public UserResponse.Id getUserId(Long userId) {
+        return buildUserIdResponse(userId);
     }
 
     private void checkAlreadyVerified(Long userId) {

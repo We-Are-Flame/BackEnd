@@ -19,4 +19,11 @@ public class UserResponseMapper {
                 .isVerified(isVerified)
                 .build();
     }
+
+
+    public static UserResponse.Id buildUserIdResponse(Long userId) {
+        return UserResponse.Id.builder()
+                .userId(userId)
+                .build();
+    }
 }

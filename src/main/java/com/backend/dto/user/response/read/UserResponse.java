@@ -37,4 +37,10 @@ public class UserResponse {
         }
     }
 
+    @Builder
+    @Getter
+    public static class Id {
+        @JsonProperty("user_id")
+        private final Long userId;
+    }
 }

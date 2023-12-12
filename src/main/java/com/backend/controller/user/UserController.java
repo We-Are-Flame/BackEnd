@@ -30,6 +30,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/id")
+    @CheckUserNotNull
+    public ResponseEntity<UserResponse.Id> getUserId(@CurrentMember User user){
+        UserResponse.Id response = userService.getUserId(user.getId());
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/nickname")
     @CheckUserNotNull
     ResponseEntity<UserUpdateResponse.Nickname> updateNickName(@RequestBody UserUpdateRequest.Nickname request,
