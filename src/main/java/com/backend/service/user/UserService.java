@@ -67,13 +67,18 @@ public class UserService {
     }
 
     public void sendCodeToEmail(Long userId, String toEmail) {
+        log.info("checkAlreadyVerified 실행");
         checkAlreadyVerified(userId);
+        log.info("checkDuplicatedEmail 실행");
         checkDuplicatedEmail(toEmail);
+        log.info("AuthCodeGenerator.createCode() 실행");
         String authCode = AuthCodeGenerator.createCode();
+        log.info("redisService.setValues");
         redisService.setValues(AUTH_CODE_PREFIX + toEmail,
                 authCode, Duration.ofMillis(authCodeExpirationMillis));
-
+        log.info("mailService.sendMessageQueue");
         mailService.sendMessageQueue(toEmail, AUTH_MAIL_TITLE, authCode);
+        log.info("sendCodeToEmail 종료");
     }
 
     @Transactional

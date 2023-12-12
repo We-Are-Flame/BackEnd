@@ -13,5 +13,6 @@ public class EmailQueueSender {
 
     public void sendEmail(EmailMessage message){
         rabbitTemplate.convertAndSend("emailQueue", message);
+        log.info("sendEmail 종료");
     }
 }

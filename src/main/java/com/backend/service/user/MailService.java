@@ -19,12 +19,17 @@ public class MailService {
 
     private final EmailQueueSender emailQueueSender;
     public void sendMessageQueue(String toEmail, String title, String authCode) {
+        log.info("sendMessageQueue 실행");
         try {
+            log.info("sendMessageQueue > createEmailForm 실행");
             EmailMessage message = createEmailForm(toEmail, title, authCode);
+            log.info("sendMessageQueue > sendEmail 실행");
             emailQueueSender.sendEmail(message);
         } catch (MailException e) {
+            log.info("sendMessageQueue 에러");
             throw new ApiNotWorkException(ErrorMessages.UNABLE_TO_SEND_EMAIL);
         }
+        log.info("sendMessageQueue 종료");
     }
 
     private EmailMessage createEmailForm(String toEmail, String title, String authCode) {
