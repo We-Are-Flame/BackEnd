@@ -64,6 +64,7 @@ public class CommentService {
                         .nickname(comment.getUser().getNickname())
                         .description(comment.getDescription())
                         .createdAt(comment.getCreatedAt())
+                        .isSchoolEmail(comment.getUser().getIsSchoolVerified())
                         .build())
                 .collect(Collectors.toList());
     }
