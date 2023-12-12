@@ -72,7 +72,8 @@ public class MeetingQueryBuilder {
                         ),
                         new QHostOutput(
                                 qUser.nickname,
-                                qUser.profileImage
+                                qUser.profileImage,
+                                qUser.schoolEmail
                         )
                 ))
                 .from(qMeeting)
@@ -128,7 +129,8 @@ public class MeetingQueryBuilder {
                         ),
                         new QHostOutput(
                                 qUser.nickname,
-                                qUser.profileImage
+                                qUser.profileImage,
+                                qUser.schoolEmail
                         ),
                         getRegistrationStatus(userId, qMeetingRegistration),
                         getRegistrationRole(userId, qMeetingRegistration)
@@ -143,7 +145,7 @@ public class MeetingQueryBuilder {
         query = createJoinRegistration(userId, qMeeting, qMeetingRegistration, query);
 
         return query.where(whereClause)
-                .groupBy(qMeeting.id, qCategory.name, qUser.nickname, qUser.profileImage,
+                .groupBy(qMeeting.id, qCategory.name, qUser.nickname, qUser.profileImage, qUser.schoolEmail,
                         qMeeting.thumbnailUrl, qMeeting.title, qMeeting.description,
                         qMeeting.maxParticipants, qMeeting.currentParticipants,
                         qMeeting.meetingAddress.location, qMeeting.meetingAddress.detailLocation,
