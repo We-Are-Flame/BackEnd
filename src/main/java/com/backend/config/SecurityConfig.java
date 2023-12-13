@@ -6,6 +6,7 @@ import com.backend.service.auth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CorsConfig corsConfig;
@@ -27,9 +29,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors-> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .authorizeHttpRequests((authorizeHttpRequest) -> authorizeHttpRequest
-                        .requestMatchers("/api/login/**").permitAll()
+                        .requestMatchers("/api/login/**")
+                        .permitAll()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login
                         .authorizationEndpoint(config -> config.baseUri("/oauth2/authorization"))
@@ -38,6 +41,12 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .clearAuthentication(true)
+                        .logoutSuccessUrl("/")
+
                 )
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .build();

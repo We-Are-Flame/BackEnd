@@ -3,8 +3,9 @@ package com.backend.controller.meeting;
 import com.backend.annotation.CheckUserNotNull;
 import com.backend.annotation.CurrentMember;
 import com.backend.dto.comment.request.CommentCreateRequest;
-import com.backend.dto.comment.response.CommentCreateResponse;
 import com.backend.dto.comment.response.CommentResponseList;
+import com.backend.dto.common.ResponseMessage;
+import com.backend.dto.common.SuccessResponse;
 import com.backend.entity.user.User;
 import com.backend.service.meeting.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,11 @@ public class CommentController {
 
     @CheckUserNotNull
     @PostMapping("/{meetingId}/comments")
-    public ResponseEntity<CommentCreateResponse> createComment(@PathVariable Long meetingId,
-                                                               @RequestBody CommentCreateRequest request,
-                                                               @CurrentMember User user) {
+    public ResponseEntity<SuccessResponse> createComment(@PathVariable Long meetingId,
+                                                         @RequestBody CommentCreateRequest request,
+                                                         @CurrentMember User user) {
         Long id = commentService.createComment(meetingId, request, user);
-        CommentCreateResponse response = CommentCreateResponse.success(id);
+        SuccessResponse response = SuccessResponse.create(id, ResponseMessage.COMMENT_CREATION);
         return ResponseEntity.ok(response);
     }
 

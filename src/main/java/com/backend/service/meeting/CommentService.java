@@ -9,11 +9,13 @@ import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
 import com.backend.repository.meeting.CommentRepository;
-import com.backend.repository.meeting.MeetingRepository;
+import com.backend.repository.meeting.meeting.MeetingRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,20 +48,23 @@ public class CommentService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public CommentResponseList getComments(Long meetingId) {
-        List<Comment> comments = commentRepository.findByMeetingId(meetingId);
-        List<CommentResponse> commentResponseList = convertToCommentData(comments);
+        Sort sort = Sort.by(Direction.ASC, "createdAt"); // 최신순 정렬
+        List<Comment> comments = commentRepository.findByMeetingId(meetingId, sort);
+        List<CommentResponse> commentResponseList = convertToCommentResponse(comments);
         int count = commentResponseList.size();
         return new CommentResponseList(count, commentResponseList);
     }
 
-    private List<CommentResponse> convertToCommentData(List<Comment> comments) {
+    private List<CommentResponse> convertToCommentResponse(List<Comment> comments) {
         return comments.stream()
                 .map(comment -> CommentResponse.builder()
                         .profileImage(comment.getUser().getProfileImage())
                         .nickname(comment.getUser().getNickname())
                         .description(comment.getDescription())
                         .createdAt(comment.getCreatedAt())
+                        .isSchoolEmail(comment.getUser().getIsSchoolVerified())
                         .build())
                 .collect(Collectors.toList());
     }

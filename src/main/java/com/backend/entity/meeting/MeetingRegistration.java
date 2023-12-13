@@ -44,7 +44,7 @@ public class MeetingRegistration {
     @JoinColumn(name = "meeting_id", nullable = false)
     private Meeting meeting;
 
-    public boolean isUserContained(User user) {
-        return this.user.isSameId(user);
+    public void updateStatus(RegistrationStatus newStatus) {
+        this.status = newStatus;
     }
 }

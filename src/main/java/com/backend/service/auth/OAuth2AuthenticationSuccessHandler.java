@@ -1,8 +1,8 @@
 package com.backend.service.auth;
 
 
-import com.backend.dto.auth.LoginResponse;
 import com.backend.dto.auth.oauth2.OAuth2UserInfo;
+import com.backend.dto.auth.response.LoginResponse;
 import com.backend.entity.user.User;
 import com.backend.exception.ErrorMessages;
 import com.backend.exception.NotFoundException;
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -28,6 +29,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Environment environment;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -40,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
         log.info("사용자 Access 토큰 : {} ", accessToken);
+//        log.info("모킹 Access 토큰 : {} ", JwtMocking.createMockJwt(tokenCreationTime));
 
         LoginResponse resBody = LoginResponse.builder()
                 .id(user.getId())
@@ -49,8 +52,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(resBody));
 
+        String callbackUrl = environment.getProperty("callback.url");
         getRedirectStrategy().sendRedirect(request, response,
-                String.format("http://localhost:3000/callback?token=%s", accessToken));
+                String.format("%s?token=%s", callbackUrl, accessToken));
     }
 
     private User getUser(Authentication authentication) {

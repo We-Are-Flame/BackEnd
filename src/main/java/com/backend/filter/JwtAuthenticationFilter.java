@@ -1,6 +1,7 @@
 package com.backend.filter;
 
 
+import com.backend.exception.JwtAuthenticationException;
 import com.backend.util.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,19 +19,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
+    private final LoginErrorSender loginErrorSender;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = getTokenFromRequest(request);
+        try {
+            String token = getTokenFromRequest(request);
 
-        if (token != null) {
-            Authentication auth = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (token != null) {
+                Authentication auth = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (JwtAuthenticationException e) {
+            loginErrorSender.send(response, e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

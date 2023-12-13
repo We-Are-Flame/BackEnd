@@ -1,6 +1,6 @@
 package com.backend.service.meeting;
 
-import com.backend.dto.meeting.request.create.input.ImageInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingImage;
 import com.backend.repository.meeting.MeetingImageRepository;
@@ -16,7 +16,7 @@ public class ImagesService {
     private final MeetingImageRepository meetingImageRepository;
 
     @Transactional
-    public void saveMeetingImages(Meeting meeting, ImageInput imageInput) {
+    public void saveMeetingImages(Meeting meeting, MeetingImageInput imageInput) {
         List<MeetingImage> meetingImages = MeetingRequestMapper.toMeetingImages(meeting, imageInput);
         meetingImageRepository.saveAll(meetingImages);
     }

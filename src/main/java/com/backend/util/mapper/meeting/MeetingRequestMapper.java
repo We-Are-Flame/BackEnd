@@ -1,9 +1,9 @@
 package com.backend.util.mapper.meeting;
 
 import com.backend.dto.meeting.request.create.MeetingCreateRequest;
-import com.backend.dto.meeting.request.create.input.ImageInput;
 import com.backend.dto.meeting.request.create.input.InfoInput;
 import com.backend.dto.meeting.request.create.input.LocationInput;
+import com.backend.dto.meeting.request.create.input.MeetingImageInput;
 import com.backend.dto.meeting.request.create.input.TimeInput;
 import com.backend.entity.meeting.Category;
 import com.backend.entity.meeting.Meeting;
@@ -48,10 +48,12 @@ public class MeetingRequestMapper {
         return MeetingAddress.builder()
                 .location(locationInput.getLocation())
                 .detailLocation(locationInput.getDetailLocation())
+                .latitude(locationInput.getLatitude())
+                .longitude(locationInput.getLongitude())
                 .build();
     }
 
-    public static List<MeetingImage> toMeetingImages(Meeting meeting, ImageInput imageInput) {
+    public static List<MeetingImage> toMeetingImages(Meeting meeting, MeetingImageInput imageInput) {
         return Optional.ofNullable(imageInput.getImageUrls())
                 .orElse(Collections.emptyList())
                 .stream()

@@ -62,10 +62,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     private void saveUserIfNotExist(OAuth2UserInfo oAuth2UserInfo, String provider) {
         Optional<User> optionalUser = userRepository.findUserByEmail(oAuth2UserInfo.getEmail());
 
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            existingUser.updateUserInfo(oAuth2UserInfo.getName(), oAuth2UserInfo.getProfileImage());
-        } else {
+        if (optionalUser.isEmpty()) {
             User newUser = createNewUser(oAuth2UserInfo);
             userRepository.save(newUser);
         }

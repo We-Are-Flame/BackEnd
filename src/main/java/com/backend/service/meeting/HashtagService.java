@@ -4,10 +4,11 @@ import com.backend.dto.meeting.request.create.input.HashtagInput;
 import com.backend.entity.meeting.Hashtag;
 import com.backend.entity.meeting.Meeting;
 import com.backend.entity.meeting.MeetingHashtag;
-import com.backend.repository.meeting.HashtagRepository;
-import com.backend.repository.meeting.MeetingHashtagRepository;
+import com.backend.repository.meeting.hashtag.HashtagRepository;
+import com.backend.repository.meeting.hashtag.MeetingHashtagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class HashtagService {
     private final HashtagRepository hashtagRepository;
     private final MeetingHashtagRepository meetingHashtagRepository;
 
+    @Transactional
     public void processMeetingHashtags(HashtagInput hashtagInput, Meeting meeting) {
         hashtagInput.getHashtags().forEach(hashtagName ->
                 processHashtag(hashtagName, meeting));

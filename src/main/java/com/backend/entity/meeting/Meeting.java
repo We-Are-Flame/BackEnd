@@ -4,6 +4,7 @@ import com.backend.entity.base.BaseEntity;
 import com.backend.entity.meeting.embeddable.MeetingAddress;
 import com.backend.entity.meeting.embeddable.MeetingTime;
 import com.backend.entity.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -40,8 +42,12 @@ public class Meeting extends BaseEntity {
     private String thumbnailUrl;
 
     @Builder.Default
-    private Integer currentParticipants = 0;
+    private Integer currentParticipants = 1;
     private Integer maxParticipants;
+
+    @Builder.Default
+    @Column(name = "is_evaluated", nullable = false)
+    private Boolean isEvaluated = false;
 
     @Embedded
     private MeetingAddress meetingAddress;
@@ -57,42 +63,28 @@ public class Meeting extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User host;
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private Set<MeetingImage> meetingImages;
 
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private Set<MeetingHashtag> meetingHashtags;
 
-    @OneToMany(mappedBy = "meeting")
-    private List<MeetingRegistration> registrations;
+    @Builder.Default
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+    private List<MeetingRegistration> registrations = new ArrayList<>();
 
     @Transient
     private Set<Hashtag> hashtags;
 
-    public void assignHashtags(Set<Hashtag> hashtags) {
-        this.hashtags = hashtags;
-    }
-
-    public boolean isUserOwner(User user) {
-        return user != null && this.host.isSameId(user);
-    }
-
-    public RegistrationStatus determineParticipationStatus(User user) {
-        if (user == null) {
-            return RegistrationStatus.NONE;
-        }
-        return this.getParticipationStatusForUser(user);
-    }
-
-    private RegistrationStatus getParticipationStatusForUser(User user) {
-        return registrations.stream()
-                .filter(registration -> registration.isUserContained(user))
-                .findFirst()
-                .map(MeetingRegistration::getStatus)
-                .orElse(RegistrationStatus.NONE);
-    }
-
     public boolean isExpired() {
         return this.meetingTime.isBeforeNow();
+    }
+
+    public void addCurrentParticipants() {
+        currentParticipants++;
+    }
+
+    public String getCategory() {
+        return category.getName();
     }
 }

@@ -1,6 +1,10 @@
+/src/main/java/com/backend/util/JwtMocking.java
+
 ### 설정파일 및 Q객체 Ignore ###
 application*.yml
 /src/main/generated/
+
+kitching-1f68b-firebase-adminsdk-iovye-440b797d4c.json
 
 HELP.md
 .gradle
