@@ -79,4 +79,4 @@
 ## 6. 시연 영상
 <hr>
 
-![](시연영상.gif)
+[![Video Label](http://img.youtube.com/vi/ILwNadCu14Q/0.jpg)](https://youtu.be/ILwNadCu14Q)
