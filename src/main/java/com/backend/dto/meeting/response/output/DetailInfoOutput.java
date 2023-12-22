@@ -23,10 +23,7 @@ public class DetailInfoOutput extends InfoDTO {
 
     @JsonIgnore
     public boolean isFull() {
-        log.info("isFull = {}", currentParticipants.equals(getMaxParticipants() - 1));
-        log.info("currentParticipants = {}", currentParticipants);
-        log.info("maxParticipants = {}", getMaxParticipants() - 1);
-        return currentParticipants.equals(getMaxParticipants() - 1);
+        return currentParticipants.equals(getMaxParticipants());
     }
 }
 
