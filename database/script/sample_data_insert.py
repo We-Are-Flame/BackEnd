@@ -11,13 +11,16 @@ def get_db_config():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(current_dir, '..', '..', 'config', 'application-dev.yml')
 
-    with open(config_path, 'r') as file:
+    with open(config_path, 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
 
     db_config = config['spring']['datasource']
+    url_parts = db_config['url'].split('/')
+    database = url_parts[3].split('?')[0]
+
     return {
-        'host': db_config['url'].split('//')[1].split('/')[0].split(':')[0],
-        'database': db_config['url'].split('/')[-1].split('?')[0],
+        'host': url_parts[2].split(':')[0],
+        'database': database,
         'user': db_config['username'],
         'password': db_config['password']
     }

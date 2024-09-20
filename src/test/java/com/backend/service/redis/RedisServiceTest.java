@@ -1,5 +1,6 @@
 package com.backend.service.redis;
 
+import com.backend.before.service.redis.RedisService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

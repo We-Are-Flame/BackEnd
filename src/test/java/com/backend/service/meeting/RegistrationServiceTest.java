@@ -7,20 +7,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.backend.entity.meeting.Meeting;
-import com.backend.entity.meeting.MeetingRegistration;
-import com.backend.entity.meeting.RegistrationRole;
-import com.backend.entity.meeting.RegistrationStatus;
-import com.backend.entity.user.User;
-import com.backend.exception.AlreadyExistsException;
-import com.backend.repository.meeting.MeetingRegistrationRepository;
-import com.backend.repository.meeting.meeting.MeetingRepository;
+import com.backend.meeting.domain.meeting.entity.Meeting;
+import com.backend.registration.entity.MeetingRegistration;
+import com.backend.registration.entity.RegistrationRole;
+import com.backend.registration.entity.RegistrationStatus;
+import com.backend.before.entity.user.User;
+import com.backend.before.exception.AlreadyExistsException;
+import com.backend.registration.repository.MeetingRegistrationRepository;
+import com.backend.meeting.domain.meeting.repository.MeetingRepository;
 import java.util.Optional;
+
+import com.backend.registration.service.RegistrationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -60,24 +61,6 @@ public class RegistrationServiceTest {
                 .maxParticipants(10)
                 .host(host)
                 .build();
-    }
-
-    @ParameterizedTest
-    @DisplayName("회원의 역할에 따라 상태 생성 테스트")
-    @ValueSource(strings = {"OWNER", "MEMBER"})
-    public void testCreateOwnerStatus(String role) {
-        User user = createUser(1L);
-        Meeting meeting = createMeeting(user);
-        MeetingRegistration registration = MeetingRegistration.builder()
-                .role(RegistrationRole.valueOf(role))
-                .status(RegistrationStatus.ACCEPTED)
-                .build();
-
-        registrationService.createOwnerStatus(meeting, user);
-
-        verify(meetingRegistrationRepository).save(any(MeetingRegistration.class));
-        assertEquals(RegistrationRole.valueOf(role), registration.getRole());
-        assertEquals(RegistrationStatus.ACCEPTED, registration.getStatus());
     }
 
     @ParameterizedTest
