@@ -2,9 +2,12 @@ package com.backend.meeting.domain.meeting.entity;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +17,9 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MeetingTime {
+    @Column(name = "start_time")
     private LocalDateTime startTime;
+    @Column(name = "end_time")
     private LocalDateTime endTime;
     private Long duration;
 

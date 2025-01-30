@@ -1,15 +1,7 @@
 package com.backend.meeting.domain.hashtag.entity;
 
 import com.backend.meeting.domain.meeting.entity.Meeting;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "meeting_hashtags")
+@Table(name = "meeting_hashtags", indexes = {
+        @Index(name = "idx_meeting_hashtag", columnList = "meeting_id,hashtag_id")
+})
 public class MeetingHashtag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
